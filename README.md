@@ -1,1 +1,1 @@
-# chatify-frontend
+# React + Vite
