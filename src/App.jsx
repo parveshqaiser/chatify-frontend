@@ -1,12 +1,26 @@
-import { useState } from 'react'
+
 import './App.css'
 
-function App() {
-	const [count, setCount] = useState(0)
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+import LoginPage from './pages/LoginPage.jsx';
+import RegistrationPage from './pages/RegistrationPage.jsx';
+import PageNotFound from './pages/PageNotFound.jsx';
 
+
+function App() {
+	
+	
 	return(
-		<div className='text-center'>hello chatify project</div>
+		<BrowserRouter>
+			<Routes>
+				<Route index path='/' element={<LoginPage />}></Route>
+				<Route index path='/login' element={<LoginPage />}></Route>
+				<Route path='/signup' element={<RegistrationPage />}></Route>
+				<Route path='*' element={<PageNotFound />}></Route>
+			</Routes>
+		</BrowserRouter>
 	)
+	
 }
 
 export default App;
