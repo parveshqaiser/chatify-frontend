@@ -4,6 +4,8 @@ login page
 signup page
 
 home page
+    sidebar
+    chatwindow
 profile page
 
 
