@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import ChatWindow from "./ChatWindow.jsx";
 import Sidebar from "./Sidebar.jsx";
+import Navbar from "./Navbar.jsx";
 
 const users = [
     { id: 1, name: "Yamal", online: true, avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT0M9PkaDKnCMW8NANGmmvjkS-WhhsIOe4pQ&s" },
@@ -42,6 +43,7 @@ function HomePage() {
     };
 
     return (
+    <>
     <main className="h-screen w-screen flex items-center justify-center bg-slate-50">
         <div className="relative flex w-[85vw] h-[85vh] rounded-xl overflow-hidden border border-slate-200 shadow-sm">
             
@@ -86,6 +88,7 @@ function HomePage() {
             </nav>
         </div>
     </main>
+    </>
     );
 }
 
