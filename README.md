@@ -9,3 +9,11 @@ home page
 profile page
 
 in home page, click on more info about uuser info.
+
+sidenavbar
+
+    3 dots must have 
+        1. add/create groups
+        2. User profile
+        3. settings
+        4. 
