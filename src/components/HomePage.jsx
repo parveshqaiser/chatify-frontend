@@ -3,6 +3,7 @@ import { Menu, X } from "lucide-react";
 import ChatWindow from "./ChatWindow.jsx";
 import Sidebar from "./Sidebar.jsx";
 import Navbar from "./Navbar.jsx";
+import bgImage from "../assets/chat-br.jpg";
 
 const users = [
     { id: 1, name: "Yamal", online: true, avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT0M9PkaDKnCMW8NANGmmvjkS-WhhsIOe4pQ&s" },
@@ -43,9 +44,13 @@ function HomePage() {
     };
 
     return (
-    <>
-    <main className="h-screen w-screen flex items-center justify-center bg-linear-to-r/srgb from-indigo-200 via-orange-400 to-teal-400">
-        <div className="relative flex w-[85vw] h-[85vh] rounded-xl overflow-hidden shadow-sm">
+    <main className="relative h-screen w-screen flex items-center justify-center overflow-hidden">
+        <img
+            src={bgImage}
+            alt="background"
+            className="absolute inset-0 w-full h-full object-cover -z-10"
+        />
+        <div className="relative z-10 flex w-[85vw] h-[85vh] rounded-xl overflow-hidden shadow-sm">
             
             {/* mobile menu button */}
             <button
@@ -54,7 +59,7 @@ function HomePage() {
             >
                 <Menu className="w-5 h-5" />
             </button>
-
+ 
             {/* sidebar: 1/4 width on desktop, slide-over on mobile */}
             <div
                 className={`fixed md:static inset-y-0 left-0 z-30 w-3/4 sm:w-1/2 md:w-1/4 transform transition-transform duration-200 ${
@@ -66,14 +71,14 @@ function HomePage() {
                         <X className="w-5 h-5" />
                     </button>
                 </div>
-
+ 
                 <Sidebar
                     users={users}
                     activeUserId={activeUserId}
                     onSelectUser={handleSelectUser}
                 />
             </div>
-
+ 
             {/* backdrop on mobile when sidebar is open */}
             {sidebarOpen && (
                 <div
@@ -81,14 +86,13 @@ function HomePage() {
                     className="fixed inset-0 bg-black/30 z-20 md:hidden"
                 />
             )}
-
+ 
             {/* chat: 3/4 width on desktop, full width on mobile */}
             <nav className="flex-1 md:w-3/4">
                 <ChatWindow user={activeUser} messages={activeMessages} onSend={handleSend} />
             </nav>
         </div>
     </main>
-    </>
     );
 }
 
