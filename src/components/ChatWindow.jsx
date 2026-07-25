@@ -47,7 +47,7 @@ const ChatWindow = ({ user, messages, onSend })=>{
     }
 
     return (
-    <section className="md:w-full w-65 h-full flex flex-col bg-indigo-200">
+    <section className="md:w-full w-65 h-full flex flex-col backdrop-blur-sm">
 
         <header className="flex items-center justify-between gap-2 border-b bg-slate-700 border-slate-700 px-3 sm:px-4 py-3">
             <div className="flex items-center gap-3 min-w-0 flex-1">

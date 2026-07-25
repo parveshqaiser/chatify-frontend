@@ -16,7 +16,7 @@ const Sidebar = ({ users, activeUserId, onSelectUser }) => {
 	);
 
 	return (
-	<aside className="w-full h-full flex flex-col bg-linear-to-t from-indigo-500 via-purple-500 to-pink-500">
+	<aside className="w-full h-full flex flex-col bg-linear-to-t from-indigo-500 via-purple-500 to-pink-500 backdrop-blur-lg">
 		<header className="p-4 flex border-b border-white/20 items-center justify-between">
 			<h2 className="text-xl font-semibold tracking-wide text-white">Chats</h2>
 			<button className="p-1.5 rounded-full hover:bg-white/20 cursor-pointer transition-colors text-white">
