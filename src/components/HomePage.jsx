@@ -44,8 +44,8 @@ function HomePage() {
 
     return (
     <>
-    <main className="h-screen w-screen flex items-center justify-center bg-slate-50">
-        <div className="relative flex w-[85vw] h-[85vh] rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+    <main className="h-screen w-screen flex items-center justify-center bg-linear-to-r/srgb from-indigo-200 via-orange-400 to-teal-400">
+        <div className="relative flex w-[85vw] h-[85vh] rounded-xl overflow-hidden shadow-sm">
             
             {/* mobile menu button */}
             <button

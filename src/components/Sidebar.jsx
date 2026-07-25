@@ -42,7 +42,7 @@ const Sidebar = ({ users, activeUserId, onSelectUser }) => {
 				<button
 					key={t}
 					onClick={() => setTab(t)}
-					className={`px-4 py-2 rounded-md capitalize ${
+					className={`px-4 py-2 rounded-md capitalize text-black ${
 					tab === t ? "bg-indigo-600 text-white" : "hover:bg-indigo-100"
 					}`}
 				>
