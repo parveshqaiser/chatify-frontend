@@ -1,11 +1,36 @@
-import { useState } from "react";
-import { FileText, Mic, Paperclip, Send, Smile, Images, Phone, Info } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { FileText, Mic, Paperclip, Send, Smile, Images, Phone, Info, MoveLeft, X, Search } from "lucide-react";
 
 const ChatWindow = ({ user, messages, onSend })=>{ 
 
     const [text, setText] = useState("");
-    const [showTextIcons, setShowTextIcons] = useState(false);
-    const [moreInfo, setMoreInfo] = useState(false);
+    const [fileIcons, setFileIcons] = useState(false);  // icons in send message
+    const [moreInfo, setMoreInfo] = useState(false);  // more info button in header
+    const [searchOpen, setSearchOpen] = useState(false);  // input field for conversation
+    const menuRef = useRef(null);
+
+    // close menu/search on Escape
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+                setMoreInfo(false);
+                setSearchOpen(false);
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, []);
+
+    // close menu on outside click
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setMoreInfo(false);
+            }
+        };
+            document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const handleSend = () => {
         if (!text.trim()) return;
@@ -22,49 +47,77 @@ const ChatWindow = ({ user, messages, onSend })=>{
     }
 
     return (
-    <section className="w-full h-full flex flex-col bg-indigo-200">
-        <header className="flex items-center justify-between border-b bg-slate-700 border-slate-700 px-4 py-3">
-            <div className="flex items-center gap-3">
+    <section className="md:w-full w-65 h-full flex flex-col bg-indigo-200">
+
+        <header className="flex items-center justify-between gap-2 border-b bg-slate-700 border-slate-700 px-3 sm:px-4 py-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
                 <img
                     src={user.avatar}
                     alt={user.name}
-                    className="h-10 w-10 rounded-full object-cover"
+                    className="h-10 w-10 rounded-full object-cover shrink-0"
                 />
-
-                <div>
-                    <h2 className="text-sm font-semibold text-white">{user.name}</h2>
-                    <p
-                        className={`text-xs ${user.online ? "text-emerald-400" : "text-rose-400"}`}
-                    >
-                        {user.online ? "Online" : "Offline"}
+                <div className="min-w-0">
+                    <h2 className="text-sm font-semibold text-white truncate">{user.name}</h2>
+                    <p className={`text-xs ${user.online ? "text-emerald-400" : "text-rose-400"}`}>
+                    {user.online ? "Online" : "Offline"}
                     </p>
                 </div>
             </div>
 
-            <div className="relative">
-                <button
-                    onClick={() => setMoreInfo(!moreInfo)}
-                    className="rounded-full p-2 transition hover:bg-white/10"
+            {/* right side: compact search + info, both always visible */}
+            <div className="flex items-center gap-1 shrink-0">
+                <div
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                        searchOpen ? "w-32 sm:w-48 md:w-56 opacity-100" : "w-0 opacity-0"
+                    }`}
                 >
-                    <Info size={20} className="text-gray-300" />
-                </button>
-
-                {moreInfo && (
-                    <ul className="menu absolute right-0 top-full mt-1 z-50 w-24 rounded-box bg-base-100 shadow-xl">
-                        <li>
-                            <button className="text-sm"> View </button>
-                        </li>
-                        <li>
-                            <button className="text-sm"> Search</button>
-                        </li>
-                         <li>
-                            <button className="text-sm">Clear All</button>
-                        </li>
-                    </ul>
-                )}
+                    <div className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5">
+                        <Search size={14} className="text-gray-400 shrink-0" />
+                        <input
+                            autoFocus={searchOpen}
+                            placeholder="Search..."
+                            className="w-full bg-transparent text-sm text-white placeholder:text-gray-400 outline-none"
+                        />
+                    </div>
                 </div>
-        </header>
 
+                {searchOpen &&<button
+                    onClick={() => setSearchOpen(!searchOpen)}
+                    className="rounded-full p-2 transition hover:bg-white/10 shrink-0"
+                >
+                    
+                    <X size={18} className="text-gray-300" />
+                </button>}
+
+                {!searchOpen &&<div className="relative shrink-0" ref={menuRef}>
+                    <button
+                        onClick={() => setMoreInfo(!moreInfo)}
+                        className="rounded-full p-2 transition hover:bg-white/10"
+                    >
+                        <Info size={20} className={"text-gray-300"} />
+                    </button>
+
+                    {moreInfo && (
+                        <ul className="menu absolute right-0 top-full mt-1 z-50 w-26 rounded-box bg-base-100 shadow-xl">
+                            <li><button className="text-[12px]">View</button></li>
+                            <li>
+                                <button
+                                    className="text-[12px]"
+                                    onClick={() => {
+                                        setSearchOpen(true);
+                                        setMoreInfo(false);
+                                    }}
+                                >
+                                    Search
+                                </button>
+                            </li>
+                            <li><button className="text-[12px]">Clear All</button></li>
+                            <li><button className="text-[12px]">Media Links & Docs</button></li>
+                        </ul>
+                    )}
+                </div>}
+            </div>
+        </header>
 
         <article className="chat-scroll flex-1 overflow-y-auto p-4 space-y-2">
             {messages.map((m) => (
@@ -81,25 +134,27 @@ const ChatWindow = ({ user, messages, onSend })=>{
             ))}
         </article>
 
+
+        {/* write message field */}
         <article className="flex items-center gap-2 border border-black/5 bg-white/50 px-3 py-2 shadow-inner backdrop-blur-sm dark:border-white/5 dark:bg-[#2d2d2b]">
             <div className="relative">
                 <button
-                    onClick={() => setShowTextIcons(!showTextIcons)}
+                    onClick={() => setFileIcons(!fileIcons)}
                     className="rounded-full p-1.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10"
                 >
                     <Paperclip size={20} className="text-gray-500 dark:text-gray-400" />
                 </button>
 
-                {showTextIcons && (
+                {fileIcons && (
                     <ul className="menu absolute bottom-11.5 left-0 z-50 w-14 rounded-box bg-base-100 shadow-lg">
                         <li>
                             <button title="Image/Video">
-                            <Images size={18} />
+                                <Images size={18} />
                             </button>
                         </li>
                         <li>
                             <button title="Files">
-                            <FileText size={18} />
+                                <FileText size={18} />
                             </button>
                         </li>
                     </ul>
@@ -117,11 +172,6 @@ const ChatWindow = ({ user, messages, onSend })=>{
             <button className="rounded-full p-1.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10">
                 <Smile size={20} className="text-gray-500 dark:text-gray-400" />
             </button>
-
-            <button className="rounded-full p-1.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10">
-                <Mic size={20} className="text-gray-500 dark:text-gray-400" />
-            </button>
-
             <button
                 className="rounded-full bg-indigo-500 p-2 text-white shadow-md transition-colors hover:bg-indigo-600"
             >
