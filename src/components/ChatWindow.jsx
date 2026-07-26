@@ -8,9 +8,10 @@ const ChatWindow = ({ user, messages, onSend })=>{
     const [fileIcons, setFileIcons] = useState(false);  // icons in send message
     const [moreInfo, setMoreInfo] = useState(false);  // more info button in header
     const [searchOpen, setSearchOpen] = useState(false);  // input field for conversation
-    const menuRef = useRef(null);
+   
     const [showEmojiPicker, setShowEmojiPicker] = useState(false); // emoji picker visibility
     const emojiPickerRef = useRef(null);
+    const menuRef = useRef(null);
 
     // close menu/search on Escape
     useEffect(() => {
@@ -51,8 +52,6 @@ const ChatWindow = ({ user, messages, onSend })=>{
             </section>
         );
     }
-
-    console.log(text);
 
     return (
     <section className="md:w-full w-65 h-full flex flex-col backdrop-blur-sm">
@@ -144,7 +143,7 @@ const ChatWindow = ({ user, messages, onSend })=>{
 
 
         {/* write message field */}
-        <article className="flex items-center gap-2 border border-black/5 bg-white/50 px-3 py-2 shadow-inner backdrop-blur-sm dark:border-white/5 dark:bg-[#2d2d2b]">
+        <article className="flex items-center gap-2 px-3 py-2 backdrop-blur-sm">
             <div className="relative">
                 <button
                     onClick={() => setFileIcons(!fileIcons)}
@@ -178,25 +177,25 @@ const ChatWindow = ({ user, messages, onSend })=>{
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
             />
 
-                <button onClick={()=> setShowEmojiPicker(!showEmojiPicker)} className="rounded-full p-1.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10">
-                    <Smile size={20} className="text-gray-500 dark:text-gray-400" />
-                </button>
+            <button onClick={()=> setShowEmojiPicker(!showEmojiPicker)} className="rounded-full p-1.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10">
+                <Smile size={20} className="text-gray-500 dark:text-gray-400" />
+            </button>
             {showEmojiPicker && (
-                <div 
-                    ref={emojiPickerRef}
-                    className="absolute bottom-11.5 right-0 z-50"
-                >
-                    <EmojiPicker 
-                        // onEmojiClick={handleEmojiClick}
-                        onEmojiClick={(e) => setText(prev=> prev + e.emoji)}
-                        width={300}
-                        height={300}
-                        theme="dark"
-                    />
-                </div>
-                )}
+            <div 
+                ref={emojiPickerRef}
+                className="absolute bottom-11.5 right-0 z-50"
+            >
+                <EmojiPicker 
+                    // onEmojiClick={handleEmojiClick}
+                    onEmojiClick={(e) => setText(prev=> prev + e.emoji)}
+                    width={300}
+                    height={320}
+                    theme="dark"
+                />
+            </div>
+            )}
             <button
-                className="rounded-full bg-indigo-500 p-2 text-white shadow-md transition-colors hover:bg-indigo-600"
+                className="rounded-full cursor-pointer bg-indigo-500 p-2 text-white shadow-md transition-colors hover:bg-indigo-600"
             >
                 <Send size={18} />
             </button>
