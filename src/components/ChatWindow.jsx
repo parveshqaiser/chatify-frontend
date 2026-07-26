@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FileText, Mic, Paperclip, Send, Smile, Images, Phone, Info, MoveLeft, X, Search } from "lucide-react";
 import EmojiPicker from 'emoji-picker-react';
+import UserViewModal from "./UserViewModal";
 
 const ChatWindow = ({ user, messages, onSend })=>{ 
 
@@ -54,6 +55,7 @@ const ChatWindow = ({ user, messages, onSend })=>{
     }
 
     return (
+    <>
     <section className="md:w-full w-65 h-full flex flex-col backdrop-blur-sm">
 
         <header className="flex items-center justify-between gap-2 border-b bg-slate-700 border-slate-700 px-3 sm:px-4 py-3">
@@ -106,7 +108,9 @@ const ChatWindow = ({ user, messages, onSend })=>{
 
                     {moreInfo && (
                         <ul className="menu absolute right-0 top-full mt-1 z-50 w-26 rounded-box bg-base-100 shadow-xl">
-                            <li><button className="text-[12px]">View</button></li>
+                            <li>
+                                <button onClick={()=>document.getElementById('my_modal_5').showModal()} className="text-[12px]">View</button>
+                            </li>
                             <li>
                                 <button
                                     className="text-[12px]"
@@ -201,6 +205,8 @@ const ChatWindow = ({ user, messages, onSend })=>{
             </button>
         </article>
     </section>
+        <UserViewModal />
+    </>
     );
 }
 
