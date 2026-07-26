@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FileText, Mic, Paperclip, Send, Smile, Images, Phone, Info, MoveLeft, X, Search } from "lucide-react";
+import EmojiPicker from 'emoji-picker-react';
 
 const ChatWindow = ({ user, messages, onSend })=>{ 
 
@@ -8,6 +9,8 @@ const ChatWindow = ({ user, messages, onSend })=>{
     const [moreInfo, setMoreInfo] = useState(false);  // more info button in header
     const [searchOpen, setSearchOpen] = useState(false);  // input field for conversation
     const menuRef = useRef(null);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false); // emoji picker visibility
+    const emojiPickerRef = useRef(null);
 
     // close menu/search on Escape
     useEffect(() => {
@@ -27,6 +30,9 @@ const ChatWindow = ({ user, messages, onSend })=>{
             if (menuRef.current && !menuRef.current.contains(e.target)) {
                 setMoreInfo(false);
             }
+            if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target)) {
+                setShowEmojiPicker(false);
+            }
         };
             document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -40,11 +46,13 @@ const ChatWindow = ({ user, messages, onSend })=>{
 
     if (!user) {
         return (
-        <section className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-400 text-sm">
-            Select a user to start chatting.
-        </section>
+            <section className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-400 text-sm">
+                Select a user to start chatting.
+            </section>
         );
     }
+
+    console.log(text);
 
     return (
     <section className="md:w-full w-65 h-full flex flex-col backdrop-blur-sm">
@@ -163,15 +171,30 @@ const ChatWindow = ({ user, messages, onSend })=>{
 
             <input
                 type="text"
+                value={text}
                 placeholder="Type a message..."
                 className="flex-1 bg-transparent px-1 py-2.5 text-sm text-gray-800 outline-none placeholder:text-gray-400 dark:text-gray-200 dark:placeholder:text-gray-500"
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
             />
 
-            <button className="rounded-full p-1.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10">
-                <Smile size={20} className="text-gray-500 dark:text-gray-400" />
-            </button>
+                <button onClick={()=> setShowEmojiPicker(!showEmojiPicker)} className="rounded-full p-1.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10">
+                    <Smile size={20} className="text-gray-500 dark:text-gray-400" />
+                </button>
+            {showEmojiPicker && (
+                <div 
+                    ref={emojiPickerRef}
+                    className="absolute bottom-11.5 right-0 z-50"
+                >
+                    <EmojiPicker 
+                        // onEmojiClick={handleEmojiClick}
+                        onEmojiClick={(e) => setText(prev=> prev + e.emoji)}
+                        width={300}
+                        height={300}
+                        theme="dark"
+                    />
+                </div>
+                )}
             <button
                 className="rounded-full bg-indigo-500 p-2 text-white shadow-md transition-colors hover:bg-indigo-600"
             >
