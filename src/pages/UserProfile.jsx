@@ -19,6 +19,9 @@ import {
 	Crown,
 	UserX,
 	ArrowUpRight,
+	LogOut,
+	AtSign,
+	BadgeInfo,
 } from "lucide-react";
 
 const UserProfile = () => {
@@ -44,41 +47,61 @@ const UserProfile = () => {
 				</p>
 			</header>
 
-			{/* prifile card */}
+			{/* prifile */}
 			<section className="card bg-base-200 shadow-xl">
-				<div className="card-body">
-					<div className="flex flex-col gap-6 md:flex-row md:items-center">
-						<div className="avatar">
-							<div className="w-28 rounded-full ring ring-primary ring-offset-2">
-								<img src="https://i.pravatar.cc/300" alt="avatar" />
+				<aside className="card-body">
+					<div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+						
+						<div className="flex justify-center lg:justify-start">
+							<div className="avatar">
+								<div className="w-28 rounded-full ring ring-primary ring-offset-2 ring-offset-base-200">
+									<img
+										src="https://i.pravatar.cc/300"
+										alt="Profile"
+									/>
+								</div>
 							</div>
 						</div>
 
+						{/* User Info */}
 						<div className="flex-1 space-y-2">
-							<h2 className="text-[22px] font-bold flex items-center gap-2"><User size={22} />John Doe</h2>
-							<p className="text-base-content/80">dimpu123</p>
-							<p className="flex items-center gap-2 text-base-content/70">
-								<Mail size={18} />	johndoe@gmail.com
-							</p>
-							<p className="text-base-content/80">
-								Passionate full-stack developer who enjoys building beautiful and scalable applications.
-							</p>
-							
+							<h2 className="flex items-center gap-2 text-[22px] font-bold">
+								<User size={22} className="" />
+								John Doe
+							</h2>
 
-							{/* <div className="flex flex-wrap gap-6 pt-3 text-sm text-base-content/70">
-								<span className="flex items-center gap-2">
-									<CalendarDays size={18} />
-									Member since 20 July 2026
-								</span>
+							<div className="flex items-center gap-2 text-base-content/80">
+								<AtSign size={18} className="" />
+								<span>dimpu123</span>
+							</div>
 
-								<span className="flex items-center gap-2">
-									<Clock3 size={18} />
-									Last login 21 July 2026
-								</span>
-							</div> */}
+							<div className="flex items-center gap-2 text-base-content/80 break-all">
+								<Mail size={18} className="" />
+								<span>johndoe@gmail.com</span>
+							</div>
+
+							<div className="flex items-start gap-2 text-base-content/80">
+								<BadgeInfo
+									size={18}
+									className=" mt-1 shrink-0"
+								/>
+
+								<p className='italic'>
+									Passionate full-stack developer who enjoys building
+									beautiful and scalable applications.
+								</p>
+							</div>
+						</div>
+
+						{/* Logout */}
+						<div className="lg:ml-auto lg:self-start">
+							<button className="btn btn-error btn-outline w-full lg:w-auto">
+								<LogOut size={18} />
+								Log out
+							</button>
 						</div>
 					</div>
-				</div>
+				</aside>
 			</section>
 
 			<section className="grid gap-6 lg:grid-cols-2">
@@ -86,7 +109,7 @@ const UserProfile = () => {
 				<div className="space-y-6">
 					{/* Edit Profile */}
 					<aside className="card bg-base-100 shadow-lg">
-						<div className="card-body">
+						<div className="card-body gap-y-3">
 							<h2 className="card-title">
 								<Pencil size={18} /> Edit Profile
 							</h2>
