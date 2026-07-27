@@ -24,9 +24,8 @@ function App() {
 				<Route path='/signup' element={<RegistrationPage />}></Route>
 				<Route path='/home' element={<HomePage />}></Route>
 				<Route path='/profile' element={<UserProfile />}></Route>
-				{/* <Route path="test/profile" element={<UserProfileGPT/>}></Route>
+				<Route path="test/profile" element={<UserProfileGPT/>}></Route>
 				<Route path="test/profile1" element={<UserProfileEditorial/>}></Route>
-				<Route path="test/profile3" element={<GPT3/>}></Route> */}
 
 				{/* test */}
 				<Route path='/home1' element={<TestHomePage1 />}></Route>
