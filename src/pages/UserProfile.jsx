@@ -1,0 +1,358 @@
+
+import React from 'react'
+import {
+	User,
+	Mail,
+	CalendarDays,
+	Clock3,
+	Pencil,
+	Camera,
+	Lock,
+	Image,
+	FileText,
+	Video,
+	HardDrive,
+	Users,
+	MessageCircle,
+	Send,
+	ShieldCheck,
+	Crown,
+	UserX,
+	ArrowUpRight,
+} from "lucide-react";
+
+const UserProfile = () => {
+
+
+	let groups = [
+		{ name: 'Design Weekly', creator: false },
+		{ name: 'Frontend Guild', creator: true },
+		{ name: 'Coffee & Code', creator: false },
+		{ name: 'Book Club', creator: true },
+	];
+
+	let blockedUsers = ['spamdealer99', 'trolling_tom', 'fake_recruiter'];
+
+	return (
+	<main className="min-h-screen bg-base-200 p-4 md:p-8">
+		<div className="mx-auto max-w-7xl space-y-8">
+
+			<header className="">
+				<h1 className="text-4xl font-bold">Profile</h1>
+				<p className="text-base-content/70 mt-1">
+					Manage your account and view your activity.
+				</p>
+			</header>
+
+			{/* prifile card */}
+			<section className="card bg-base-200 shadow-xl">
+				<div className="card-body">
+					<div className="flex flex-col gap-6 md:flex-row md:items-center">
+						<div className="avatar">
+							<div className="w-28 rounded-full ring ring-primary ring-offset-2">
+								<img src="https://i.pravatar.cc/300" alt="avatar" />
+							</div>
+						</div>
+
+						<div className="flex-1 space-y-2">
+							<h2 className="text-[22px] font-bold flex items-center gap-2"><User size={22} />John Doe</h2>
+							<p className="text-base-content/80">dimpu123</p>
+							<p className="flex items-center gap-2 text-base-content/70">
+								<Mail size={18} />	johndoe@gmail.com
+							</p>
+							<p className="text-base-content/80">
+								Passionate full-stack developer who enjoys building beautiful and scalable applications.
+							</p>
+							
+
+							{/* <div className="flex flex-wrap gap-6 pt-3 text-sm text-base-content/70">
+								<span className="flex items-center gap-2">
+									<CalendarDays size={18} />
+									Member since 20 July 2026
+								</span>
+
+								<span className="flex items-center gap-2">
+									<Clock3 size={18} />
+									Last login 21 July 2026
+								</span>
+							</div> */}
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section className="grid gap-6 lg:grid-cols-2">
+
+				<div className="space-y-6">
+					{/* Edit Profile */}
+					<aside className="card bg-base-100 shadow-lg">
+						<div className="card-body">
+							<h2 className="card-title">
+								<Pencil size={18} /> Edit Profile
+							</h2>
+
+							<div className="flex flex-col items-center gap-4">
+								<div className="avatar">
+									<div className="w-24 rounded-full">
+										<img src="https://i.pravatar.cc/300" />
+									</div>
+								</div>
+
+								<button className="btn btn-dash btn-sm">
+									<Camera size={16} /> Change Avatar
+								</button>
+							</div>
+
+							<input
+								type="text"
+								placeholder="Full Name"
+								className="input input-accent w-full"
+							/>
+
+							<textarea
+								className="textarea textarea-accent"
+								rows={3}
+								placeholder="Write your Bio..."
+							/>
+
+							<button className="btn btn-info w-full">
+								Save Changes
+							</button>
+						</div>
+					</aside>
+
+					{/* Storage */}
+					<aside className="card bg-base-100 shadow-lg">
+						<div className="card-body">
+							<h2 className="card-title">
+								<HardDrive size={20} />
+								Storage
+							</h2>
+
+							<div className="space-y-4 mt-3">
+								<div className="flex justify-between">
+									<span className="flex items-center gap-2">
+									<Image size={18} />
+									Images
+									</span>
+
+									<span className="font-semibold">58</span>
+								</div>
+
+								<div className="flex justify-between">
+									<span className="flex items-center gap-2">
+									<Video size={18} />
+									Videos
+									</span>
+
+									<span className="font-semibold">12</span>
+								</div>
+
+								<div className="flex justify-between">
+									<span className="flex items-center gap-2">
+									<FileText size={18} />
+									Documents
+									</span>
+
+									<span className="font-semibold">26</span>
+								</div>
+
+								<progress
+									className="progress progress-primary w-full"
+									value="62"
+									max="100"
+								></progress>
+
+								<p className="text-sm text-base-content/70">
+									1.8 GB of 5 GB used
+								</p>
+							</div>
+						</div>
+					</aside>
+
+					{/*GROUPS  */}
+					<aside className="card bg-base-100 shadow-lg">
+						<div className="card-body p-5">
+							<div className="flex items-center justify-between mb-3">
+								<h2 className="card-title text-lg">
+									<Users size={20} />Groups
+								</h2>
+
+								<div className="badge badge-primary">
+									{groups.length} total
+								</div>
+							</div>
+
+							<ul className="space-y-1">
+								{groups.map((g) => (
+									<li
+										key={g.name}
+										className="flex items-center justify-between rounded-lg px-0 py-3 hover:bg-base-200 transition-colors"
+									>
+										<div className="flex items-center gap-3">
+											<span className="text-sm font-medium">
+												{g.name}
+											</span>
+										</div>
+
+										{g.creator ? (
+											<div className="badge badge-info">
+												<Crown className="w-3 h-3" />
+												Creator
+											</div>
+										) : (
+											<div className="badge badge-success">
+												Member
+											</div>
+										)}
+									</li>
+								))}
+							</ul>
+						</div>
+					</aside>
+				</div>
+
+				<div className="space-y-6">
+					
+					{/* Password */}
+					<aside className="card bg-base-100 shadow-lg">
+						<div className="card-body gap-y-3">
+							<h2 className="card-title">
+								<Lock size={20} />
+								Change Password
+							</h2>
+
+							<input
+								type="password"
+								placeholder="Current Password"
+								className="input input-warning"
+							/>
+
+							<input
+								type="password"
+								placeholder="New Password"
+								className="input input-warning"
+							/>
+
+							<input
+								type="password"
+								placeholder="Confirm Password"
+								className="input input-warning"
+							/>
+
+							<p className="text-sm text-base-content/60">Password last changed on 18 July 2026</p>
+
+							<button className="btn btn-warning w-full">Update Password</button>
+						</div>
+					</aside>
+
+					{/* Account Info*/}
+					<aside className="card bg-base-100 shadow-lg">
+						<div className="card-body">
+							<h2 className="card-title">
+								<ShieldCheck size={20} />
+								Account Information
+							</h2>
+
+							<div className="space-y-4">
+								<div className="flex justify-between">
+									<span>Email Verified</span>
+									<div className="badge badge-success">Verified</div>
+								</div>
+
+								<div className="flex justify-between">
+									<span>Account Status</span>
+
+									<div className="badge badge-primary">Active</div>
+								</div>
+
+								<div className="flex justify-between">
+									<span>Member Since</span>
+									<span>20 July 2026</span>
+								</div>
+
+								<div className="flex justify-between">
+									<span>Last Login</span>
+
+									<span>21 July 2026</span>
+								</div>
+							</div>
+						</div>
+					</aside>
+
+					{/* Statistics */}
+					<aside className="card bg-base-100 shadow-lg">
+						<div className="card-body">
+							<h2 className="card-title">
+								<MessageCircle size={20} />
+								Chat Statistics
+							</h2>
+
+							<div className="stats stats-vertical lg:stats-horizontal shadow">
+								<div className="stat">
+									<div className="stat-figure text-primary">
+										<MessageCircle />
+									</div>
+
+									<div className="stat-title">Chats</div>
+									<div className="stat-value">24</div>
+								</div>
+
+								<div className="stat">
+									<div className="stat-figure text-secondary"><Send /></div>
+									<div className="stat-title">Messages</div>
+									<div className="stat-value">3.4K</div>
+								</div>
+
+								<div className="stat">
+									<div className="stat-figure text-accent"><Users /></div>
+									<div className="stat-title">Contacts</div>
+									<div className="stat-value">91</div>
+								</div>
+							</div>
+						</div>
+					</aside>
+
+					{/* blocked users */}
+					<section className="card bg-base-100 shadow-lg">
+						<aside className="card-body p-5">
+							<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+								<h2 className="card-title text-lg">
+									<UserX size={20} />
+									Blocked Users
+								</h2>
+
+								<div className="badge badge-error badge-outline">
+									{blockedUsers.length} Total
+								</div>
+							</div>
+
+							<ul className="space-y-1">
+								{blockedUsers.map((user) => (
+									<li
+										key={user}
+										className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl px-0 py-2 hover:bg-base-200 transition-all"
+									>
+										<div className="flex items-center gap-3">										
+											<span className="font-medium text-sm break-all">
+												{user}
+											</span>
+										</div>
+
+										<button className="btn btn-sm btn-outline btn-success">
+											Unblock
+											<ArrowUpRight size={15} />
+										</button>
+									</li>
+								))}
+							</ul>
+						</aside>
+					</section>
+				</div>
+			</section>
+		</div>
+	</main>
+	);
+};
+
+export default UserProfile;
