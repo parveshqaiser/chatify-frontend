@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { MoreVertical, Search } from "lucide-react";
+import { LogOutIcon, MessageCirclePlus, MoreVertical, Search, UserCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Sidebar = ({ users, activeUserId, onSelectUser }) => {
 	// const [query, setQuery] = useState("");
@@ -10,18 +11,40 @@ const Sidebar = ({ users, activeUserId, onSelectUser }) => {
 
 	const [query, setQuery] = useState("");
 	const [tab, setTab] = useState("online");
+	const [verticalBtn, setVerticalBtn] = useState(false);
 
 	const filtered = users.filter((u) => (tab === "online" ? u.online : true))
 		.filter((u) => u.name.toLowerCase().includes(query.toLowerCase())
 	);
 
 	return (
-	<aside className="w-full h-full flex flex-col bg-linear-to-t from-indigo-500 via-purple-500 to-pink-500 backdrop-blur-lg">
+	<aside className="w-full h-full flex flex-col bg-linear-to-t from-indigo-500 via-purple-500 to-pink-500 backdrop-blur-sm">
 		<header className="p-4 flex border-b border-white/20 items-center justify-between">
 			<h2 className="text-xl font-semibold tracking-wide text-white">Chats</h2>
-			<button className="p-1.5 rounded-full hover:bg-white/20 cursor-pointer transition-colors text-white">
+			<button onClick={()=> setVerticalBtn(!verticalBtn)} className="p-1.5 rounded-full hover:bg-white/20 cursor-pointer transition-colors text-white">
 				<MoreVertical size={20} />
 			</button>
+
+			{verticalBtn && (
+				<ul className="menu absolute top-13.75 right-1 z-20 bg-base-100  rounded-box">
+					<li className="tooltip" data-tip="Profile">
+						{/* <Link to="/profile" ><span className="text-[13px]">Profile </span></Link> */}
+						<Link to="/profile">
+							<UserCircle size={18} />
+						</Link>
+					</li>
+					<li className="tooltip" data-tip="Create Group">
+						<Link to="/group" >
+							<MessageCirclePlus size={18}/>
+						</Link>
+					</li>
+					<li className="tooltip" data-tip="Log out">
+						<button className="text-[13px]">
+							<LogOutIcon size={18} />
+						</button>
+					</li>
+				</ul>
+			)}
 		</header>
 
 		<section className="p-2 m-1">
