@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { FileText, Mic, Paperclip, Send, Smile, Images, Phone, Info, MoveLeft, X, Search } from "lucide-react";
 import EmojiPicker from 'emoji-picker-react';
 import UserViewModal from "./UserViewModal";
-import DeleteConversation from "./DeleteConversation";
+import DeleteConversationModal from "./DeleteConversationModal";
 
 const ChatWindow = ({ user, messages, onSend })=>{ 
 
@@ -227,7 +227,7 @@ const ChatWindow = ({ user, messages, onSend })=>{
             </article>
         </section>
     <UserViewModal />
-    <DeleteConversation deleteModal={deleteModal} setDeleteModal={setDeleteModal} />
+    <DeleteConversationModal deleteModal={deleteModal} setDeleteModal={setDeleteModal} />
     </>
     );
 }

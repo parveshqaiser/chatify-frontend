@@ -1,6 +1,6 @@
 import { TriangleAlert } from "lucide-react";
 
-const DeleteConversation = ({ deleteModal, setDeleteModal, onDelete }) => {
+const DeleteConversationModal = ({ deleteModal, setDeleteModal, onDelete }) => {
     return (
         <dialog
             className={`modal ${deleteModal ? "modal-open" : ""}`}
@@ -51,4 +51,4 @@ const DeleteConversation = ({ deleteModal, setDeleteModal, onDelete }) => {
     );
 };
 
-export default DeleteConversation;
+export default DeleteConversationModal;
