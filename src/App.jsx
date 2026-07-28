@@ -13,12 +13,14 @@ import UserProfileEditorial from './test/UserProfileEditorial.jsx';
 // for testing
 import TestHomePage1 from './test/Test.jsx';
 import Fetch from './test/Fetch.jsx';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
 	
 	
 	return(
 		<BrowserRouter>
+		<Toaster position='top-center' reverseOrder={false} />
 			<Routes>
 				<Route index path='/' element={<LoginPage />}></Route>
 				<Route index path='/login' element={<LoginPage />}></Route>
