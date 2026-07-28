@@ -56,7 +56,6 @@ const ChatWindow = ({ user, messages, onSend })=>{
             </section>
         );
     }
-    console.log(deleteModal)
 
     return (
     <>
