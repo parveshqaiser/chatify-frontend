@@ -1,11 +1,52 @@
 
 
+import axios from "axios";
 import { Eye, EyeOff, MessageCircleMore } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom";
+import { BASE_URL } from "../utils/constants";
+import { allowedDomains } from "../utils/constants.js";
 
 const LoginPage = () => {
-  const [showPassword, setShowPassword] = useState(false);
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [email, setEmail] = useState("");
+    const [pwd, setPwd] = useState("");
+
+    let navigate = useNavigate();
+
+    const handleSubmit = async()=>{
+
+        if(!email.trim() || !pwd.trim()){
+            return toast.error("Please fill in all required fields");            
+        }
+
+        if(!allowedDomains.some(domain => email.endsWith(domain)))
+        {
+            return toast.error("Please enter a valid Gmail, Hotmail, or Yahoo email address.");
+        }
+        
+        let data = {
+            email,
+            password :pwd,
+        };
+
+        try {
+            let res = await axios.post(BASE_URL + "/auth/login",data);
+            if(res.data.success){
+                toast.success(res.data.message);
+                setTimeout(()=>{
+                    navigate("/home")
+                },1500);
+            }
+
+        } catch (error) {
+            console.log(error);
+            toast.error(error?.response?.data?.message || error?.message, {duration:2000})
+        }
+    }
+
 
     return (
         <main className="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 px-4">
@@ -26,20 +67,25 @@ const LoginPage = () => {
                     <div>
                         <label className="mb-1 block text-sm text-slate-300">Email</label>
                         <input
-                            type="email"
+                            type="text"
+                            value={email}
+                            onChange={(e)=> setEmail(e.target.value.trim())}
                             placeholder="Enter your email"
                             className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition-all placeholder:text-slate-500 focus:border-cyan-500"
                         />
+                        {/* <span className="text-red-500 text-sm">some error</span> */}
                     </div>
 
                     <div>
                         <label className="mb-1 block text-sm text-slate-300">Password</label>
                         <div className="relative">
                             <input
+                                onChange={(e)=> setPwd(e.target.value)}
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Enter your password"
                                 className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 pr-12 text-white outline-none transition-all placeholder:text-slate-500 focus:border-cyan-500"
                             />
+                             {/* <span className="text-red-500 text-sm">some error</span> */}
 
                             <button
                                 type="button"
@@ -52,7 +98,7 @@ const LoginPage = () => {
                     </div>
 
                     <button
-                        type="submit"
+                        onClick={handleSubmit}
                         className="w-full rounded-xl bg-cyan-500 py-3 font-semibold text-slate-950 transition hover:bg-cyan-400 cursor-pointer"
                     >
                         Login
