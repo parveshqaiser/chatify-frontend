@@ -12,6 +12,7 @@ import UserProfileEditorial from './test/UserProfileEditorial.jsx';
 
 // for testing
 import TestHomePage1 from './test/Test.jsx';
+import Fetch from './test/Fetch.jsx';
 
 function App() {
 	
@@ -29,6 +30,7 @@ function App() {
 
 				{/* test */}
 				<Route path='/home1' element={<TestHomePage1 />}></Route>
+				<Route path='/api' element={<Fetch />}></Route>
 				
 				<Route path='*' element={<PageNotFound />}></Route>
 			</Routes>
