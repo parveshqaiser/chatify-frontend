@@ -1,5 +1,6 @@
 
-import React from 'react'
+import React from 'react';
+import { Link } from 'react-router-dom';
 import {
 	User,
 	Mail,
@@ -22,6 +23,7 @@ import {
 	LogOut,
 	AtSign,
 	BadgeInfo,
+	HomeIcon,
 } from "lucide-react";
 
 import { groups, blockedUsers } from '../utils/constants';
@@ -32,11 +34,21 @@ const UserProfile = () => {
 	<main className="min-h-screen bg-base-200 p-4 md:p-8">
 		<div className="mx-auto max-w-7xl space-y-8">
 
-			<header className="">
-				<h1 className="text-4xl font-bold">Profile</h1>
-				<p className="text-base-content/70 mt-1">
-					Manage your account and view your activity.
-				</p>
+			<header className="flex flex-col gap-6 lg:flex-row lg:justify-between lg:items-center">
+				<div>
+					<h1 className="text-4xl font-bold">Profile</h1>
+					<p className="text-base-content/70 mt-1">
+						Manage your account and view your activity.
+					</p>
+				</div>
+
+				<div>
+					<Link to={"/home"} className="btn btn-primary btn-outline w-full lg:w-auto">
+						<HomeIcon size={18} />
+						Home
+					</Link>
+				</div>
+				
 			</header>
 
 			{/* prifile */}
