@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import ChatWindow from "./ChatWindow.jsx";
 import Sidebar from "./Sidebar.jsx";
-import Navbar from "./Navbar.jsx";
 import bgImage from "../assets/chat-br.jpg";
 
 const users = [
