@@ -14,11 +14,14 @@ import UserProfileEditorial from './test/UserProfileEditorial.jsx';
 import TestHomePage1 from './test/Test.jsx';
 import Fetch from './test/Fetch.jsx';
 import { Toaster } from 'react-hot-toast';
+import { Provider } from 'react-redux';
+import appStore from './redux/store.js';
 
 function App() {
 	
 	
 	return(
+	<Provider store={appStore}>
 		<BrowserRouter>
 		<Toaster position='top-center' reverseOrder={false} />
 			<Routes>
@@ -37,6 +40,7 @@ function App() {
 				<Route path='*' element={<PageNotFound />}></Route>
 			</Routes>
 		</BrowserRouter>
+	</Provider>
 	)
 	
 }
