@@ -22,13 +22,17 @@ let userSlice = createSlice({
     initialState : {
         user : null,
         isLoading : false,
-        error : null
+        error : null,
+        userEmail : null
     },
     reducers : {
         logout : (state, action)=>{
             state.user = null;
             state.isLoading = false;
             state.error = null;
+        },
+        addTemporaryEmail : (state, action)=>{
+            state.userEmail = action.payload
         }
     },
     extraReducers : (builder)=>{
@@ -51,5 +55,5 @@ let userSlice = createSlice({
 });
 
 
-export let {logout} = userSlice.actions;
+export let {logout, addTemporaryEmail} = userSlice.actions;
 export default userSlice.reducer;

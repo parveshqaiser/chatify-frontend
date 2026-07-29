@@ -5,13 +5,13 @@ import bgImage from "../assets/email-verify.png";
 import file from "../assets/file.svg";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 
-function EmailVerificatipnPage({email = "seemafirdous2727@gmail.com"}) 
+function EmailVerificatipnPage() 
 {
 
-    // useEffect(()=>{
-    //     toast.success(`A Message with a confrimation link has been sent your ${email}`)
-    // },[]);
+   let email = useSelector(store => store?.user?.userEmail);
+   console.log(email);
 
     useEffect(()=>{
         toast.custom((t) => (
@@ -24,7 +24,7 @@ function EmailVerificatipnPage({email = "seemafirdous2727@gmail.com"})
                 <InfoIcon className="mt-1 shrink-0" />
 
                 <p className="text-white text-sm leading-6">
-                    A message with a confirmation link has been sent to <strong>{email}</strong>.
+                    A message with a confirmation link has been sent to <strong>{email || "NA"}</strong>.
                     Please follow the link to activate your account.
                 </p>
             </aside>
@@ -117,7 +117,7 @@ function EmailVerificatipnPage({email = "seemafirdous2727@gmail.com"})
                     We have sent a confirmation message to
                 </p>
                 <p className="font-mono-tight text-[#27219b] bg-white rounded-lg px-3 py-2 inline-block mb-8 break-all">
-                    {email}
+                    {email || "NA"}
                 </p>
 
                 <div className="border-t border-[#E6E3F8] pt-6">

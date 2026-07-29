@@ -4,11 +4,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { allowedDomains, BASE_URL, initialFormData } from "../utils/constants.js";
 import toast from "react-hot-toast";
 import axios from "axios";
+import Spinner from "../components/Spinner.jsx";
+import { useDispatch } from "react-redux";
+import { addTemporaryEmail } from "../redux/userSlice.js";
 
 
 const RegistrationPage = () => {
 
     const navigate = useNavigate();
+
+    let dispatch = useDispatch();
+
+    const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         username : "",
@@ -33,7 +40,6 @@ const RegistrationPage = () => {
     }
 
     const handleSubmit = async()=>{
-        console.log(formData);
         let {username, name,email, password} = formData;
 
         if(!username.trim() || !name.trim() || !email.trim() || !password.trim()){
@@ -44,22 +50,28 @@ const RegistrationPage = () => {
             return toast.error("Please enter a valid Gmail, Hotmail, or Yahoo email address.");
         }
 
+        setLoading(true);
+
         try {
             let res = await axios.post(BASE_URL + "/auth/register", formData);
 
              if(res.data.success){
                 toast.success(res.data.message);
+                dispatch(addTemporaryEmail(formData.email))
                 setFormData(initialFormData);
+                setLoading(false);
                 setTimeout(()=>{
                     navigate("/register/success")
-                },1500);
+                },2000);
             }
 
         } catch (error) {
             console.log(error);
+            setLoading(false);
             toast.error(error?.response?.data?.message || error?.message, {duration:2000})
+        }finally {
+            setLoading(false);
         }
-
     }
 
 
@@ -124,12 +136,15 @@ const RegistrationPage = () => {
                     />
                 </div>
 
-                <button
-                    onClick={handleSubmit}
-                    className="w-full cursor-pointer rounded-xl bg-cyan-500 py-3 font-semibold text-slate-950 transition hover:bg-cyan-400"
-                >
-                    Create Account
-                </button>
+                {loading ? 
+                    <Spinner /> : 
+                    <button
+                        onClick={handleSubmit}
+                        className="w-full cursor-pointer rounded-xl bg-cyan-500 py-3 font-semibold text-slate-950 transition hover:bg-cyan-400"
+                    >
+                        Create Account
+                    </button>
+                }
             </form>
 
             <p className="mt-6 text-center text-sm text-slate-400">

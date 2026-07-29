@@ -22,7 +22,7 @@ import UserProfileEditorial from './test/UserProfileEditorial.jsx';
 
 function App() {
 	
-	
+
 	return(
 	<Provider store={appStore}>
 		<BrowserRouter>
