@@ -7,12 +7,14 @@ import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import { allowedDomains } from "../utils/constants.js";
+import Spinner from "../components/Spinner.jsx";
 
 const LoginPage = () => {
 
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState("");
     const [pwd, setPwd] = useState("");
+    const [loading, setLoading] = useState(false);
 
     let navigate = useNavigate();
 
@@ -33,9 +35,11 @@ const LoginPage = () => {
         };
 
         try {
+            setLoading(true);
             let res = await axios.post(BASE_URL + "/auth/login",data);
             if(res.data.success){
                 toast.success(res.data.message);
+                setLoading(false);
                 setTimeout(()=>{
                     navigate("/home")
                 },1500);
@@ -44,9 +48,10 @@ const LoginPage = () => {
         } catch (error) {
             console.log(error);
             toast.error(error?.response?.data?.message || error?.message, {duration:2000})
+        }finally {
+            setLoading(false);
         }
     }
-
 
     return (
         <main className="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 px-4">
@@ -97,12 +102,15 @@ const LoginPage = () => {
                         </div>
                     </div>
 
-                    <button
-                        onClick={handleSubmit}
-                        className="w-full rounded-xl bg-cyan-500 py-3 font-semibold text-slate-950 transition hover:bg-cyan-400 cursor-pointer"
-                    >
-                        Login
-                    </button>
+                    {loading ? 
+                        <Spinner /> :
+                        <button
+                            onClick={handleSubmit}
+                            className="w-full rounded-xl bg-cyan-500 py-3 font-semibold text-slate-950 transition hover:bg-cyan-400 cursor-pointer"
+                        >
+                            Login
+                        </button>
+                    }
                 </form>
 
                 <p className="mt-6 text-center text-sm text-slate-400">
