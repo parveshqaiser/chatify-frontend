@@ -10,3 +10,12 @@ export let initialFormData = {
     password : ""
 };
 
+export let groups = [
+		{ name: 'Design Weekly', creator: false },
+		{ name: 'Frontend Guild', creator: true },
+		{ name: 'Coffee & Code', creator: false },
+		{ name: 'Book Club', creator: true },
+	];
+
+export let blockedUsers = ['spamdealer99', 'trolling_tom', 'fake_recruiter'];
+

@@ -24,17 +24,9 @@ import {
 	BadgeInfo,
 } from "lucide-react";
 
+import { groups, blockedUsers } from '../utils/constants';
+
 const UserProfile = () => {
-
-
-	let groups = [
-		{ name: 'Design Weekly', creator: false },
-		{ name: 'Frontend Guild', creator: true },
-		{ name: 'Coffee & Code', creator: false },
-		{ name: 'Book Club', creator: true },
-	];
-
-	let blockedUsers = ['spamdealer99', 'trolling_tom', 'fake_recruiter'];
 
 	return (
 	<main className="min-h-screen bg-base-200 p-4 md:p-8">
