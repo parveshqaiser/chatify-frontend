@@ -1,8 +1,68 @@
 import {MessageCircleMore } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { allowedDomains, BASE_URL, initialFormData } from "../utils/constants.js";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 
 const RegistrationPage = () => {
+
+    const navigate = useNavigate();
+
+    const [formData, setFormData] = useState({
+        username : "",
+        name : "",
+        email : "",
+        password : ""
+    });
+
+    function handleChange(e){
+        let {name, value} = e.target;
+
+        if (name == "name"){
+            value = value.charAt(0).toUpperCase() + value.slice(1);
+            setFormData({
+                ...formData, [name] : value
+            });
+        }else {
+            setFormData({
+            ...formData, [name] : value
+            });
+        }       
+    }
+
+    const handleSubmit = async()=>{
+        console.log(formData);
+        let {username, name,email, password} = formData;
+
+        if(!username.trim() || !name.trim() || !email.trim() || !password.trim()){
+            return toast.error("Please fill in all required fields");  
+        }
+
+        if(!allowedDomains.some(domain => email.endsWith(domain))){
+            return toast.error("Please enter a valid Gmail, Hotmail, or Yahoo email address.");
+        }
+
+        try {
+            let res = await axios.post(BASE_URL + "/auth/register", formData);
+
+             if(res.data.success){
+                toast.success(res.data.message);
+                setFormData(initialFormData);
+                setTimeout(()=>{
+                    navigate("/register/success")
+                },1500);
+            }
+
+        } catch (error) {
+            console.log(error);
+            toast.error(error?.response?.data?.message || error?.message, {duration:2000})
+        }
+
+    }
+
+
     return (
     <main className="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 px-4 py-8">
         <section className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/70 p-8 shadow-2xl backdrop-blur-md">
@@ -20,43 +80,52 @@ const RegistrationPage = () => {
 
             <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
                 <div>
-                    <label className="mb-1 block text-sm text-slate-300">Username</label>
+                    <label className="mb-1 inline-block text-sm text-slate-300">Username</label> <span className="text-red-500">*</span>
                     <input
                         type="text"
+                        name="username"
+                        onChange={handleChange}
                         placeholder="Enter your username"
                         className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition-all placeholder:text-slate-500 focus:border-cyan-500"
                     />
                 </div>
 
                 <div>
-                    <label className="mb-1 block text-sm text-slate-300">Full Name</label>
+                    <label className="mb-1 inline-block text-sm text-slate-300">Full Name</label> <span className="text-red-500">*</span>
                     <input
                         type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
                         placeholder="Enter your full name"
                         className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition-all placeholder:text-slate-500 focus:border-cyan-500"
                     />
                 </div>
 
                 <div>
-                    <label className="mb-1 block text-sm text-slate-300">Email</label>
+                   <label className="mb-1 inline-block text-sm text-slate-300">Email</label> <span className="text-red-500">*</span>
                     <input
-                        type="email"
+                        type="text"
+                        name="email"
+                        onChange={handleChange}
                         placeholder="Enter your email"
                         className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition-all placeholder:text-slate-500 focus:border-cyan-500"
                     />
                 </div>
 
                 <div>
-                    <label className="mb-1 block text-sm text-slate-300">Password</label>
+                    <label className="mb-1 inline-block text-sm text-slate-300">Password</label> <span className="text-red-500">*</span>
                     <input
                         type="password"
+                        name="password"
+                        onChange={handleChange}
                         placeholder="Create a password"
                         className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition-all placeholder:text-slate-500 focus:border-cyan-500"
                     />
                 </div>
 
                 <button
-                    type="submit"
+                    onClick={handleSubmit}
                     className="w-full cursor-pointer rounded-xl bg-cyan-500 py-3 font-semibold text-slate-950 transition hover:bg-cyan-400"
                 >
                     Create Account
