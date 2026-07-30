@@ -111,7 +111,7 @@ const UserViewModal = ({ user, onClose }) => {
             </article>
         </main>
 
-        <style jsx>{`
+        <style>{`
             .custom-scrollbar-files::-webkit-scrollbar {
             width: 4px;
             }
