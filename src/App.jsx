@@ -18,6 +18,8 @@ import TestHomePage1 from './test/Test.jsx';
 import Fetch from './test/Fetch.jsx';
 import UserProfileGPT from './test/UserProfileGPT.jsx';
 import UserProfileEditorial from './test/UserProfileEditorial.jsx';
+// import { ApiProvider } from '@reduxjs/toolkit/query/react';
+import { api } from './redux/api.js';
 
 
 function App() {

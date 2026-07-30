@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { LogOutIcon, MessageCirclePlus, MoreVertical, Search, UserCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLogoutMutation } from "../redux/api";
+import toast from "react-hot-toast";
 
 const Sidebar = ({ users, activeUserId, onSelectUser }) => {
-	// const [query, setQuery] = useState("");
+	
 
-	// const filtered = users.filter((u) =>
-	// 	u.name.toLowerCase().includes(query.toLowerCase())
-	// );
+	let [loggout] = useLogoutMutation();
 
 	const [query, setQuery] = useState("");
 	const [tab, setTab] = useState("online");
@@ -16,6 +16,22 @@ const Sidebar = ({ users, activeUserId, onSelectUser }) => {
 	const filtered = users.filter((u) => (tab === "online" ? u.online : true))
 		.filter((u) => u.name.toLowerCase().includes(query.toLowerCase())
 	);
+
+	let handleLogout = async()=>{
+
+		try {
+			let res = await logout().unwrap();
+
+			console.log(res);
+			localStorage.removeItem("token");
+
+			//  dispatch(api.util.resetApiState());
+
+		} catch (error) {
+			console.log(error);
+			toast.error(error.data?.message || "Logout failed");
+		}
+	}
 
 	return (
 	<aside className="w-full h-full flex flex-col bg-linear-to-t from-indigo-500 via-purple-500 to-pink-500 backdrop-blur-sm">
@@ -39,7 +55,7 @@ const Sidebar = ({ users, activeUserId, onSelectUser }) => {
 						</Link>
 					</li>
 					<li className="tooltip" data-tip="Log out">
-						<button className="text-[13px]">
+						<button onClick={handleLogout} className="text-[13px]">
 							<LogOutIcon size={18} />
 						</button>
 					</li>
