@@ -1,34 +1,17 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import {
-	User,
-	Mail,
-	CalendarDays,
-	Clock3,
-	Pencil,
-	Camera,
-	Lock,
-	Image,
-	FileText,
-	Video,
-	HardDrive,
-	Users,
-	MessageCircle,
-	Send,
-	ShieldCheck,
-	Crown,
-	UserX,
-	ArrowUpRight,
-	LogOut,
-	AtSign,
-	BadgeInfo,
-	HomeIcon,
+import { data, Link } from 'react-router-dom';
+import {User,Mail,CalendarDays,Clock3,Pencil,Camera,Lock,Image,FileText,Video,HardDrive,Users,
+	MessageCircle,Send,ShieldCheck,Crown,UserX,ArrowUpRight,LogOut,AtSign,BadgeInfo,HomeIcon,
 } from "lucide-react";
 
 import { groups, blockedUsers } from '../utils/constants';
+import { useGetUserDetailsQuery } from '../redux/api.js';
 
 const UserProfile = () => {
+
+	let {data : user, isLoading , isError,error} = useGetUserDetailsQuery();
+	console.log(user, error, isError);
 
 	return (
 	<main className="min-h-screen bg-base-200 p-4 md:p-8">
