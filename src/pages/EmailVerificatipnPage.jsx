@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 function EmailVerificatipnPage() 
 {
 
-   let email = useSelector(store => store?.user?.userEmail);
+   let email = useSelector(store => store?.email?.email);
    console.log(email);
 
     useEffect(()=>{
