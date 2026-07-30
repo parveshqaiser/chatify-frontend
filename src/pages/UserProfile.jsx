@@ -1,17 +1,40 @@
 
 import React from 'react';
-import { data, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {User,Mail,CalendarDays,Clock3,Pencil,Camera,Lock,Image,FileText,Video,HardDrive,Users,
 	MessageCircle,Send,ShieldCheck,Crown,UserX,ArrowUpRight,LogOut,AtSign,BadgeInfo,HomeIcon,
 } from "lucide-react";
 
 import { groups, blockedUsers } from '../utils/constants';
-import { useGetUserDetailsQuery } from '../redux/api.js';
+import { api, useGetUserDetailsQuery, useLogoutMutation } from '../redux/api.js';
+import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
 
 const UserProfile = () => {
 
 	let {data : user, isLoading , isError,error} = useGetUserDetailsQuery();
-	console.log(user, error, isError);
+	let [logout] = useLogoutMutation();
+
+	let dispatch = useDispatch();
+	let navigate = useNavigate();
+
+	let handleLogout = async()=>{
+		try {
+			let res = await logout().unwrap();
+
+			if(res.success){
+				toast.success(res.message);
+				localStorage.removeItem("token");
+				dispatch(api.util.resetApiState());
+				setTimeout(()=>{
+					navigate("/login");
+				},1200);	
+			}
+		} catch (error) {
+			console.log(error);
+			toast.error(error.data?.message || "Logout failed");
+		}
+	}
 
 	return (
 	<main className="min-h-screen bg-base-200 p-4 md:p-8">
@@ -82,7 +105,7 @@ const UserProfile = () => {
 
 						{/* Logout */}
 						<div className="lg:ml-auto lg:self-start">
-							<button className="btn btn-error btn-outline w-full lg:w-auto">
+							<button onClick={handleLogout} className="btn btn-error btn-outline w-full lg:w-auto">
 								<LogOut size={18} />
 								Log out
 							</button>
