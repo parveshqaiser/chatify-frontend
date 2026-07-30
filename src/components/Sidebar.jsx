@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { LogOutIcon, MessageCirclePlus, MoreVertical, Search, UserCircle } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useLogoutMutation } from "../redux/api";
-import toast from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom";
+import { api, useLogoutMutation } from "../redux/api.js";
+import toast, { Toaster } from "react-hot-toast";
+import { useDispatch } from "react-redux";
 
 const Sidebar = ({ users, activeUserId, onSelectUser }) => {
 	
 
-	let [loggout] = useLogoutMutation();
+	let [logout] = useLogoutMutation();
+
+	let dispatch = useDispatch();
+	let navigate = useNavigate();
 
 	const [query, setQuery] = useState("");
 	const [tab, setTab] = useState("online");
@@ -23,10 +27,14 @@ const Sidebar = ({ users, activeUserId, onSelectUser }) => {
 			let res = await logout().unwrap();
 
 			console.log(res);
-			localStorage.removeItem("token");
-
-			//  dispatch(api.util.resetApiState());
-
+			if(res.success){
+				toast.success(res.message);
+				localStorage.removeItem("token");
+				dispatch(api.util.resetApiState());
+				setTimeout(()=>{
+					navigate("/login");
+				},1200);	
+			}
 		} catch (error) {
 			console.log(error);
 			toast.error(error.data?.message || "Logout failed");
