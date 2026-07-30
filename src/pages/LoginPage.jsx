@@ -39,6 +39,7 @@ const LoginPage = () => {
             let res = await axios.post(BASE_URL + "/auth/login",data);
             if(res.data.success){
                 toast.success(res.data.message);
+                localStorage.setItem("token", res.data.token)
                 setLoading(false);
                 setTimeout(()=>{
                     navigate("/home")

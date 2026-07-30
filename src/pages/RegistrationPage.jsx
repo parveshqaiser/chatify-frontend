@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import Spinner from "../components/Spinner.jsx";
 import { useDispatch } from "react-redux";
-import { addTemporaryEmail } from "../redux/userSlice.js";
+import { addTemporaryEmail } from "../redux/emailSlice.js";
 
 
 const RegistrationPage = () => {
