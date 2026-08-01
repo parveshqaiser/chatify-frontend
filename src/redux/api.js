@@ -1,22 +1,16 @@
+
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { BASE_URL } from '../utils/constants.js'
+import { BASE_URL } from '../utils/constants.js';
 
 const baseQuery = fetchBaseQuery({
     baseUrl: BASE_URL,
     credentials: "include",
-    prepareHeaders: (headers) => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            headers.set("Authorization", `Bearer ${token}`);
-        }
-        return headers;
-    },
 });
 
 export const api = createApi({
-    reducerPath: 'api',
+    reducerPath: "api",
     baseQuery: baseQuery,
-    endpoints: (builder) => ({
+    endpoints : (builder) => ({
         getUserDetails: builder.query({
             query: () => '/auth/current-user',
         }),
@@ -30,9 +24,10 @@ export const api = createApi({
                 method : "GET",
                 url : "/auth/logout"
             })
-       }),
-    }),
+        }),
+    })
 });
 
-export const {useGetUserDetailsQuery, useGetAllUsersQuery, useLogoutMutation} = api;
+
+export const {useGetUserDetailsQuery,useGetAllUsersQuery, useLogoutMutation} = api;
 

@@ -1,22 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import ChatWindow from "./ChatWindow.jsx";
 import Sidebar from "./Sidebar.jsx";
 import bgImage from "../assets/chat-br.jpg";
+import toast from "react-hot-toast";
+import { users ,initialMessages} from "../utils/constants.js";
 
-const users = [
-    { id: 1, name: "Yamal", online: true, avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT0M9PkaDKnCMW8NANGmmvjkS-WhhsIOe4pQ&s" },
-    { id: 2, name: "Messi", online: true, avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT0M9PkaDKnCMW8NANGmmvjkS-WhhsIOe4pQ&s" },
-    { id: 3, name: "Ronaldo", online: false, avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT0M9PkaDKnCMW8NANGmmvjkS-WhhsIOe4pQ&s" },
-    { id: 4, name: "Bruno", online: false, avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT0M9PkaDKnCMW8NANGmmvjkS-WhhsIOe4pQ&s" },
-];
-
-const initialMessages = {
-    1: [
-        { id: 1, text: "Are we still on for 6?", fromSelf: false },
-        { id: 2, text: "Yep, see you then", fromSelf: true },
-    ],
-};
 
 function HomePage() {
   
@@ -41,6 +30,30 @@ function HomePage() {
         ],
         }));
     };
+
+    useEffect(()=>{
+        toast.custom((t) => (
+        <main
+            className={`${
+            t.visible ? 'animate-custom-enter' : 'animate-custom-leave'
+            } lg:max-w-md sm:max-w-sm w-full bg-blue-500 shadow-lg rounded-lg pointer-events-auto flex ring-opacity-5`}
+        >
+           <aside className="flex-1 flex items-start gap-3 p-4">
+                <p className="text-white text-sm leading-6">
+                    Welcome Parvesh Qaiser
+                </p>
+            </aside>
+            <aside className="flex border-l border-gray-200">
+                <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="w-full rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-black focus:outline-none"
+                >
+                    Close
+                </button>
+            </aside>
+        </main>
+        ))
+    },[])
 
     return (
     <main className="relative h-screen w-screen flex items-center justify-center overflow-hidden">
