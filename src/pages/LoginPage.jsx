@@ -47,7 +47,7 @@ const LoginPage = () => {
             }
 
         } catch (error) {
-            console.log(error);
+            // console.log(error);
             toast.error(error?.response?.data?.message || error?.message, {duration:2000})
         }finally {
             setLoading(false);
