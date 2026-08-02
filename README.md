@@ -7,6 +7,10 @@ home page
     sidebar
     chatwindow
 profile page
+add connection page
+
+
+pending : rtk interceptor
 
 in home page, click on more info about uuser info.
 
