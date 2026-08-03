@@ -9,6 +9,7 @@ import { groups, blockedUsers } from '../utils/constants';
 import { api, useGetUserDetailsQuery, useLogoutMutation } from '../redux/api.js';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
+import { LoadingMessage } from '../components/Spinner.jsx';
 
 const UserProfile = () => {
 
@@ -17,6 +18,8 @@ const UserProfile = () => {
 
 	let dispatch = useDispatch();
 	let navigate = useNavigate();
+
+	console.log("user ", user);
 
 	let handleLogout = async()=>{
 		try {
@@ -34,6 +37,12 @@ const UserProfile = () => {
 			console.log(error);
 			toast.error(error.data?.message || "Logout failed");
 		}
+	}
+
+	if(isLoading){
+		return(
+			<LoadingMessage />
+		)
 	}
 
 	return (
