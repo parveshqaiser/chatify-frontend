@@ -31,29 +31,29 @@ function HomePage() {
         }));
     };
 
-    useEffect(()=>{
-        toast.custom((t) => (
-        <main
-            className={`${
-            t.visible ? 'animate-custom-enter' : 'animate-custom-leave'
-            } lg:max-w-md sm:max-w-sm w-full bg-blue-500 shadow-lg rounded-lg pointer-events-auto flex ring-opacity-5`}
-        >
-           <aside className="flex-1 flex items-start gap-3 p-4">
-                <p className="text-white text-sm leading-6">
-                    Welcome Parvesh Qaiser
-                </p>
-            </aside>
-            <aside className="flex border-l border-gray-200">
-                <button
-                    onClick={() => toast.dismiss(t.id)}
-                    className="w-full rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-black focus:outline-none"
-                >
-                    Close
-                </button>
-            </aside>
-        </main>
-        ))
-    },[])
+    // useEffect(()=>{
+    //     toast.custom((t) => (
+    //     <main
+    //         className={`${
+    //         t.visible ? 'animate-custom-enter' : 'animate-custom-leave'
+    //         } lg:max-w-md sm:max-w-sm w-full bg-blue-500 shadow-lg rounded-lg pointer-events-auto flex ring-opacity-5`}
+    //     >
+    //        <aside className="flex-1 flex items-start gap-3 p-4">
+    //             <p className="text-white text-sm leading-6">
+    //                 Welcome Parvesh Qaiser
+    //             </p>
+    //         </aside>
+    //         <aside className="flex border-l border-gray-200">
+    //             <button
+    //                 onClick={() => toast.dismiss(t.id)}
+    //                 className="w-full rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-black focus:outline-none"
+    //             >
+    //                 Close
+    //             </button>
+    //         </aside>
+    //     </main>
+    //     ))
+    // },[])
 
     return (
     <main className="relative h-screen w-screen flex items-center justify-center overflow-hidden">
