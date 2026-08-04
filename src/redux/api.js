@@ -25,9 +25,31 @@ export const api = createApi({
                 url : "/auth/logout"
             })
         }),
+
+        updateProfile : builder.mutation({
+            query : ({name,bio})=>({
+                method : "PATCH",
+                url : "/auth/update-profile",
+                body : {name, bio}
+            })
+        }),
+
+        updatePassword : builder.mutation({
+            query : (data)=>({
+                method : "POST",
+                url : "/auth/change-password",
+                body : data
+            })
+        })
     })
 });
 
 
-export const {useGetUserDetailsQuery,useGetAllUsersQuery, useLogoutMutation} = api;
+export const {
+    useGetUserDetailsQuery,
+    useGetAllUsersQuery,
+    useLogoutMutation, 
+    useUpdateProfileMutation,
+    useUpdatePasswordMutation,
+} = api;
 

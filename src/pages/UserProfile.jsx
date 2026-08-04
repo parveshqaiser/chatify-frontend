@@ -1,25 +1,53 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {User,Mail,CalendarDays,Clock3,Pencil,Camera,Lock,Image,FileText,Video,HardDrive,Users,
 	MessageCircle,Send,ShieldCheck,Crown,UserX,ArrowUpRight,LogOut,AtSign,BadgeInfo,HomeIcon,
 } from "lucide-react";
 
 import { groups, blockedUsers } from '../utils/constants';
-import { api, useGetUserDetailsQuery, useLogoutMutation } from '../redux/api.js';
+import { api, useGetUserDetailsQuery, useLogoutMutation, useUpdatePasswordMutation, useUpdateProfileMutation } from '../redux/api.js';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { LoadingMessage } from '../components/Spinner.jsx';
 
 const UserProfile = () => {
 
-	let {data : user, isLoading , isError,error} = useGetUserDetailsQuery();
+	let {data : user, isLoading , isError,error, refetch} = useGetUserDetailsQuery();
 	let [logout] = useLogoutMutation();
+	let [updateProfle] = useUpdateProfileMutation();
+	let [updatePassword] = useUpdatePasswordMutation();
 
 	let dispatch = useDispatch();
 	let navigate = useNavigate();
 
-	console.log("user ", user);
+	let [name, setName] = useState("");
+	let [bio, setBio] = useState("");
+
+	let [pwdValues, setPwdValues] = useState({
+		password : "",
+		newPassword : "",
+		confirmPassword : "",
+	});
+
+	useEffect(() => {
+		if (user?.data) {
+			setName(user.data.name);
+			setBio(user.data.bio);
+		}
+	},[user?.data]);
+
+	if(isLoading){
+		return(
+			<LoadingMessage />
+		)
+	}
+
+	if(isError){
+		return <div className="flex items-center justify-center min-h-screen">
+			<h2 className='text-xl text-red-500'>Some Error Occured While Trying to Fetch Profile Data.. Please Try again later</h2>
+		</div>
+	}
 
 	let handleLogout = async()=>{
 		try {
@@ -39,10 +67,55 @@ const UserProfile = () => {
 		}
 	}
 
-	if(isLoading){
-		return(
-			<LoadingMessage />
-		)
+	const handleSubmitProfile = async()=>{
+
+		if(!name.trim() || !bio.trim()){
+			return toast.error("Name & Bio Cannot be empty")
+		}
+
+		try {
+			let res = await updateProfle({name,bio}).unwrap();
+			if(res.success){
+				toast.success(res.message);
+				await refetch();
+			}
+		} catch (error) {
+			console.log(error);
+			toast.error(error?.data?.message || "Failed to update profile");
+		}	
+	}
+
+	const handleUpdatePassword = async()=>{
+
+		// let {existingPassword, newPassword, confirmPassword} = pwdValues;  NOTE
+		let {password, newPassword, confirmPassword} = pwdValues;
+
+		if(!password.trim() || !newPassword.trim() || !confirmPassword.trim()){
+			return toast.error("All are required fields")
+		}
+
+		if(newPassword !== confirmPassword){
+			return toast.error("Confrim Password doesn't match")
+		}
+
+
+		let data = pwdValues;
+
+		try {
+			let res = await updatePassword(data).unwrap();
+			if(res.success){
+				toast.success(res.message);
+				setPwdValues({
+					password : "",
+					newPassword :"",
+					confirmPassword :""
+				})
+			}
+
+		} catch (error) {
+			console.log(error);
+			toast.error(error?.data?.message || "Failed to update password");
+		}
 	}
 
 	return (
@@ -86,17 +159,17 @@ const UserProfile = () => {
 						<div className="flex-1 space-y-2">
 							<h2 className="flex items-center gap-2 text-[22px] font-bold">
 								<User size={22} className="" />
-								John Doe
+								{user?.data?.name || "John Doe"}
 							</h2>
 
 							<div className="flex items-center gap-2 text-base-content/80">
 								<AtSign size={18} className="" />
-								<span>dimpu123</span>
+								<span>{user?.data?.username || "dimpu123"}</span>
 							</div>
 
 							<div className="flex items-center gap-2 text-base-content/80 break-all">
 								<Mail size={18} className="" />
-								<span>johndoe@gmail.com</span>
+								<span>{user?.data?.email || "johndoe@gmail.com"}</span>
 							</div>
 
 							<div className="flex items-start gap-2 text-base-content/80">
@@ -106,8 +179,7 @@ const UserProfile = () => {
 								/>
 
 								<p className='italic'>
-									Passionate full-stack developer who enjoys building
-									beautiful and scalable applications.
+									{user?.data?.bio || "NA"}
 								</p>
 							</div>
 						</div>
@@ -147,17 +219,30 @@ const UserProfile = () => {
 
 							<input
 								type="text"
-								placeholder="Full Name"
+								placeholder="Full Name"								
+								value={name}
+								onChange={(e)=> {
+									let {value} = e.target;
+									value = value.charAt(0).toUpperCase() + value.slice(1);
+									setName(value);
+								}}
 								className="input input-accent w-full"
 							/>
 
 							<textarea
 								className="textarea textarea-accent"
 								rows={3}
+								value={bio}
+								maxLength={100}
+								onChange={(e)=> {
+									let {value} = e.target;
+									value = value.charAt(0).toUpperCase() + value.slice(1);
+									setBio(value);
+								}}
 								placeholder="Write your Bio..."
 							/>
 
-							<button className="btn btn-info w-full">
+							<button onClick={handleSubmitProfile} className="btn btn-info w-full">
 								Save Changes
 							</button>
 						</div>
@@ -266,25 +351,42 @@ const UserProfile = () => {
 
 							<input
 								type="password"
+								onChange={(e)=> {
+									let {value} = e.target;								
+									setPwdValues({...pwdValues,password : value})
+								}}
 								placeholder="Current Password"
 								className="input input-warning"
 							/>
 
 							<input
 								type="password"
+								onChange={(e)=> {
+									let {value} = e.target;
+									setPwdValues({...pwdValues,newPassword : value})
+								}}
 								placeholder="New Password"
 								className="input input-warning"
 							/>
 
 							<input
 								type="password"
+								onChange={(e)=> {
+									let {value} = e.target;
+									setPwdValues({...pwdValues,confirmPassword : value})
+								}}
 								placeholder="Confirm Password"
 								className="input input-warning"
 							/>
 
 							<p className="text-sm text-base-content/60">Password last changed on 18 July 2026</p>
 
-							<button className="btn btn-warning w-full">Update Password</button>
+							<button 
+								onClick={handleUpdatePassword}
+								className="btn btn-warning w-full"
+							>
+								Update Password
+							</button>
 						</div>
 					</aside>
 
@@ -355,7 +457,7 @@ const UserProfile = () => {
 						</div>
 					</aside>
 
-					{/* blocked users */}
+					{/* Blocked users */}
 					<section className="card bg-base-100 shadow-lg">
 						<aside className="card-body p-5">
 							<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
