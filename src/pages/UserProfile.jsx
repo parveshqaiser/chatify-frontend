@@ -10,6 +10,7 @@ import { api, useGetUserDetailsQuery, useLogoutMutation, useUpdatePasswordMutati
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { LoadingMessage } from '../components/Spinner.jsx';
+import dayjs from 'dayjs';
 
 const UserProfile = () => {
 
@@ -57,9 +58,7 @@ const UserProfile = () => {
 				toast.success(res.message);
 				localStorage.removeItem("token");
 				dispatch(api.util.resetApiState());
-				setTimeout(()=>{
-					navigate("/login");
-				},1200);	
+				navigate("/login")
 			}
 		} catch (error) {
 			console.log(error);
@@ -98,20 +97,19 @@ const UserProfile = () => {
 			return toast.error("Confrim Password doesn't match")
 		}
 
-
 		let data = pwdValues;
 
 		try {
 			let res = await updatePassword(data).unwrap();
 			if(res.success){
 				toast.success(res.message);
+				await refetch();
 				setPwdValues({
 					password : "",
 					newPassword :"",
 					confirmPassword :""
 				})
 			}
-
 		} catch (error) {
 			console.log(error);
 			toast.error(error?.data?.message || "Failed to update password");
@@ -351,6 +349,7 @@ const UserProfile = () => {
 
 							<input
 								type="password"
+								value={pwdValues.password}
 								onChange={(e)=> {
 									let {value} = e.target;								
 									setPwdValues({...pwdValues,password : value})
@@ -361,6 +360,7 @@ const UserProfile = () => {
 
 							<input
 								type="password"
+								value={pwdValues.newPassword}
 								onChange={(e)=> {
 									let {value} = e.target;
 									setPwdValues({...pwdValues,newPassword : value})
@@ -371,6 +371,7 @@ const UserProfile = () => {
 
 							<input
 								type="password"
+								value={pwdValues.confirmPassword}
 								onChange={(e)=> {
 									let {value} = e.target;
 									setPwdValues({...pwdValues,confirmPassword : value})
@@ -379,7 +380,9 @@ const UserProfile = () => {
 								className="input input-warning"
 							/>
 
-							<p className="text-sm text-base-content/60">Password last changed on 18 July 2026</p>
+							<p className="text-sm text-base-content/60">
+								Password last changed on {dayjs(user?.data?.lastPasswordUpdated).format("D MMMM YYYY") || "NA"}
+							</p>
 
 							<button 
 								onClick={handleUpdatePassword}
