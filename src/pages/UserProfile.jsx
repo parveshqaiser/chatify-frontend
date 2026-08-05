@@ -90,7 +90,7 @@ const UserProfile = () => {
 		let {password, newPassword, confirmPassword} = pwdValues;
 
 		if(!password.trim() || !newPassword.trim() || !confirmPassword.trim()){
-			return toast.error("All are required fields")
+			return toast.error("All Password fields are required")
 		}
 
 		if(newPassword !== confirmPassword){
@@ -380,10 +380,11 @@ const UserProfile = () => {
 								className="input input-warning"
 							/>
 
-							<p className="text-sm text-base-content/60">
-								Password last changed on {dayjs(user?.data?.lastPasswordUpdated).format("D MMMM YYYY") || "NA"}
-							</p>
-
+							{user?.data?.lastPasswordUpdated && 
+								<p className="text-sm text-base-content/60">							
+									Password last changed on {dayjs(user?.data?.lastPasswordUpdated).format("D MMMM YYYY") || "NA"}
+								</p>
+							}
 							<button 
 								onClick={handleUpdatePassword}
 								className="btn btn-warning w-full"
@@ -415,13 +416,12 @@ const UserProfile = () => {
 
 								<div className="flex justify-between">
 									<span>Member Since</span>
-									<span>20 July 2026</span>
+									<span>{dayjs(user?.data?.createdAt).format("D MMMM YYYY") || "NA"}</span>
 								</div>
 
 								<div className="flex justify-between">
 									<span>Last Login</span>
-
-									<span>21 July 2026</span>
+									<span>{dayjs(user?.data?.lastLogin).format("D MMMM YYYY") || "NA"}</span>
 								</div>
 							</div>
 						</div>
