@@ -40,7 +40,13 @@ export const api = createApi({
                 url : "/auth/change-password",
                 body : data
             })
+        }),
+
+        // messages
+        getAllMessages : builder.query({
+            query: (targetUserId) => `/chat/${targetUserId}`,
         })
+
     })
 });
 
@@ -51,5 +57,6 @@ export const {
     useLogoutMutation, 
     useUpdateProfileMutation,
     useUpdatePasswordMutation,
+    useGetAllMessagesQuery,
 } = api;
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, X, Info, Paperclip, Smile, Send,Images,FileText,User,Mail,Calendar,Download,File,Image,FileArchive,FileCode} from 'lucide-react';
 
-const UserViewModal = ({ user, onClose }) => {
+const UserViewModal = ({user, onClose }) => {
  
     const files = [
         { id: 1, name: "profile_picture.jpg", type: "image", size: "2.4 MB", date: "2024-01-15" },
@@ -47,17 +47,14 @@ const UserViewModal = ({ user, onClose }) => {
                             alt={user?.name || "User"}
                             className="w-18 h-18 rounded-full object-cover border-3 border-indigo-100 dark:border-indigo-900"
                         />
-                        {user?.online && (
-                            <span className="absolute bottom-0 right-0 w-4 h-4 bg-emerald-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
+                        {user?.status == "online" && (
+                            <span className="absolute bottom-0 right-2 w-3 h-3 bg-emerald-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
                         )}
                     </div>
                     <div className="flex-1">
                         <h4 className="text-md font-bold text-gray-900 dark:text-white">{user?.name || "User Name"}</h4>
-                        {/* <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                            <User size={14} />
-                            {user?.online ? "Online" : "Offline"}
-                        </p> */}
-                        <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                      
+                        <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <Mail size={14} />
                             {user?.email || "user@example.com"}
                         </p>
