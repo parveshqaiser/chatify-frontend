@@ -10,7 +10,7 @@ profile page
 add connection page
 
 
-pending : rtk interceptor
+pending : rtk interceptor , fixed activer user button in sidenvbar
 
 in home page, click on more info about uuser info.
 

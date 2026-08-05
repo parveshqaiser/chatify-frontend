@@ -32,7 +32,7 @@ function HomePage() {
         if(activeUser?._id){
             setAllMessages(msg?.data?.message || [])
         }else{
-            setAllMessages([])
+            setAllMessages([]) // very imp step
         }
     },[activeUser?._id])
 
