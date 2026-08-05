@@ -27,9 +27,10 @@ const Sidebar = ({ users, activeUser, onSelectUser }) => {
 			if(res.success){
 				toast.success(res.message);
 				localStorage.removeItem("token");
-				dispatch(api.util.resetApiState());
+				navigate("/login");
+				
 				setTimeout(()=>{
-					navigate("/login");
+					dispatch(api.util.resetApiState());
 				},1200);	
 			}
 		} catch (error) {
@@ -86,7 +87,7 @@ const Sidebar = ({ users, activeUser, onSelectUser }) => {
 					key={t}
 					onClick={() => setTab(t)}
 					className={`px-4 py-2 rounded-md capitalize text-black ${
-					tab === t ? "bg-indigo-600 text-white" : "hover:bg-indigo-100"
+						tab === t ? "bg-indigo-600 text-white" : "hover:bg-indigo-100"
 					}`}
 				>
 					{t}
@@ -101,7 +102,7 @@ const Sidebar = ({ users, activeUser, onSelectUser }) => {
 				<button
 					key={user._id}
 					onClick={() => onSelectUser(user)}
-					className={`w-full flex items-center gap-3 px-2 py-2 rounded-2xl text-left transition-colors ${activeUser._id === user.id? "bg-white/25 shadow-lg": "hover:bg-white/10"}`}
+					className={`w-full flex cursor-pointer items-center gap-3 px-2 py-2 rounded-2xl text-left transition-colors ${activeUser._id == user.id? "bg-white/25 shadow-lg": "hover:bg-white/10"}`}
 				>
 					<span className="relative shrink-0">
 						<span className="w-12 h-12 rounded-full bg-white/25 flex items-center justify-center text-white font-semibold text-sm">

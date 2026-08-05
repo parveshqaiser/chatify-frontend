@@ -13,14 +13,13 @@ function HomePage() {
 
     let {data : user , isLoading, isError,error} = useGetAllUsersQuery();
   
-    const [activeUser, setActiveUser] = useState("");
+    const [activeUser, setActiveUser] = useState(""); // selected user in left sidebar
     const [messages, setMessages] = useState(initialMessages);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     let {data : msg, isLoading : loadingMsg, error : msgError} = useGetAllMessagesQuery(activeUser?._id, {skip : !activeUser});
 
     const [allMessages, setAllMessages] = useState([]);
-
     const [allUsers, setAllUsers] = useState([]);
 
     useEffect(()=>{
@@ -32,6 +31,8 @@ function HomePage() {
     useEffect(()=>{
         if(activeUser?._id){
             setAllMessages(msg?.data?.message || [])
+        }else{
+            setAllMessages([])
         }
     },[activeUser?._id])
 

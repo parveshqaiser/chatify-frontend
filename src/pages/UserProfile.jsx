@@ -57,8 +57,8 @@ const UserProfile = () => {
 			if(res.success){
 				toast.success(res.message);
 				localStorage.removeItem("token");
-				dispatch(api.util.resetApiState());
 				navigate("/login")
+				dispatch(api.util.resetApiState());
 			}
 		} catch (error) {
 			console.log(error);

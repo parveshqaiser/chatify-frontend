@@ -67,7 +67,6 @@ const ChatWindow = ({selectedUser,allMessages,activeUser, onSend })=>{
             </section>
         )
     }
-
     return (
     <>
     <section className="md:w-full w-65 h-full flex flex-col backdrop-blur-sm">
@@ -163,6 +162,7 @@ const ChatWindow = ({selectedUser,allMessages,activeUser, onSend })=>{
 
         <article className="chat-scroll flex-1 overflow-y-auto p-4 space-y-2">
             {allMessages.map((m) => (
+                
             <div
                 key={m._id}
                 className={`max-w-[60%] px-3 py-2 rounded-lg text-sm ${
