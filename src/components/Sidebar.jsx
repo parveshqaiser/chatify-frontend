@@ -5,7 +5,7 @@ import { api, useLogoutMutation } from "../redux/api.js";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 
-const Sidebar = ({ users, activeUserId, onSelectUser }) => {
+const Sidebar = ({ users, activeUser, onSelectUser }) => {
 	
 
 	let [logout] = useLogoutMutation();
@@ -100,8 +100,8 @@ const Sidebar = ({ users, activeUserId, onSelectUser }) => {
 			return (
 				<button
 					key={user._id}
-					onClick={() => onSelectUser(user._id)}
-					className={`w-full flex items-center gap-3 px-2 py-2 rounded-2xl text-left transition-colors ${activeUserId === user.id? "bg-white/25 shadow-lg": "hover:bg-white/10"}`}
+					onClick={() => onSelectUser(user)}
+					className={`w-full flex items-center gap-3 px-2 py-2 rounded-2xl text-left transition-colors ${activeUser._id === user.id? "bg-white/25 shadow-lg": "hover:bg-white/10"}`}
 				>
 					<span className="relative shrink-0">
 						<span className="w-12 h-12 rounded-full bg-white/25 flex items-center justify-center text-white font-semibold text-sm">
