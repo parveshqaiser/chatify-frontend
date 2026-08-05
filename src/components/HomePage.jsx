@@ -5,16 +5,40 @@ import Sidebar from "./Sidebar.jsx";
 import bgImage from "../assets/chat-br.jpg";
 import toast from "react-hot-toast";
 import { users ,initialMessages} from "../utils/constants.js";
+import { useGetAllUsersQuery } from "../redux/api.js";
+import { LoadingMessage } from "./Spinner.jsx";
 
 
 function HomePage() {
+
+    let {data : user , isLoading, isError,error} = useGetAllUsersQuery();
   
-    const [activeUserId, setActiveUserId] = useState(1);
+    const [activeUserId, setActiveUserId] = useState("");
     const [messages, setMessages] = useState(initialMessages);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const activeUser = users.find((u) => u.id === activeUserId);
-    const activeMessages = messages[activeUserId] || [];
+    // const activeUser = users.find((u) => u.id === activeUserId);
+    // const activeMessages = messages[activeUserId] || [];
+
+    const [allUsers, setAllUsers] = useState([]);
+
+    useEffect(()=>{
+        if(user?.data){
+            setAllUsers(user?.data)
+        }
+    },[user?.data])
+
+    if(isLoading){
+        return(
+            <LoadingMessage />
+        )
+    }
+    
+    if(isError){
+        return <div className="flex items-center justify-center min-h-screen">
+            <h2 className='text-xl text-red-500'>Some Error Occured While Trying to Fetch Data.. Please Try again later</h2>
+        </div>
+    }
 
     const handleSelectUser = (id) => {
         setActiveUserId(id);
@@ -30,30 +54,6 @@ function HomePage() {
         ],
         }));
     };
-
-    // useEffect(()=>{
-    //     toast.custom((t) => (
-    //     <main
-    //         className={`${
-    //         t.visible ? 'animate-custom-enter' : 'animate-custom-leave'
-    //         } lg:max-w-md sm:max-w-sm w-full bg-blue-500 shadow-lg rounded-lg pointer-events-auto flex ring-opacity-5`}
-    //     >
-    //        <aside className="flex-1 flex items-start gap-3 p-4">
-    //             <p className="text-white text-sm leading-6">
-    //                 Welcome Parvesh Qaiser
-    //             </p>
-    //         </aside>
-    //         <aside className="flex border-l border-gray-200">
-    //             <button
-    //                 onClick={() => toast.dismiss(t.id)}
-    //                 className="w-full rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-black focus:outline-none"
-    //             >
-    //                 Close
-    //             </button>
-    //         </aside>
-    //     </main>
-    //     ))
-    // },[])
 
     return (
     <main className="relative h-screen w-screen flex items-center justify-center overflow-hidden">
@@ -85,8 +85,8 @@ function HomePage() {
                 </div>
  
                 <Sidebar
-                    users={users}
-                    activeUserId={activeUserId}
+                    activeUserId = {activeUserId}
+                    users={allUsers}
                     onSelectUser={handleSelectUser}
                 />
             </div>
@@ -101,7 +101,7 @@ function HomePage() {
  
             {/* chat: 3/4 width on desktop, full width on mobile */}
             <nav className="flex-1 md:w-3/4">
-                <ChatWindow user={activeUser} messages={activeMessages} onSend={handleSend} />
+                {/* <ChatWindow user={activeUser} messages={activeMessages} onSend={handleSend} /> */}
             </nav>
         </div>
     </main>
