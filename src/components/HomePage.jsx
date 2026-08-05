@@ -5,7 +5,7 @@ import Sidebar from "./Sidebar.jsx";
 import bgImage from "../assets/chat-br.jpg";
 import toast from "react-hot-toast";
 import { users ,initialMessages} from "../utils/constants.js";
-import { useGetAllUsersQuery } from "../redux/api.js";
+import { useGetAllMessagesQuery, useGetAllUsersQuery } from "../redux/api.js";
 import { LoadingMessage } from "./Spinner.jsx";
 
 
@@ -17,8 +17,9 @@ function HomePage() {
     const [messages, setMessages] = useState(initialMessages);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    // const activeUser = users.find((u) => u.id === activeUserId);
-    // const activeMessages = messages[activeUserId] || [];
+    let {data : msg, isLoading : loadingMsg, error : msgError} = useGetAllMessagesQuery(activeUser?._id, {skip : !activeUser});
+
+    const [allMessages, setAllMessages] = useState([]);
 
     const [allUsers, setAllUsers] = useState([]);
 
@@ -26,7 +27,13 @@ function HomePage() {
         if(user?.data){
             setAllUsers(user?.data)
         }
-    },[user?.data])
+    },[user?.data]);
+
+    useEffect(()=>{
+        if(activeUser?._id){
+            setAllMessages(msg?.data?.message || [])
+        }
+    },[activeUser?._id])
 
     if(isLoading){
         return(
@@ -101,7 +108,12 @@ function HomePage() {
  
             {/* chat: 3/4 width on desktop, full width on mobile */}
             <nav className="flex-1 md:w-3/4">
-                <ChatWindow selectedUser={activeUser}  onSend={handleSend} />
+                <ChatWindow 
+                    selectedUser={activeUser}  
+                    allMessages={allMessages}
+                    activeUser={activeUser}
+                    onSend={handleSend} 
+                />
             </nav>
         </div>
     </main>

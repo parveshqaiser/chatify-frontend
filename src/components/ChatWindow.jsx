@@ -7,7 +7,7 @@ import DeleteConversationModal from "./DeleteConversationModal.jsx";
 
 import robot from "../assets/robot.gif";
 
-const ChatWindow = ({ selectedUser, onSend })=>{ 
+const ChatWindow = ({selectedUser,allMessages,activeUser, onSend })=>{ 
 
     const [text, setText] = useState("");
     const [fileIcons, setFileIcons] = useState(false);  // icons in send message
@@ -55,11 +55,11 @@ const ChatWindow = ({ selectedUser, onSend })=>{
     if (!selectedUser){
         return(
             <section className="w-full h-full text-slate-400 text-sm bg-linear-to-tr from-rose-500 via-orange-300 to-purple-200">
-                
                 <div>
                     <img src={robot} alt="gif" className="w-60 m-auto" />
                 </div>
                 <div className="text-center">
+                    <p className="text-black text-xl">Hello Test</p>
                     <p className="text-white font-medium text-base">No conversation selected</p>
                     <p className="text-white text-sm">Pick a user from the list to start chatting</p>
                 </div>
@@ -162,18 +162,18 @@ const ChatWindow = ({ selectedUser, onSend })=>{
         </header>
 
         <article className="chat-scroll flex-1 overflow-y-auto p-4 space-y-2">
-            {/* {messages.map((m) => (
+            {allMessages.map((m) => (
             <div
-                key={m.id}
+                key={m._id}
                 className={`max-w-[60%] px-3 py-2 rounded-lg text-sm ${
-                m.fromSelf
+                m?.senderId?.name == activeUser?.name
                     ? "bg-indigo-600 text-white ml-auto"
                     : "bg-white text-slate-700 border border-slate-200"
                 }`}
             >
-                {m.text}
+                {m.msg}
             </div>
-            ))} */}
+            ))}
         </article>
 
 
@@ -236,7 +236,7 @@ const ChatWindow = ({ selectedUser, onSend })=>{
             </button>
         </article>
     </section>
-    <UserViewModal />
+    <UserViewModal user={selectedUser}/>
     <DeleteConversationModal deleteModal={deleteModal} setDeleteModal={setDeleteModal} />
     </>
     );
