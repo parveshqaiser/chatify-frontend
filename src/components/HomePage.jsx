@@ -13,7 +13,7 @@ function HomePage() {
 
     let {data : user , isLoading, isError,error} = useGetAllUsersQuery();
   
-    const [activeUserId, setActiveUserId] = useState("");
+    const [activeUser, setActiveUser] = useState("");
     const [messages, setMessages] = useState(initialMessages);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -40,8 +40,8 @@ function HomePage() {
         </div>
     }
 
-    const handleSelectUser = (id) => {
-        setActiveUserId(id);
+    const handleSelectUser = (person) => {
+        setActiveUser(person);
         setSidebarOpen(false);
     };
 
@@ -85,7 +85,7 @@ function HomePage() {
                 </div>
  
                 <Sidebar
-                    activeUserId = {activeUserId}
+                    activeUser = {activeUser}
                     users={allUsers}
                     onSelectUser={handleSelectUser}
                 />
@@ -101,7 +101,7 @@ function HomePage() {
  
             {/* chat: 3/4 width on desktop, full width on mobile */}
             <nav className="flex-1 md:w-3/4">
-                {/* <ChatWindow user={activeUser} messages={activeMessages} onSend={handleSend} /> */}
+                <ChatWindow selectedUser={activeUser}  onSend={handleSend} />
             </nav>
         </div>
     </main>
