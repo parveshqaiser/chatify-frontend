@@ -13,20 +13,17 @@ const Sidebar = ({ users, activeUserId, onSelectUser }) => {
 	let dispatch = useDispatch();
 	let navigate = useNavigate();
 
-	const [query, setQuery] = useState("");
+	const [query, setQuery] = useState(""); // search input
 	const [tab, setTab] = useState("online");
-	const [verticalBtn, setVerticalBtn] = useState(false);
+	const [verticalBtn, setVerticalBtn] = useState(false);  // modal
 
-	const filtered = users.filter((u) => (tab === "online" ? u.online : true))
-		.filter((u) => u.name.toLowerCase().includes(query.toLowerCase())
-	);
+	const filtered = users.filter((u) => (tab === "online" ? u.status == "online" : true))
+		.filter((u) => u.name.toLowerCase().includes(query.toLowerCase()));
+
 
 	let handleLogout = async()=>{
-
 		try {
 			let res = await logout().unwrap();
-
-			console.log(res);
 			if(res.success){
 				toast.success(res.message);
 				localStorage.removeItem("token");
@@ -36,7 +33,6 @@ const Sidebar = ({ users, activeUserId, onSelectUser }) => {
 				},1200);	
 			}
 		} catch (error) {
-			console.log(error);
 			toast.error(error.data?.message || "Logout failed");
 		}
 	}
@@ -103,28 +99,25 @@ const Sidebar = ({ users, activeUserId, onSelectUser }) => {
 			const initials = user.name.slice(0, 2).toUpperCase();
 			return (
 				<button
-					key={user.id}
-					onClick={() => onSelectUser(user.id)}
+					key={user._id}
+					onClick={() => onSelectUser(user._id)}
 					className={`w-full flex items-center gap-3 px-2 py-2 rounded-2xl text-left transition-colors ${activeUserId === user.id? "bg-white/25 shadow-lg": "hover:bg-white/10"}`}
 				>
 					<span className="relative shrink-0">
 						<span className="w-12 h-12 rounded-full bg-white/25 flex items-center justify-center text-white font-semibold text-sm">
 							{initials}
 						</span>
-						{user.online && (
+						{user.status == "online" && (
 							<span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-400 border-2 border-purple-400" />
 						)}
 					</span>
 
 					<span className="flex-1 min-w-0">
 						<span className="flex items-center justify-between gap-2">
-							<span className="font-semibold text-white truncate">{user.name}</span>
-							{/* <span className="text-xs text-white/70 shrink-0">
-								{user.online ? "Online" : user.lastSeen || "Offline"}
-							</span> */}
+							<span className="font-semibold text-white truncate">{user.username}</span>
 						</span>
-						<span className="block text-sm text-white/70 truncate">
-							{user.online ? "Active now" : "Last seen recently"}
+						<span className="block text-[12px] text-white/70 truncate">
+							{user.status == "online" ? "Active now" : "Last seen recently"}
 						</span>
 					</span>
 				</button>
