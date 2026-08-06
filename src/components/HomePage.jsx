@@ -25,16 +25,18 @@ function HomePage() {
     useEffect(()=>{
         if(user?.data){
             setAllUsers(user?.data)
+        }else {
+            setAllUsers([])
         }
     },[user?.data]);
 
-    useEffect(()=>{
-        if(activeUser?._id){
-            setAllMessages(msg?.data?.message || [])
-        }else{
-            setAllMessages([]) // very imp step
+    useEffect(() => {
+        if (!activeUser?._id) {
+            return setAllMessages([]);
         }
-    },[activeUser?._id])
+
+        setAllMessages(msg?.data?.message || []);
+    }, [activeUser?._id, msg]);
 
     if(isLoading){
         return(
