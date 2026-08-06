@@ -6,6 +6,7 @@ import UserViewModal from "./UserViewModal.jsx";
 import DeleteConversationModal from "./DeleteConversationModal.jsx";
 
 import robot from "../assets/robot.gif";
+import dayjs from "dayjs";
 
 const ChatWindow = ({selectedUser,allMessages,activeUser, onSend })=>{ 
 
@@ -167,11 +168,12 @@ const ChatWindow = ({selectedUser,allMessages,activeUser, onSend })=>{
                 key={m._id}
                 className={`max-w-[60%] px-3 py-2 rounded-lg text-sm ${
                 m?.senderId?.name == activeUser?.name
-                    ? "bg-indigo-600 text-white ml-auto"
+                    ? "bg-yellow-500 text-white ml-auto"
                     : "bg-white text-slate-700 border border-slate-200"
                 }`}
             >
                 {m.msg}
+                <span className="text-[11px] text-green-600 text-right"> Delivered {dayjs(m.createdAt).format('hh:mm A') }</span>
             </div>
             ))}
         </article>
