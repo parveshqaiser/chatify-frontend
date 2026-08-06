@@ -50,6 +50,10 @@ const RegistrationPage = () => {
             return toast.error("Please enter a valid Gmail, Hotmail, or Yahoo email address.");
         }
 
+        if(password.length <=7){
+            return toast.error("Min Password shoudl be 8 chars")
+        }
+
         setLoading(true);
 
         try {
@@ -97,7 +101,8 @@ const RegistrationPage = () => {
                         type="text"
                         name="username"
                         onChange={handleChange}
-                        placeholder="Enter your username"
+                        placeholder="Enter your username (Max 8 chars)"
+                        maxLength={8}
                         className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition-all placeholder:text-slate-500 focus:border-cyan-500"
                     />
                 </div>
@@ -131,7 +136,8 @@ const RegistrationPage = () => {
                         type="password"
                         name="password"
                         onChange={handleChange}
-                        placeholder="Create a password"
+                        placeholder="Create a password (Min 8 chars)"
+                        minLength={7}
                         className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition-all placeholder:text-slate-500 focus:border-cyan-500"
                     />
                 </div>
