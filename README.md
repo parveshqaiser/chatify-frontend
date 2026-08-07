@@ -10,9 +10,24 @@ profile page
 add connection page
 
 
-pending : rtk interceptor
+pending : 
+    rtk interceptor, 
+    get all online users, 
+    scrollview of chat smooths, 
+    load 10 messages at once,
+    chat bubble,
+    message seen or not,
+    use of double tick 
 
-in home page, click on more info about uuser info.
+
+
+for production, 
+
+if(location.hostname == "localhost"){
+    return io(BASE_URL)
+}else{
+    return io("/", {path: "/api/socket.io"})
+}
 
 sidenavbar
 
