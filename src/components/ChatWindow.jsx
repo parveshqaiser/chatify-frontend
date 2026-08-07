@@ -7,8 +7,12 @@ import DeleteConversationModal from "./DeleteConversationModal.jsx";
 
 import robot from "../assets/robot.gif";
 import dayjs from "dayjs";
+import { socketConnection } from "../utils/socket-client.js";
+import { useGetUserDetailsQuery } from "../redux/api.js";
 
-const ChatWindow = ({selectedUser,allMessages,activeUser, onSend })=>{ 
+const ChatWindow = ({selectedUser,allMessages,activeUser, onSend , refetch, allUsersRefetch})=>{ 
+
+    let {data : user, isLoading , isError,error} = useGetUserDetailsQuery();
 
     const [text, setText] = useState("");
     const [fileIcons, setFileIcons] = useState(false);  // icons in send message
@@ -47,9 +51,45 @@ const ChatWindow = ({selectedUser,allMessages,activeUser, onSend })=>{
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    useEffect(()=>{
+        let socket = socketConnection();
+
+        if(!activeUser?._id) return;
+
+        socket.on("connect",()=>{
+            console.log("connection est ", socket.id);
+            socket.emit("joinChat",{
+                current : user?.data?._id,
+                target : activeUser?._id
+            });
+
+            socket.on("receiveMessage",(current,target,text)=>{
+                console.log("text received",current,target,text);
+                refetch();
+                allUsersRefetch()
+            });
+        });
+
+        socket.on("connect_error", (err) => {
+            console.log(err.message);
+        });
+        
+        return()=>{
+            console.log("socket diconnected");
+            socket.disconnect();
+        }
+    },[activeUser?._id])    
+
     const handleSend = () => {
         if (!text.trim()) return;
-        onSend(text);
+        let socket = socketConnection();
+
+        socket.emit("sendMessage",{
+            current : user?.data?._id,
+            target : activeUser?._id,
+            text
+        });
+        // onSend(text);
         setText("");
     };
 
@@ -161,6 +201,7 @@ const ChatWindow = ({selectedUser,allMessages,activeUser, onSend })=>{
             </div>
         </header>
 
+        {/* display messages */}
         <article className="chat-scroll flex-1 overflow-y-auto p-4 space-y-2">
             {allMessages.map((m) => (
                 
@@ -211,7 +252,7 @@ const ChatWindow = ({selectedUser,allMessages,activeUser, onSend })=>{
                 placeholder="Type a message..."
                 className="flex-1 bg-transparent px-1 py-2.5 text-sm text-gray-800 outline-none placeholder:text-gray-400 dark:text-gray-200 dark:placeholder:text-gray-500"
                 onChange={(e) => setText(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                // onKeyDown={(e) => e.key === "Enter" && handleSend()}
             />
 
             <button onClick={()=> setShowEmojiPicker(!showEmojiPicker)} className="rounded-full p-1.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10">
@@ -232,6 +273,7 @@ const ChatWindow = ({selectedUser,allMessages,activeUser, onSend })=>{
             </div>
             )}
             <button
+                onClick={handleSend}
                 className="rounded-full cursor-pointer bg-indigo-500 p-2 text-white shadow-md transition-colors hover:bg-indigo-600"
             >
                 <Send size={18} />

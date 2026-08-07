@@ -43,9 +43,19 @@ export const api = createApi({
         }),
 
         // messages
+
+
         getAllMessages : builder.query({
             query: (targetUserId) => `/chat/${targetUserId}`,
-        })
+        }),
+
+        sendMessage : builder.mutation({
+            query : ({data, targetUserId})=>({
+                method : "POST",
+                url : `/auth/chat/send/${targetUserId}`,
+                body : data
+            })
+        }),
 
     })
 });
@@ -58,5 +68,6 @@ export const {
     useUpdateProfileMutation,
     useUpdatePasswordMutation,
     useGetAllMessagesQuery,
+    useSendMessageMutation,
 } = api;
 
