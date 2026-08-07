@@ -10,7 +10,7 @@ import dayjs from "dayjs";
 import { socketConnection } from "../utils/socket-client.js";
 import { useGetUserDetailsQuery } from "../redux/api.js";
 
-const ChatWindow = ({selectedUser,allMessages,activeUser, onSend , refetch, allUsersRefetch})=>{ 
+const ChatWindow = ({selectedUser,allMessages,refetch, allUsersRefetch})=>{ 
 
     let {data : user, isLoading , isError,error} = useGetUserDetailsQuery();
 
@@ -54,17 +54,17 @@ const ChatWindow = ({selectedUser,allMessages,activeUser, onSend , refetch, allU
     useEffect(()=>{
         let socket = socketConnection();
 
-        if(!activeUser?._id) return;
+        if(!selectedUser?._id) return;
 
         socket.on("connect",()=>{
-            console.log("connection est ", socket.id);
+            // console.log("connection est ", socket.id);
             socket.emit("joinChat",{
                 current : user?.data?._id,
-                target : activeUser?._id
+                target : selectedUser?._id
             });
 
             socket.on("receiveMessage",(current,target,text)=>{
-                console.log("text received",current,target,text);
+                // console.log("text received",current,target,text);
                 refetch();
                 allUsersRefetch()
             });
@@ -78,7 +78,7 @@ const ChatWindow = ({selectedUser,allMessages,activeUser, onSend , refetch, allU
             console.log("socket diconnected");
             socket.disconnect();
         }
-    },[activeUser?._id])    
+    },[selectedUser?._id])    
 
     const handleSend = () => {
         if (!text.trim()) return;
@@ -86,7 +86,7 @@ const ChatWindow = ({selectedUser,allMessages,activeUser, onSend , refetch, allU
 
         socket.emit("sendMessage",{
             current : user?.data?._id,
-            target : activeUser?._id,
+            target : selectedUser?._id,
             text
         });
         // onSend(text);
@@ -108,6 +108,7 @@ const ChatWindow = ({selectedUser,allMessages,activeUser, onSend , refetch, allU
             </section>
         )
     }
+
     return (
     <>
     <section className="md:w-full w-65 h-full flex flex-col backdrop-blur-sm">
@@ -208,7 +209,7 @@ const ChatWindow = ({selectedUser,allMessages,activeUser, onSend , refetch, allU
             <div
                 key={m._id}
                 className={`max-w-[60%] px-3 py-2 rounded-lg text-sm ${
-                m?.senderId?.name == activeUser?.name
+                m?.senderId?.name == selectedUser?.name
                     ? "bg-yellow-500 text-white ml-auto"
                     : "bg-white text-slate-700 border border-slate-200"
                 }`}

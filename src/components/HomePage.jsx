@@ -11,12 +11,13 @@ import { LoadingMessage } from "./Spinner.jsx";
 
 function HomePage() {
 
-    let {data : user , isLoading, isError,error, refetch:allUsersRefetch} = useGetAllUsersQuery();
+    let {data : user , isLoading, isError,error, refetch:allUsersRefetch} = useGetAllUsersQuery();  // all users
   
     const [activeUser, setActiveUser] = useState(""); // selected user in left sidebar
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    let {data : msg, isLoading : loadingMsg, error : msgError, refetch} = useGetAllMessagesQuery(activeUser?._id, {skip : !activeUser});
+    let {data : msg,  isLoading : loadingMsg, error : msgError,refetch} = 
+        useGetAllMessagesQuery(activeUser?._id, {skip : !activeUser}); // all messages
 
     const [allMessages, setAllMessages] = useState([]);
     const [allUsers, setAllUsers] = useState([]);
@@ -52,10 +53,6 @@ function HomePage() {
     const handleSelectUser = (person) => {
         setActiveUser(person);
         setSidebarOpen(false);
-    };
-
-    const handleSend = (text) => {
-      
     };
 
     return (
@@ -107,8 +104,6 @@ function HomePage() {
                 <ChatWindow 
                     selectedUser={activeUser}  
                     allMessages={allMessages}
-                    activeUser={activeUser}
-                    onSend={handleSend} 
                     refetch={refetch}
                     allUsersRefetch={allUsersRefetch}
                 />

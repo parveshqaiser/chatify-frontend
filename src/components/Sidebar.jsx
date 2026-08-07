@@ -13,12 +13,12 @@ const Sidebar = ({ users, activeUser, onSelectUser }) => {
 	let dispatch = useDispatch();
 	let navigate = useNavigate();
 
-	const [query, setQuery] = useState(""); // search input
+	const [search, setSearch] = useState(""); // search input
 	const [tab, setTab] = useState("online");
 	const [verticalBtn, setVerticalBtn] = useState(false);  // modal
 
 	const filtered = users.filter((u) => (tab === "online" ? u.status == "online" : true))
-		.filter((u) => u.name.toLowerCase().includes(query.toLowerCase()));
+		.filter((u) => u.name.toLowerCase().includes(search.toLowerCase()));
 
 
 	let handleLogout = async()=>{
@@ -72,8 +72,8 @@ const Sidebar = ({ users, activeUser, onSelectUser }) => {
 			<div className="relative">
 				<Search className="absolute left-3 top-3 w-4 h-4 text-white/60" />
 				<input
-					value={query}
-					onChange={(e) => setQuery(e.target.value)}
+					value={search}
+					onChange={(e) => setSearch(e.target.value)}
 					placeholder="Search users..."
 					className="w-full pl-9 pr-3 py-2.5 text-sm rounded-2xl bg-white/15 text-white placeholder:text-white/60 outline-none border border-white/20 focus:ring-2 focus:ring-white/40 transition-all"
 				/>
