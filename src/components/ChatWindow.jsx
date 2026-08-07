@@ -10,7 +10,7 @@ import dayjs from "dayjs";
 import { socketConnection } from "../utils/socket-client.js";
 import { useGetUserDetailsQuery } from "../redux/api.js";
 
-const ChatWindow = ({selectedUser,allMessages,refetch, allUsersRefetch})=>{ 
+const ChatWindow = ({selectedUser,allMessages,refetchAllMessages})=>{ 
 
     let {data : user, isLoading , isError,error} = useGetUserDetailsQuery();
 
@@ -65,8 +65,7 @@ const ChatWindow = ({selectedUser,allMessages,refetch, allUsersRefetch})=>{
 
             socket.on("receiveMessage",(current,target,text)=>{
                 // console.log("text received",current,target,text);
-                refetch();
-                allUsersRefetch()
+                refetchAllMessages();
             });
         });
 
@@ -89,7 +88,6 @@ const ChatWindow = ({selectedUser,allMessages,refetch, allUsersRefetch})=>{
             target : selectedUser?._id,
             text
         });
-        // onSend(text);
         setText("");
     };
 
@@ -253,7 +251,7 @@ const ChatWindow = ({selectedUser,allMessages,refetch, allUsersRefetch})=>{
                 placeholder="Type a message..."
                 className="flex-1 bg-transparent px-1 py-2.5 text-sm text-gray-800 outline-none placeholder:text-gray-400 dark:text-gray-200 dark:placeholder:text-gray-500"
                 onChange={(e) => setText(e.target.value)}
-                // onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                onKeyDown={(e) => e.key === "Enter" && handleSend()}
             />
 
             <button onClick={()=> setShowEmojiPicker(!showEmojiPicker)} className="rounded-full p-1.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10">
