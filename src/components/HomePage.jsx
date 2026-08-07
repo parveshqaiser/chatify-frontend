@@ -4,20 +4,19 @@ import ChatWindow from "./ChatWindow.jsx";
 import Sidebar from "./Sidebar.jsx";
 import bgImage from "../assets/chat-br.jpg";
 import toast from "react-hot-toast";
-import { users ,initialMessages} from "../utils/constants.js";
+
 import { useGetAllMessagesQuery, useGetAllUsersQuery } from "../redux/api.js";
 import { LoadingMessage } from "./Spinner.jsx";
 
 
 function HomePage() {
 
-    let {data : user , isLoading, isError,error} = useGetAllUsersQuery();
+    let {data : user , isLoading, isError,error, refetch:allUsersRefetch} = useGetAllUsersQuery();
   
     const [activeUser, setActiveUser] = useState(""); // selected user in left sidebar
-    const [messages, setMessages] = useState(initialMessages);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    let {data : msg, isLoading : loadingMsg, error : msgError} = useGetAllMessagesQuery(activeUser?._id, {skip : !activeUser});
+    let {data : msg, isLoading : loadingMsg, error : msgError, refetch} = useGetAllMessagesQuery(activeUser?._id, {skip : !activeUser});
 
     const [allMessages, setAllMessages] = useState([]);
     const [allUsers, setAllUsers] = useState([]);
@@ -56,13 +55,7 @@ function HomePage() {
     };
 
     const handleSend = (text) => {
-        setMessages((prev) => ({
-        ...prev,
-        [activeUserId]: [
-            ...(prev[activeUserId] || []),
-            { id: Date.now(), text, fromSelf: true },
-        ],
-        }));
+      
     };
 
     return (
@@ -116,6 +109,8 @@ function HomePage() {
                     allMessages={allMessages}
                     activeUser={activeUser}
                     onSend={handleSend} 
+                    refetch={refetch}
+                    allUsersRefetch={allUsersRefetch}
                 />
             </nav>
         </div>
