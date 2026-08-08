@@ -6,7 +6,6 @@ import toast, { Toaster } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 
 const Sidebar = ({ users, activeUser, onSelectUser }) => {
-	
 
 	let [logout] = useLogoutMutation();
 
@@ -19,7 +18,6 @@ const Sidebar = ({ users, activeUser, onSelectUser }) => {
 
 	const filtered = users.filter((u) => (tab === "online" ? u.status == "online" : true))
 		.filter((u) => u.name.toLowerCase().includes(search.toLowerCase()));
-
 
 	let handleLogout = async()=>{
 		try {
