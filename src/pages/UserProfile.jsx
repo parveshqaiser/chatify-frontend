@@ -1,26 +1,24 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link} from 'react-router-dom';
 import {User,Mail,CalendarDays,Clock3,Pencil,Camera,Lock,Image,FileText,Video,HardDrive,Users,
 	MessageCircle,Send,ShieldCheck,Crown,UserX,ArrowUpRight,LogOut,AtSign,BadgeInfo,HomeIcon,
 } from "lucide-react";
 
 import { groups, blockedUsers } from '../utils/constants';
-import { api, useGetUserDetailsQuery, useLogoutMutation, useUpdatePasswordMutation, useUpdateProfileMutation } from '../redux/api.js';
+import {useGetUserDetailsQuery, useUpdatePasswordMutation, useUpdateProfileMutation } from '../redux/api.js';
 import toast from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
 import { LoadingMessage } from '../components/Spinner.jsx';
 import dayjs from 'dayjs';
+import useLogout from '../hooks/useLogout.js';
 
 const UserProfile = () => {
 
 	let {data : user, isLoading , isError,error, refetch} = useGetUserDetailsQuery();
-	let [logout] = useLogoutMutation();
 	let [updateProfle] = useUpdateProfileMutation();
 	let [updatePassword] = useUpdatePasswordMutation();
 
-	let dispatch = useDispatch();
-	let navigate = useNavigate();
+	let logoutHandler = useLogout();
 
 	let [name, setName] = useState("");
 	let [bio, setBio] = useState("");
@@ -48,22 +46,6 @@ const UserProfile = () => {
 		return <div className="flex items-center justify-center min-h-screen">
 			<h2 className='text-xl text-red-500'>Some Error Occured While Trying to Fetch Profile Data.. Please Try again later</h2>
 		</div>
-	}
-
-	let handleLogout = async()=>{
-		try {
-			let res = await logout().unwrap();
-
-			if(res.success){
-				toast.success(res.message);
-				localStorage.removeItem("token");
-				navigate("/login")
-				dispatch(api.util.resetApiState());
-			}
-		} catch (error) {
-			console.log(error);
-			toast.error(error.data?.message || "Logout failed");
-		}
 	}
 
 	const handleSubmitProfile = async()=>{
@@ -184,7 +166,7 @@ const UserProfile = () => {
 
 						{/* Logout */}
 						<div className="lg:ml-auto lg:self-start">
-							<button onClick={handleLogout} className="btn btn-error btn-outline w-full lg:w-auto">
+							<button onClick={logoutHandler} className="btn btn-error btn-outline w-full lg:w-auto">
 								<LogOut size={18} />
 								Log out
 							</button>
