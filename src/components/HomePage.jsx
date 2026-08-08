@@ -61,7 +61,14 @@ function HomePage() {
         };
     }, [currentUser?.data?._id]);
 
+    let usersWithStatus = useMemo(() => {
+        const onlineSet = new Set(onlineUserIds);
 
+        return allUsers.map((user) => ({
+            ...user,
+            status: onlineSet.has(user._id) ? "online" : "offline",
+        }));
+    }, [onlineUserIds, allUsers]);
 
     if(isLoading){
         return(
@@ -80,14 +87,7 @@ function HomePage() {
         setSidebarOpen(false);
     };
 
-    let usersWithStatus = useMemo(() => {
-        const onlineSet = new Set(onlineUserIds);
-
-        return allUsers.map((user) => ({
-            ...user,
-            status: onlineSet.has(user._id) ? "online" : "offline",
-        }));
-    }, [allUsers, onlineUserIds]);
+   
 
     return (
     <main className="relative h-screen w-screen flex items-center justify-center overflow-hidden">
