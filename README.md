@@ -17,7 +17,8 @@ pending :
     load 10 messages at once,
     chat bubble,
     message seen or not,
-    use of double tick 
+    use of double tick ,
+    logout modularity
 
 
 

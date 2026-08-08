@@ -8,11 +8,8 @@ import DeleteConversationModal from "./DeleteConversationModal.jsx";
 import robot from "../assets/robot.gif";
 import dayjs from "dayjs";
 import { socketConnection } from "../utils/socket-client.js";
-import { useGetUserDetailsQuery } from "../redux/api.js";
 
-const ChatWindow = ({selectedUser,allMessages,refetchAllMessages})=>{ 
-
-    let {data : user, isLoading , isError,error} = useGetUserDetailsQuery();
+const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>{ 
 
     const [text, setText] = useState("");
     const [fileIcons, setFileIcons] = useState(false);  // icons in send message
@@ -59,7 +56,7 @@ const ChatWindow = ({selectedUser,allMessages,refetchAllMessages})=>{
         socket.on("connect",()=>{
             // console.log("connection est ", socket.id);
             socket.emit("joinChat",{
-                current : user?.data?._id,
+                current : currentUser?.data?._id,
                 target : selectedUser?._id
             });
 
@@ -84,7 +81,7 @@ const ChatWindow = ({selectedUser,allMessages,refetchAllMessages})=>{
         let socket = socketConnection();
 
         socket.emit("sendMessage",{
-            current : user?.data?._id,
+            current : currentUser?.data?._id,
             target : selectedUser?._id,
             text
         });
@@ -101,12 +98,12 @@ const ChatWindow = ({selectedUser,allMessages,refetchAllMessages})=>{
                     <p className="text-black text-xl">Hello Test</p>
                     <p className="text-white font-medium text-base">No conversation selected</p>
                     <p className="text-white text-sm">Pick a user from the list to start chatting</p>
-                </div>
-                
+                </div>                
             </section>
         )
     }
 
+   
     return (
     <>
     <section className="md:w-full w-65 h-full flex flex-col backdrop-blur-sm">

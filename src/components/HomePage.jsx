@@ -1,17 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Menu, X } from "lucide-react";
 import ChatWindow from "./ChatWindow.jsx";
 import Sidebar from "./Sidebar.jsx";
 import bgImage from "../assets/chat-br.jpg";
 import toast from "react-hot-toast";
 
-import { useGetAllMessagesQuery, useGetAllUsersQuery } from "../redux/api.js";
+import { useGetAllMessagesQuery, useGetAllUsersQuery, useGetUserDetailsQuery } from "../redux/api.js";
 import { LoadingMessage } from "./Spinner.jsx";
+import { socketConnection } from "../utils/socket-client.js";
 
 
 function HomePage() {
 
     let {data : user , isLoading, isError,error} = useGetAllUsersQuery();  // all users
+    let {data : currentUser} = useGetUserDetailsQuery(); // current user
   
     const [activeUser, setActiveUser] = useState(""); // selected user in left sidebar
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -21,6 +23,7 @@ function HomePage() {
 
     const [allMessages, setAllMessages] = useState([]);
     const [allUsers, setAllUsers] = useState([]);
+    const [onlineUserIds, setOnlineUserIds] = useState([]);
 
     useEffect(()=>{
         if(user?.data){
@@ -38,6 +41,28 @@ function HomePage() {
         setAllMessages(msg?.data?.message || []);
     }, [activeUser?._id, msg]);
 
+    useEffect(() => {
+        let userId = currentUser?.data?._id;
+
+        if (!userId) return;
+        let socket = socketConnection();
+
+        let handleOnlineUsers = (userIds) => {
+            setOnlineUserIds(userIds);
+        };
+
+        socket.on("onlineUsers", handleOnlineUsers);
+
+        socket.emit("register", userId);
+
+        return () => {
+            socket.off("onlineUsers", handleOnlineUsers);
+            socket.disconnect();
+        };
+    }, [currentUser?.data?._id]);
+
+
+
     if(isLoading){
         return(
             <LoadingMessage />
@@ -54,6 +79,15 @@ function HomePage() {
         setActiveUser(person);
         setSidebarOpen(false);
     };
+
+    let usersWithStatus = useMemo(() => {
+        const onlineSet = new Set(onlineUserIds);
+
+        return allUsers.map((user) => ({
+            ...user,
+            status: onlineSet.has(user._id) ? "online" : "offline",
+        }));
+    }, [allUsers, onlineUserIds]);
 
     return (
     <main className="relative h-screen w-screen flex items-center justify-center overflow-hidden">
@@ -86,7 +120,7 @@ function HomePage() {
  
                 <Sidebar
                     activeUser = {activeUser}
-                    users={allUsers}
+                    users={usersWithStatus}
                     onSelectUser={handleSelectUser}
                 />
             </div>
@@ -104,6 +138,7 @@ function HomePage() {
                 <ChatWindow 
                     selectedUser={activeUser}  
                     allMessages={allMessages}
+                    currentUser ={currentUser}
                     refetchAllMessages={refetch}
                 />
             </nav>
