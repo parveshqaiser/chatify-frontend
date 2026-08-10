@@ -44,16 +44,14 @@ export const api = createApi({
 
         // messages
 
-
         getAllMessages : builder.query({
             query: (targetUserId) => `/chat/${targetUserId}`,
         }),
 
-        sendMessage : builder.mutation({
-            query : ({data, targetUserId})=>({
-                method : "POST",
-                url : `/auth/chat/send/${targetUserId}`,
-                body : data
+        deleteMessage : builder.mutation({
+            query : ({targetUserId, messageId})=> ({
+                method : "DELETE",
+                url : `/chat/${targetUserId}/message/${messageId}`,
             })
         }),
 
@@ -68,6 +66,5 @@ export const {
     useUpdateProfileMutation,
     useUpdatePasswordMutation,
     useGetAllMessagesQuery,
-    useSendMessageMutation,
+    useDeleteMessageMutation
 } = api;
-
