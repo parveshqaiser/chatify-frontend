@@ -26,6 +26,7 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
     const [activeMsgId, setActiveMsgId] = useState(null);  // selected message id
 
     const [deleteModal, setDeleteModal]=useState(false);
+    const [isDoubleClicked, setIsDoubleClicked] = useState(false); // to ensure edit, delete button is removed & sending or editing message
 
     let scrollBar = useRef();
     useEffect(()=>{
@@ -69,7 +70,7 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
                 target : selectedUser?._id
             });
 
-            socket.on("receiveMessage",(current,target,text)=>{
+            socket.on("receiveMessage",()=>{
                 refetchAllMessages();
             });
         });
@@ -88,12 +89,26 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
         if (!text.trim()) return;
         let socket = socketConnection();
 
-        socket.emit("sendMessage",{
-            current : currentUser?.data?._id,
-            target : selectedUser?._id,
-            text
-        });
+        if(isDoubleClicked){
+            socket.emit("sendMessage", {
+                current : currentUser?.data?._id,
+                target : selectedUser?._id,
+                text,
+                messageId : activeMsgId,
+                isEdit : isDoubleClicked
+            })
+        }else {
+            socket.emit("sendMessage",{
+                current : currentUser?.data?._id,
+                target : selectedUser?._id,
+                text,
+                messageId : "",
+                isEdit : false
+            });
+        }
+
         setText("");
+        setIsDoubleClicked(false);
     };
 
     let handleDelete = async()=>{
@@ -127,7 +142,6 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
             </section>
         )
     }
-
    
     return (
     <>
@@ -240,7 +254,7 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
                     {dayjs(m?.createdAt).format("HH:mm")}
                 </span>
 
-                <div onDoubleClick={() => setActiveMsgId(m._id)}
+                <div onDoubleClick={() => {setActiveMsgId(m._id), setIsDoubleClicked(true)}}
                     className={`chat-bubble cursor-pointer select-none ${
                         m?.senderId?.name === selectedUser?.name
                         ? "chat-bubble-primary"
@@ -254,12 +268,12 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
                 Delivered
                 <span className="text-[10px]">{isMine ? "You" : ""}</span>
 
-                {isMine && isActive && (
+                {isDoubleClicked &&  isMine && isActive &&(
                     <span className="flex items-center gap-1 ml-1">
                     <Pencil
                         size={14}
                         className="cursor-pointer text-warning"
-                        onClick={() => handleEdit()}
+                        onClick={() => setText(m.msg)}
                     />
                     <Trash2
                         size={14}
@@ -305,8 +319,17 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
                 value={text}
                 placeholder="Type a message..."
                 className="flex-1 bg-transparent px-1 py-2.5 text-sm text-gray-800 outline-none placeholder:text-gray-400 dark:text-gray-200 dark:placeholder:text-gray-500"
-                onChange={(e) => setText(e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                onChange={(e) => {
+                    let {value} = e.target;
+                    if(value){
+                        setText(e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))
+                    }
+                    else {
+                        setText("");
+                        setIsDoubleClicked(false)
+                    }
+                }}
             />
 
             <button onClick={()=> setShowEmojiPicker(!showEmojiPicker)} className="rounded-full p-1.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10">

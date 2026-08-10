@@ -55,6 +55,14 @@ export const api = createApi({
             })
         }),
 
+        editMessage : builder.mutation({
+            query : ({targetUserId, messageId, text})=> ({
+                method : "PATCH",
+                url : `/chat/${targetUserId}/message/${messageId}`,
+                body : text
+            })
+        }),
+
     })
 });
 
@@ -66,5 +74,6 @@ export const {
     useUpdateProfileMutation,
     useUpdatePasswordMutation,
     useGetAllMessagesQuery,
-    useDeleteMessageMutation
+    useDeleteMessageMutation,
+    useEditMessageMutation,
 } = api;
