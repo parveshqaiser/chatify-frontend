@@ -1,6 +1,6 @@
 
 import { useEffect, useRef, useState } from "react";
-import { FileText, Mic, Paperclip, Send, Smile, Images, Phone, Info, MoveLeft, X, Search, MessageSquare } from "lucide-react";
+import { FileText, Mic, Paperclip, Send, Smile, Images, Phone, Info, MoveLeft, X, Search, MessageSquare, Pencil, Trash2 } from "lucide-react";
 import EmojiPicker from 'emoji-picker-react';
 import UserViewModal from "./UserViewModal.jsx";
 import DeleteConversationModal from "./DeleteConversationModal.jsx";
@@ -8,8 +8,12 @@ import DeleteConversationModal from "./DeleteConversationModal.jsx";
 import robot from "../assets/robot.gif";
 import dayjs from "dayjs";
 import { socketConnection } from "../utils/socket-client.js";
+import { useDeleteMessageMutation } from "../redux/api.js";
+import toast from "react-hot-toast";
 
 const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>{ 
+
+    let [deleteMessage] = useDeleteMessageMutation();
 
     const [text, setText] = useState("");
     const [fileIcons, setFileIcons] = useState(false);  // icons in send message
@@ -19,11 +23,11 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
     const [showEmojiPicker, setShowEmojiPicker] = useState(false); // emoji picker visibility
     const emojiPickerRef = useRef(null);
     const menuRef = useRef(null);
+    const [activeMsgId, setActiveMsgId] = useState(null);  // selected message id
 
     const [deleteModal, setDeleteModal]=useState(false);
 
     let scrollBar = useRef();
-
     useEffect(()=>{
         scrollBar.current?.scrollIntoView({behavior : "smooth"});
     },[allMessages])
@@ -60,14 +64,12 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
         if(!selectedUser?._id) return;
 
         socket.on("connect",()=>{
-            // console.log("connection est ", socket.id);
             socket.emit("joinChat",{
                 current : currentUser?.data?._id,
                 target : selectedUser?._id
             });
 
             socket.on("receiveMessage",(current,target,text)=>{
-                // console.log("text received",current,target,text);
                 refetchAllMessages();
             });
         });
@@ -93,6 +95,23 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
         });
         setText("");
     };
+
+    let handleDelete = async()=>{
+        try {
+            let res = await deleteMessage({
+                targetUserId : selectedUser._id,
+                messageId : activeMsgId
+            }).unwrap();
+
+            if(res.success){
+				toast.success(res.message);
+                refetchAllMessages();
+			}
+        } catch (error) {
+            console.log(error);
+			toast.error(error.data?.message || "Some Problem in Deleting Message");
+        }
+    }
 
     if (!selectedUser){
         return(
@@ -205,24 +224,55 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
 
         {/* display messages */}
         <article className="chat-scroll flex-1 overflow-y-auto p-2 space-y-1">
-            {allMessages.map((m) => (
-            
-            <div
+        {allMessages.map((m) => {
+            let isMine = m?.senderId?.name !== selectedUser?.name;
+            let isActive = activeMsgId === m._id;
+
+            return (
+            <nav
                 ref={scrollBar}
                 key={m._id}
-                className={`px-3 py-2 rounded-lg text-sm chat  ${
-                m?.senderId?.name == selectedUser?.name
-                    ? "chat-start"
-                    : "chat-end"
+                className={`px-3 py-2 rounded-lg text-sm chat ${
+                m?.senderId?.name === selectedUser?.name ? "chat-start" : "chat-end"
                 }`}
             >
-                <span className="chat-header text-[10px]">{dayjs(m?.createdAt).format('HH:mm')}</span>
-                <div className={`chat-bubble ${m?.senderId?.name == selectedUser?.name ? " chat-bubble-primary" : "chat-bubble-neutral"}`}>{m?.msg}</div>
-                <div className="chat-footer opacity-50">Delivered <span className="text-[10px]">{ m?.senderId?.name == selectedUser?.name ? "" : "You"}</span> </div>
-            </div>
-            ))}
-        </article>
+                <span className="chat-header text-[10px]">
+                    {dayjs(m?.createdAt).format("HH:mm")}
+                </span>
 
+                <div onDoubleClick={() => setActiveMsgId(m._id)}
+                    className={`chat-bubble cursor-pointer select-none ${
+                        m?.senderId?.name === selectedUser?.name
+                        ? "chat-bubble-primary"
+                        : "chat-bubble-neutral"
+                    }`}
+                >
+                    {m?.msg}
+                </div>
+
+                <div className="chat-footer opacity-50 flex items-center gap-2">
+                Delivered
+                <span className="text-[10px]">{isMine ? "You" : ""}</span>
+
+                {isMine && isActive && (
+                    <span className="flex items-center gap-1 ml-1">
+                    <Pencil
+                        size={14}
+                        className="cursor-pointer text-warning"
+                        onClick={() => handleEdit()}
+                    />
+                    <Trash2
+                        size={14}
+                        className="cursor-pointer text-error"
+                        onClick={() => handleDelete()}
+                    />
+                    </span>
+                )}
+                </div>
+            </nav>
+            );
+        })}
+        </article>
 
         {/* write message field */}
         <article className="flex items-center gap-2 px-3 py-2 backdrop-blur-sm">
