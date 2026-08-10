@@ -15,7 +15,7 @@ pending :
     get all online users,           done
     scrollview of chat smooths, 
     load 10 messages at once,
-    chat bubble,
+    chat bubble UI,                 done
     message seen or not,
     use of double tick ,
     logout modularity ,             done

@@ -22,6 +22,12 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
 
     const [deleteModal, setDeleteModal]=useState(false);
 
+    let scrollBar = useRef();
+
+    useEffect(()=>{
+        scrollBar.current?.scrollIntoView({behavior : "smooth"});
+    },[allMessages])
+
     // close menu/search on Escape
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -198,19 +204,21 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
         </header>
 
         {/* display messages */}
-        <article className="chat-scroll flex-1 overflow-y-auto p-4 space-y-2">
+        <article className="chat-scroll flex-1 overflow-y-auto p-2 space-y-1">
             {allMessages.map((m) => (
-                
+            
             <div
+                ref={scrollBar}
                 key={m._id}
-                className={`max-w-[60%] px-3 py-2 rounded-lg text-sm ${
+                className={`px-3 py-2 rounded-lg text-sm chat  ${
                 m?.senderId?.name == selectedUser?.name
-                    ? "bg-yellow-500 text-white ml-auto"
-                    : "bg-white text-slate-700 border border-slate-200"
+                    ? "chat-start"
+                    : "chat-end"
                 }`}
             >
-                {m.msg}
-                <span className="text-[11px] text-green-600 text-right"> Delivered {dayjs(m.createdAt).format('hh:mm A') }</span>
+                <span className="chat-header text-[10px]">{dayjs(m?.createdAt).format('HH:mm')}</span>
+                <div className={`chat-bubble ${m?.senderId?.name == selectedUser?.name ? " chat-bubble-primary" : "chat-bubble-neutral"}`}>{m?.msg}</div>
+                <div className="chat-footer opacity-50">Delivered <span className="text-[10px]">{ m?.senderId?.name == selectedUser?.name ? "" : "You"}</span> </div>
             </div>
             ))}
         </article>
@@ -247,7 +255,7 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
                 value={text}
                 placeholder="Type a message..."
                 className="flex-1 bg-transparent px-1 py-2.5 text-sm text-gray-800 outline-none placeholder:text-gray-400 dark:text-gray-200 dark:placeholder:text-gray-500"
-                onChange={(e) => setText(e.target.value)}
+                onChange={(e) => setText(e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
             />
 
