@@ -8,12 +8,13 @@ import DeleteConversationModal from "./DeleteConversationModal.jsx";
 import robot from "../assets/robot.gif";
 import dayjs from "dayjs";
 import { socketConnection } from "../utils/socket-client.js";
-import { useDeleteMessageMutation } from "../redux/api.js";
+import { useClearConversationMutation, useDeleteMessageMutation } from "../redux/api.js";
 import toast from "react-hot-toast";
 
 const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>{ 
 
     let [deleteMessage] = useDeleteMessageMutation();
+    let [deleteAll] = useClearConversationMutation();
 
     const [text, setText] = useState("");
     const [fileIcons, setFileIcons] = useState(false);  // icons in send message
@@ -125,6 +126,21 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
         } catch (error) {
             console.log(error);
 			toast.error(error.data?.message || "Some Problem in Deleting Message");
+        }
+    }
+
+    let handleDeleteAll = async()=>{
+        try {
+            let res = await deleteAll(selectedUser._id).unwrap();
+             if(res.success){
+				toast.success(res.message)
+                setDeleteModal(false);
+                refetchAllMessages();
+			}
+        } catch (error) {
+            console.log(error);
+            setDeleteModal(false);
+			toast.error(error.data?.message || "Some Problem in Deleting All Message");
         }
     }
 
@@ -358,7 +374,11 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
         </article>
     </section>
     <UserViewModal user={selectedUser}/>
-    <DeleteConversationModal deleteModal={deleteModal} setDeleteModal={setDeleteModal} />
+    <DeleteConversationModal 
+        onDelete={handleDeleteAll} 
+        deleteModal={deleteModal} 
+        setDeleteModal={setDeleteModal} 
+    />
     </>
     );
 }
