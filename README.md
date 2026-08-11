@@ -22,8 +22,12 @@ pending :
 
 
 
-for production, 
+check notes :
+    online users,
+    functon in child (backend)
 
+
+for production, 
 if(location.hostname == "localhost"){
     return io(BASE_URL)
 }else{

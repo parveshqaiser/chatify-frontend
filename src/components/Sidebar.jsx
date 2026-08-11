@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LogOutIcon, MessageCirclePlus, MoreVertical, Search, UserCircle } from "lucide-react";
 import { Link  } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
@@ -12,6 +12,16 @@ const Sidebar = ({ users, activeUser, onSelectUser }) => {
 	const [search, setSearch] = useState(""); // search input
 	const [tab, setTab] = useState("online");
 	const [verticalBtn, setVerticalBtn] = useState(false);  // modal
+
+	useEffect(()=>{
+		const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+				setVerticalBtn(false);
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+	},[])
 
 	const filtered = users.filter((u) => (tab === "online" ? u.status == "online" : true))
 		.filter((u) => u.name.toLowerCase().includes(search.toLowerCase()));
