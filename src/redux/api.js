@@ -55,6 +55,7 @@ export const api = createApi({
             })
         }),
 
+        // using socket
         editMessage : builder.mutation({
             query : ({targetUserId, messageId, text})=> ({
                 method : "PATCH",
@@ -62,6 +63,13 @@ export const api = createApi({
                 body : text
             })
         }),
+
+        clearConversation : builder.mutation({
+            query : (targetUserId)=> ({
+                method : "DELETE",
+                url : `/chat/${targetUserId}`,
+            })
+        })
 
     })
 });
@@ -76,4 +84,5 @@ export const {
     useGetAllMessagesQuery,
     useDeleteMessageMutation,
     useEditMessageMutation,
+    useClearConversationMutation
 } = api;
