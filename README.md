@@ -13,8 +13,8 @@ add connection page
 pending : 
     rtk interceptor, 
     get all online users,           done
-    scrollview of chat smooths, 
-    load 10 messages at once,
+    scrollview of chat smooths,     done
+    load 20 messages at once,
     chat bubble UI,                 done
     message seen or not,
     use of double tick ,

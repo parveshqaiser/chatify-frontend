@@ -403,7 +403,7 @@ const UserProfile = () => {
 
 								<div className="flex justify-between">
 									<span>Last Login</span>
-									<span>{dayjs(user?.data?.lastLogin).format("D MMMM YYYY") || "NA"}</span>
+									<span>{dayjs(user?.data?.previousLogin).format("D MMMM YYYY") || "NA"}</span>
 								</div>
 							</div>
 						</div>
