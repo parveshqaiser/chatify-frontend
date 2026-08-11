@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import { socketConnection } from "../utils/socket-client.js";
 import { useClearConversationMutation, useDeleteMessageMutation } from "../redux/api.js";
 import toast from "react-hot-toast";
+import HighlightMessage from "./HighlightMessage.jsx";
 
 const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>{ 
 
@@ -17,19 +18,20 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
     let [deleteAll] = useClearConversationMutation();
 
     const [text, setText] = useState("");
+    const [findText, setFindText] = useState("");
     const [fileIcons, setFileIcons] = useState(false);  // icons in send message
     const [moreInfo, setMoreInfo] = useState(false);  // more info button in header
     const [searchOpen, setSearchOpen] = useState(false);  // input field for conversation
+    const [activeMsgId, setActiveMsgId] = useState(null);  // selected message id
    
     const [showEmojiPicker, setShowEmojiPicker] = useState(false); // emoji picker visibility
     const emojiPickerRef = useRef(null);
     const menuRef = useRef(null);
-    const [activeMsgId, setActiveMsgId] = useState(null);  // selected message id
-
+    const scrollBar = useRef();
+  
     const [deleteModal, setDeleteModal]=useState(false);
     const [isDoubleClicked, setIsDoubleClicked] = useState(false); // to ensure edit, delete button is removed & sending or editing message
 
-    let scrollBar = useRef();
     useEffect(()=>{
         scrollBar.current?.scrollIntoView({behavior : "smooth"});
     },[allMessages])
@@ -61,10 +63,9 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
     }, []);
 
     useEffect(()=>{
-        let socket = socketConnection();
-
         if(!selectedUser?._id) return;
 
+        let socket = socketConnection();
         socket.on("connect",()=>{
             socket.emit("joinChat",{
                 current : currentUser?.data?._id,
@@ -74,10 +75,6 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
             socket.on("receiveMessage",()=>{
                 refetchAllMessages();
             });
-        });
-
-        socket.on("connect_error", (err) => {
-            console.log(err.message);
         });
         
         return()=>{
@@ -107,7 +104,6 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
                 isEdit : false
             });
         }
-
         setText("");
         setIsDoubleClicked(false);
     };
@@ -189,6 +185,15 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
                         <Search size={14} className="text-gray-400 shrink-0" />
                         <input
                             autoFocus={searchOpen}
+                            value={findText}
+                            onChange={(e)=>{
+                                if(e.target.value){
+                                    setFindText(e.target.value);
+                                    highLightText();
+                                }else {
+                                    setFindText("");
+                                }
+                            }}
                             placeholder="Search..."
                             className="w-full bg-transparent text-sm text-white placeholder:text-gray-400 outline-none"
                         />
@@ -277,11 +282,15 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
                         : "chat-bubble-neutral"
                     }`}
                 >
-                    {m?.msg}
+                    {/* {m?.msg} */}
+                    <HighlightMessage 
+                        text={m?.msg || ""}
+                        searchQuery={findText}
+                    />
                 </div>
 
                 <div className="chat-footer opacity-50 flex items-center gap-2">
-                Delivered
+                    Delivered
                 <span className="text-[10px]">{isMine ? "You" : ""}</span>
 
                 {isDoubleClicked &&  isMine && isActive &&(
