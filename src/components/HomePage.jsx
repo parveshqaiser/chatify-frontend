@@ -18,8 +18,9 @@ function HomePage() {
     const [activeUser, setActiveUser] = useState(""); // selected user in left sidebar
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    let {data : msg,  isLoading : loadingMsg, error : msgError,refetch} = 
-        useGetAllMessagesQuery(activeUser?._id, {skip : !activeUser}); // all messages
+    let {data : msg,  isLoading : loadingMsg, error : msgError,refetch} = useGetAllMessagesQuery(
+        activeUser?._id, {skip : !activeUser}
+    ); // all messages
 
     const [allMessages, setAllMessages] = useState([]);
     const [allUsers, setAllUsers] = useState([]);
