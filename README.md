@@ -19,6 +19,7 @@ pending :
     message seen or not,
     use of double tick ,
     logout modularity ,             done
+    group by date,                  done (some bus is there)
 
 
 

@@ -88,14 +88,16 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
         let socket = socketConnection();
 
         if(isDoubleClicked){
+            console.log("edit side")
             socket.emit("sendMessage", {
                 current : currentUser?.data?._id,
                 target : selectedUser?._id,
                 text,
                 messageId : activeMsgId,
-                isEdit : isDoubleClicked
+                isEdit : true
             })
         }else {
+            console.log("add side")
             socket.emit("sendMessage",{
                 current : currentUser?.data?._id,
                 target : selectedUser?._id,
@@ -117,10 +119,12 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
 
             if(res.success){
 				toast.success(res.message);
+                setIsDoubleClicked(false);
                 refetchAllMessages();
 			}
         } catch (error) {
             console.log(error);
+            setIsDoubleClicked(false);
 			toast.error(error.data?.message || "Some Problem in Deleting Message");
         }
     }
@@ -140,6 +144,21 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
         }
     }
 
+
+    let groupedMessages = Object.entries(
+        allMessages?.reduce((groups, message) => {
+            const date = dayjs(message.createdAt).format("YYYY-MM-DD");
+
+            if (!groups[date]) {
+                groups[date] = [];
+            }
+
+            groups[date].push(message);
+
+            return groups;
+        }, {})).map(([date, messages]) => ({date,messages})
+        );
+
     if (!selectedUser){
         return(
             <section className="w-full h-full text-slate-400 text-sm bg-linear-to-tr from-rose-500 via-orange-300 to-purple-200">
@@ -147,7 +166,7 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
                     <img src={robot} alt="gif" className="w-60 m-auto" />
                 </div>
                 <div className="text-center">
-                    <p className="text-black text-xl">Hello Test</p>
+                    <p className="text-black italic text-xl">Hello {currentUser?.data?.name || "NA"}</p>
                     <p className="text-white font-medium text-base">No conversation selected</p>
                     <p className="text-white text-sm">Pick a user from the list to start chatting</p>
                 </div>                
@@ -257,60 +276,79 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
             </div>
         </header>
 
-        {/* display messages */}
-        <article className="chat-scroll flex-1 overflow-y-auto p-2 space-y-1">
-        {allMessages.map((m) => {
-            let isMine = m?.senderId?.name !== selectedUser?.name;
-            let isActive = activeMsgId === m._id;
+      <article className="chat-scroll flex-1 overflow-y-auto p-2 space-y-1">
+        {groupedMessages.map((group) => (
+            <div key={group.date}>
 
-            return (
-            <nav
-                ref={scrollBar}
-                key={m._id}
-                className={`px-3 py-2 rounded-lg text-sm chat ${
-                m?.senderId?.name === selectedUser?.name ? "chat-start" : "chat-end"
-                }`}
-            >
-                <span className="chat-header text-[10px]">
-                    {dayjs(m?.createdAt).format("HH:mm")}
-                </span>
-
-                <div onDoubleClick={() => {setActiveMsgId(m._id), setIsDoubleClicked(true)}}
-                    className={`chat-bubble cursor-pointer select-none ${
-                        m?.senderId?.name === selectedUser?.name
-                        ? "chat-bubble-primary"
-                        : "chat-bubble-neutral"
-                    }`}
-                >
-                    {/* {m?.msg} */}
-                    <HighlightMessage 
-                        text={m?.msg || ""}
-                        searchQuery={findText}
-                    />
-                </div>
-
-                <div className="chat-footer opacity-50 flex items-center gap-2">
-                    Delivered
-                <span className="text-[10px]">{isMine ? "You" : ""}</span>
-
-                {isDoubleClicked &&  isMine && isActive &&(
-                    <span className="flex items-center gap-1 ml-1">
-                    <Pencil
-                        size={14}
-                        className="cursor-pointer text-warning"
-                        onClick={() => setText(m.msg)}
-                    />
-                    <Trash2
-                        size={14}
-                        className="cursor-pointer text-error"
-                        onClick={() => handleDelete()}
-                    />
+                <div className="flex justify-center my-3">
+                    <span className="px-3 py-1 rounded-full bg-base-300 text-xs">
+                    {dayjs(group.date).format("DD MMM YYYY")}
                     </span>
-                )}
                 </div>
-            </nav>
-            );
-        })}
+
+                {group.messages.map((m) => {
+                    const isMine = m?.senderId?._id !== selectedUser?._id;
+                    const isActive = activeMsgId === m._id;
+
+                    return (
+                    <nav
+                        ref={scrollBar}
+                        key={m._id}
+                        className={`px-3 py-2 rounded-lg text-sm chat ${
+                        m?.senderId?._id === selectedUser?._id
+                            ? "chat-start"
+                            : "chat-end"
+                        }`}
+                    >
+                        <span className="chat-header text-[10px]">
+                        {dayjs(m?.createdAt).format("HH:mm")}
+                        </span>
+
+                        <div
+                        onDoubleClick={() => {
+                            setActiveMsgId(m._id);
+                            setIsDoubleClicked(true);
+                        }}
+                        className={`chat-bubble cursor-pointer select-none ${
+                            m?.senderId?._id === selectedUser?._id
+                            ? "chat-bubble-primary"
+                            : "chat-bubble-neutral"
+                        }`}
+                        >
+                        <HighlightMessage
+                            text={m?.msg || ""}
+                            searchQuery={findText}
+                        />
+                        </div>
+
+                        <div className="chat-footer opacity-50 flex items-center gap-2">
+                        Delivered
+
+                        <span className="text-[10px]">
+                            {isMine ? "You" : ""}
+                        </span>
+
+                        {isDoubleClicked && isMine && isActive && (
+                            <span className="flex items-center gap-1 ml-1">
+                            <Pencil
+                                size={14}
+                                className="cursor-pointer text-warning"
+                                onClick={() => setText(m.msg)}
+                            />
+
+                            <Trash2
+                                size={14}
+                                className="cursor-pointer text-error"
+                                onClick={() => handleDelete()}
+                            />
+                            </span>
+                        )}
+                        </div>
+                    </nav>
+                    );
+                })}
+            </div>
+        ))}
         </article>
 
         {/* write message field */}
