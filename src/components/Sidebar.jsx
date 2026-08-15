@@ -105,6 +105,7 @@ const Sidebar = ({ users, activeUser, onSelectUser }) => {
 					<span className="flex-1 min-w-0">
 						<span className="flex items-center justify-between gap-2">
 							<span className="font-semibold text-white truncate">{user.username}</span>
+							<span className="font-semibold text-green-400 truncate text-[14px] ">1</span>
 						</span>
 						<span className="block text-[12px] text-white/70 truncate">
 							{user.status == "online" ? "Active now" : "Last seen recently"}
