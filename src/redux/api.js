@@ -48,6 +48,51 @@ export const api = createApi({
             query: (targetUserId) => `/chat/${targetUserId}`,
         }),
 
+        /*
+        getAllMessages: builder.query({
+            query: ({ targetUserId, page = 1, limit = 10 }) => 
+                `/chat/${targetUserId}?page=${page}&limit=${limit}`,
+            
+            serializeQueryArgs: ({ queryArgs }) => {
+                return `chat-${queryArgs.targetUserId}`;
+            },
+            
+            // FIX: Proper merge to avoid duplicates
+            merge: (currentCache, newData, { arg }) => {
+                if (arg.page === 1) {
+                    // First page - replace cache entirely
+                    return newData;
+                }
+                
+                if (!currentCache) return newData;
+                
+                // Get existing messages (ensure we have an array)
+                const existingMessages = currentCache.data?.messages || [];
+                const newMessages = newData.data?.messages || [];
+                
+                // FIX: Create a Set of existing message IDs to avoid duplicates
+                const existingIds = new Set(existingMessages.map(msg => msg._id));
+                
+                // Only add messages that don't already exist
+                const uniqueNewMessages = newMessages.filter(msg => !existingIds.has(msg._id));
+                
+                // For older messages (page > 1), prepend unique new messages
+                return {
+                    ...newData,
+                    data: {
+                        ...newData.data,
+                        messages: [...uniqueNewMessages, ...existingMessages]
+                    }
+                };
+            },
+            
+            forceRefetch({ currentArg, previousArg }) {
+                return currentArg?.page !== previousArg?.page;
+            },
+        }),
+
+        */
+
         deleteMessage : builder.mutation({
             query : ({targetUserId, messageId})=> ({
                 method : "DELETE",
@@ -82,6 +127,7 @@ export const {
     useUpdateProfileMutation,
     useUpdatePasswordMutation,
     useGetAllMessagesQuery,
+    useLazyGetAllMessagesQuery,
     useDeleteMessageMutation,
     useEditMessageMutation,
     useClearConversationMutation
