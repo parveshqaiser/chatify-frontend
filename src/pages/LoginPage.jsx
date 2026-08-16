@@ -43,7 +43,7 @@ const LoginPage = () => {
                 setLoading(false);
                 setTimeout(()=>{
                     navigate("/home")
-                },1500);
+                },500);
             }
 
         } catch (error) {
