@@ -5,7 +5,7 @@ import Sidebar from "./Sidebar.jsx";
 import bgImage from "../assets/chat-br.jpg";
 import toast from "react-hot-toast";
 
-import { useGetAllMessagesQuery, useGetAllUsersQuery, useGetUserDetailsQuery } from "../redux/api.js";
+import { useGetAllUsersQuery, useGetUserDetailsQuery } from "../redux/api.js";
 import { LoadingMessage } from "./Spinner.jsx";
 import { socketConnection } from "../utils/socket-client.js";
 
@@ -18,11 +18,6 @@ function HomePage() {
     const [activeUser, setActiveUser] = useState(""); // selected user in left sidebar
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    let {data : msg,  isLoading : loadingMsg, error : msgError,refetch} = useGetAllMessagesQuery(
-        activeUser?._id, {skip : !activeUser}
-    ); // all messages
-
-    const [allMessages, setAllMessages] = useState([]);
     const [allUsers, setAllUsers] = useState([]);
     const [onlineUserIds, setOnlineUserIds] = useState([]);
 
@@ -33,14 +28,6 @@ function HomePage() {
             setAllUsers([])
         }
     },[user?.data]);
-
-    useEffect(() => {
-        if (!activeUser?._id) {
-            return setAllMessages([]);
-        }
-
-        setAllMessages(msg?.data?.message || []);
-    }, [activeUser?._id, msg]);
 
     useEffect(() => {
         let userId = currentUser?.data?._id;
@@ -87,8 +74,6 @@ function HomePage() {
         setActiveUser(person);
         setSidebarOpen(false);
     };
-
-   
 
     return (
     <main className="relative h-screen w-screen flex items-center justify-center overflow-hidden">
@@ -138,9 +123,8 @@ function HomePage() {
             <nav className="flex-1 md:w-3/4">
                 <ChatWindow 
                     selectedUser={activeUser}  
-                    allMessages={allMessages}
+                    activeUser = {activeUser}
                     currentUser ={currentUser}
-                    refetchAllMessages={refetch}
                 />
             </nav>
         </div>

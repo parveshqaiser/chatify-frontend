@@ -1,21 +1,35 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FileText, Mic, Paperclip, Send, Smile, Images, Phone, Info, MoveLeft, X, Search, MessageSquare, Pencil, Trash2 } from "lucide-react";
 import EmojiPicker from 'emoji-picker-react';
 import UserViewModal from "./UserViewModal.jsx";
 import DeleteConversationModal from "./DeleteConversationModal.jsx";
-
 import robot from "../assets/robot.gif";
 import dayjs from "dayjs";
 import { socketConnection } from "../utils/socket-client.js";
-import { useClearConversationMutation, useDeleteMessageMutation } from "../redux/api.js";
+import { useClearConversationMutation, useDeleteMessageMutation, useGetAllMessagesQuery, useLazyGetAllMessagesQuery } from "../redux/api.js";
 import toast from "react-hot-toast";
 import HighlightMessage from "./HighlightMessage.jsx";
 
-const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>{ 
+const ChatWindow = ({selectedUser,activeUser,currentUser})=>{ 
 
     let [deleteMessage] = useDeleteMessageMutation();
     let [deleteAll] = useClearConversationMutation();
+
+    let {
+        data : msg,  
+        isLoading : loadingMsg, 
+        error : msgError, 
+        refetch: refetchAllMessages
+    } = useGetAllMessagesQuery(
+        activeUser?._id,
+        { skip: !activeUser }
+    );
+
+    console.log("***** ", msg);
+
+    // Query for fetching more messages
+    // let [fetchMoreMessages] = useLazyGetAllMessagesQuery();
 
     const [text, setText] = useState("");
     const [findText, setFindText] = useState("");
@@ -31,6 +45,31 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
   
     const [deleteModal, setDeleteModal]=useState(false);
     const [isDoubleClicked, setIsDoubleClicked] = useState(false); // to ensure edit, delete button is removed & sending or editing message
+
+    const [allMessages, setAllMessages] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hasMoreMessages, setHasMoreMessages] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [isAtBottom, setIsAtBottom] = useState(true);
+    
+    const chatContainerRef = useRef(null);
+    const previousScrollHeight = useRef(0);
+    const previousScrollTop = useRef(0);
+    const isInitialLoad = useRef(true);
+
+     useEffect(() => {
+        if (!activeUser?._id) {
+            setAllMessages([]);
+            return;
+        }
+
+        if (msg?.data?.message) {
+            setAllMessages(msg.data.message);
+        }else {
+            setAllMessages([]);
+        }
+    }, [activeUser?._id, msg]);
+
 
     useEffect(()=>{
         scrollBar.current?.scrollIntoView({behavior : "smooth"});
@@ -88,7 +127,7 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
         let socket = socketConnection();
 
         if(isDoubleClicked){
-            console.log("edit side")
+            // console.log("edit side")
             socket.emit("sendMessage", {
                 current : currentUser?.data?._id,
                 target : selectedUser?._id,
@@ -97,7 +136,7 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
                 isEdit : true
             })
         }else {
-            console.log("add side")
+            // console.log("add side")
             socket.emit("sendMessage",{
                 current : currentUser?.data?._id,
                 target : selectedUser?._id,
@@ -142,8 +181,7 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
             setDeleteModal(false);
 			toast.error(error.data?.message || "Some Problem in Deleting All Message");
         }
-    }
-
+    }   
 
     let groupedMessages = Object.entries(
         allMessages?.reduce((groups, message) => {
@@ -276,7 +314,7 @@ const ChatWindow = ({selectedUser,allMessages,currentUser,refetchAllMessages})=>
             </div>
         </header>
 
-      <article className="chat-scroll flex-1 overflow-y-auto p-2 space-y-1">
+        <article className="chat-scroll flex-1 overflow-y-auto p-2 space-y-1" >
         {groupedMessages.map((group) => (
             <div key={group.date}>
 
