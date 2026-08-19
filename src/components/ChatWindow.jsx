@@ -26,8 +26,6 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
         { skip: !activeUser }
     );
 
-    console.log("***** ", msg);
-
     // Query for fetching more messages
     // let [fetchMoreMessages] = useLazyGetAllMessagesQuery();
 
@@ -117,7 +115,7 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
         });
         
         return()=>{
-            console.log("socket diconnected");
+            // console.log("socket diconnected");
             socket.disconnect();
         }
     },[selectedUser?._id])    
