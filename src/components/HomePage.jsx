@@ -107,6 +107,7 @@ function HomePage() {
                 <Sidebar
                     activeUser = {activeUser}
                     users={usersWithStatus}
+                    currentUser = {currentUser}
                     onSelectUser={handleSelectUser}
                 />
             </div>

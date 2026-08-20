@@ -202,7 +202,7 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
                     <img src={robot} alt="gif" className="w-60 m-auto" />
                 </div>
                 <div className="text-center">
-                    <p className="text-black italic text-xl">Hello {currentUser?.data?.name || "NA"}</p>
+                    <p className="text-base text-black">Hello <span className="text-purple-700 not-italic text-xl bg-yellow-300 p-1 rounded-lg"> {currentUser?.data?.name || "NA"}</span> </p>
                     <p className="text-white font-medium text-base">No conversation selected</p>
                     <p className="text-white text-sm">Pick a user from the list to start chatting</p>
                 </div>                
