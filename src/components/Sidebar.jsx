@@ -1,10 +1,10 @@
+
 import { useEffect, useState } from "react";
 import { LogOutIcon, MessageCirclePlus, MoreVertical, Search, UserCircle } from "lucide-react";
 import { Link  } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
 import useLogout from "../hooks/useLogout.js";
 
-const Sidebar = ({ users, activeUser, onSelectUser }) => {
+const Sidebar = ({ users, activeUser, currentUser, onSelectUser }) => {
 
 
 	let logoutHandler = useLogout(); 
@@ -31,6 +31,7 @@ const Sidebar = ({ users, activeUser, onSelectUser }) => {
 	<aside className="w-full h-full flex flex-col bg-linear-to-t from-indigo-500 via-purple-500 to-pink-500 backdrop-blur-sm">
 		<header className="p-4 flex border-b border-white/20 items-center justify-between">
 			<h2 className="text-xl font-semibold tracking-wide text-white">Chats</h2>
+			<h2 className=" font-sans tracking-wide text-[12px] text-white">{currentUser?.data?.name}</h2>
 			<button onClick={()=> setVerticalBtn(!verticalBtn)} className="p-1.5 rounded-full hover:bg-white/20 cursor-pointer transition-colors text-white">
 				<MoreVertical size={20} />
 			</button>
