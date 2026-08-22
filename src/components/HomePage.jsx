@@ -3,16 +3,16 @@ import { Menu, X } from "lucide-react";
 import ChatWindow from "./ChatWindow.jsx";
 import Sidebar from "./Sidebar.jsx";
 import bgImage from "../assets/chat-br.jpg";
-import toast from "react-hot-toast";
 
 import { useGetAllUsersQuery, useGetUserDetailsQuery } from "../redux/api.js";
 import { LoadingMessage } from "./Spinner.jsx";
 import { socketConnection } from "../utils/socket-client.js";
+import { useNavigate } from "react-router-dom";
 
 
 function HomePage() {
 
-    let {data : user , isLoading, isError,error} = useGetAllUsersQuery();  // all users
+    let {data : user , isLoading, isError, error} = useGetAllUsersQuery();  // all users
     let {data : currentUser} = useGetUserDetailsQuery(); // current user
   
     const [activeUser, setActiveUser] = useState(""); // selected user in left sidebar

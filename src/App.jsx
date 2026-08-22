@@ -12,14 +12,7 @@ import EmailVerificatipnPage from './pages/EmailVerificatipnPage.jsx';
 import { Toaster } from 'react-hot-toast';
 import { Provider } from 'react-redux';
 import appStore from './redux/store.js';
-
-// for testing
-import TestHomePage1 from './test/Test.jsx';
-import Fetch from './test/Fetch.jsx';
-import UserProfileGPT from './test/UserProfileGPT.jsx';
-import UserProfileEditorial from './test/UserProfileEditorial.jsx';
-// import { ApiProvider } from '@reduxjs/toolkit/query/react';
-import { api } from './redux/api.js';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 
 function App() {
@@ -35,14 +28,10 @@ function App() {
 				<Route path='/signup' element={<RegistrationPage />}></Route>
 				<Route path='/register/success' element={<EmailVerificatipnPage />}></Route>
 
-				<Route path='/home' element={<HomePage />}></Route>
-				<Route path='/profile' element={<UserProfile />}></Route>
-				
-				{/* test */}
-				<Route path='/home1' element={<TestHomePage1 />}></Route>
-				<Route path='/api' element={<Fetch />}></Route>
-				<Route path="test/profile" element={<UserProfileGPT/>}></Route>
-				<Route path="test/profile1" element={<UserProfileEditorial/>}></Route>
+				<Route element={<ProtectedRoute />}>
+                    <Route path="/home" element={<HomePage />} />
+                    <Route path="/profile" element={<UserProfile />} />
+                </Route>
 
 				<Route path='*' element={<PageNotFound />}></Route>
 			</Routes>
