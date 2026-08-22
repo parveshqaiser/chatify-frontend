@@ -244,7 +244,7 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
                             onChange={(e)=>{
                                 if(e.target.value){
                                     setFindText(e.target.value);
-                                    highLightText();
+                                    // highLightText();
                                 }else {
                                     setFindText("");
                                 }
