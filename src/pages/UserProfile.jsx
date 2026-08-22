@@ -62,7 +62,7 @@ const UserProfile = () => {
 			}
 		} catch (error) {
 			console.log(error);
-			toast.error(error?.data?.message || "Failed to update profile");
+			toast.error(error?.data?.message || error?.message || "Failed to update profile");
 		}	
 	}
 
