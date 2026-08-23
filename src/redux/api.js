@@ -38,13 +38,13 @@ const handleUnauthorized = async (api, errorMessage = "Session expired. Please l
     });
     
     // Reset RTK Query cache if available
-    if (api && api.dispatch) {
-        try {
-            api.dispatch(api.util.resetApiState());
-        } catch (error) {
-            console.log('Error resetting API state:', error);
-        }
-    }
+    // if (api && api.dispatch) {
+    //     try {
+    //         api.dispatch(api.util.resetApiState());
+    //     } catch (error) {
+    //         console.log('Error resetting API state:', error);
+    //     }
+    // }
     
     
     // Redirect to login page
