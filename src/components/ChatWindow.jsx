@@ -317,7 +317,7 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
             <div key={group.date}>
 
                 <div className="flex justify-center my-3">
-                    <span className="px-3 py-1 rounded-full bg-base-300 text-xs">
+                    <span className="px-3 py-1 rounded-full bg-green-700 text-[10px]">
                     {dayjs(group.date).format("DD MMM YYYY")}
                     </span>
                 </div>
