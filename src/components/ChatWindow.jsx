@@ -1,12 +1,12 @@
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FileText, Mic, Paperclip, Send, Smile, Images, Phone, Info, MoveLeft, X, Search, MessageSquare, Pencil, Trash2 } from "lucide-react";
 import EmojiPicker from 'emoji-picker-react';
 import UserViewModal from "./UserViewModal.jsx";
 import DeleteConversationModal from "./DeleteConversationModal.jsx";
 import robot from "../assets/robot.gif";
 import dayjs from "dayjs";
-import { socketConnection } from "../utils/socket-client.js";
+import { createSocketConnection, disconnectSocket } from "../utils/socket-client.js";
 import { useClearConversationMutation, useDeleteMessageMutation, useGetAllMessagesQuery, useLazyGetAllMessagesQuery } from "../redux/api.js";
 import toast from "react-hot-toast";
 import HighlightMessage from "./HighlightMessage.jsx";
@@ -40,20 +40,15 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
     const emojiPickerRef = useRef(null);
     const menuRef = useRef(null);
     const scrollBar = useRef();
+
+    const [isTyping, setIsTyping] = useState(false);
+    const typingTimerRef = useRef(null);
+    const isTypingRef = useRef(false);
   
     const [deleteModal, setDeleteModal]=useState(false);
     const [isDoubleClicked, setIsDoubleClicked] = useState(false); // to ensure edit, delete button is removed & sending or editing message
 
     const [allMessages, setAllMessages] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [hasMoreMessages, setHasMoreMessages] = useState(true);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const [isAtBottom, setIsAtBottom] = useState(true);
-    
-    const chatContainerRef = useRef(null);
-    const previousScrollHeight = useRef(0);
-    const previousScrollTop = useRef(0);
-    const isInitialLoad = useRef(true);
 
      useEffect(() => {
         if (!activeUser?._id) {
@@ -99,50 +94,76 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    useEffect(()=>{
-        if(!selectedUser?._id) return;
+    useEffect(() => {
+        if (!selectedUser?._id) return;
 
-        let socket = socketConnection();
-        socket.on("connect",()=>{
-            socket.emit("joinChat",{
-                current : currentUser?.data?._id,
-                target : selectedUser?._id
-            });
+        let socket = createSocketConnection();
 
-            socket.on("receiveMessage",()=>{
-                refetchAllMessages();
+        let current = currentUser?.data?._id;
+        let target = selectedUser._id;
+
+        let handleReceiveMessage = () => {
+            refetchAllMessages();
+        };
+
+        let joinChat = () => {
+            // emit --> client to server
+            socket.emit("joinChat", {
+                current,
+                target
             });
-        });
-        
-        return()=>{
-            // console.log("socket diconnected");
-            socket.disconnect();
+        };
+
+        // socket.on means server to client
+        socket.on("receiveMessage", handleReceiveMessage);
+
+        if (socket.connected) {
+            joinChat();
+        } else {
+            socket.once("connect", joinChat);
         }
-    },[selectedUser?._id])    
+
+        return () => {
+            socket.off("receiveMessage", handleReceiveMessage);
+            socket.off("connect", joinChat);
+        };
+    }, [selectedUser?._id]);    
+
+
+    useEffect(()=>{
+        if (!selectedUser?._id) return;
+
+        const socket = createSocketConnection();
+
+        const handleTypingStart = () => {
+            setIsTyping(true);
+        };
+
+        const handleTypingStop = () => {
+            setIsTyping(false);
+        };
+
+        socket.on("typing:start", handleTypingStart);
+        socket.on("typing:stop", handleTypingStop);
+
+        return () => {
+            socket.off("typing:start", handleTypingStart);
+            socket.off("typing:stop", handleTypingStop);
+        };
+    },[selectedUser?._id])
 
     const handleSend = () => {
         if (!text.trim()) return;
-        let socket = socketConnection();
+        let socket = createSocketConnection();
 
-        if(isDoubleClicked){
-            // console.log("edit side")
-            socket.emit("sendMessage", {
-                current : currentUser?.data?._id,
-                target : selectedUser?._id,
-                text,
-                messageId : activeMsgId,
-                isEdit : true
-            })
-        }else {
-            // console.log("add side")
-            socket.emit("sendMessage",{
-                current : currentUser?.data?._id,
-                target : selectedUser?._id,
-                text,
-                messageId : "",
-                isEdit : false
-            });
-        }
+        socket.emit("sendMessage", {
+            current : currentUser?.data?._id,
+            target : selectedUser?._id,
+            text,
+            messageId : isDoubleClicked ? activeMsgId : "",
+            isEdit : isDoubleClicked
+        });
+
         setText("");
         setIsDoubleClicked(false);
     };
@@ -209,6 +230,8 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
             </section>
         )
     }
+
+    console.log("***** typing ", isTyping);
    
     return (
     <>
@@ -224,7 +247,7 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
                 <div className="min-w-0">
                     <h2 className="text-sm font-semibold text-white truncate">{selectedUser.name}</h2>
                     <p className={`text-xs ${selectedUser.status == "online" ? "text-emerald-400" : "text-rose-400"}`}>
-                        {selectedUser.status == "online" ? "Online" : "Offline"}
+                        {selectedUser.status == "online" ? "Online" : "Offline"} {isTyping ? "Typing..." : ""}
                     </p>
                 </div>
             </div>
@@ -421,12 +444,32 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 onChange={(e) => {
                     let {value} = e.target;
-                    if(value){
-                        setText(e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))
+                    let socket = createSocketConnection();
+                    const current = currentUser?.data?._id;
+                    const target = selectedUser?._id;
+                    clearTimeout(typingTimerRef.current);
+            
+                    if(!value){
+                        if (isTypingRef.current) {
+                            socket.emit("typing:stop", {current,target});
+                            isTypingRef.current = false;
+                        }
+
+                        setText("");
+                        setIsDoubleClicked(false);
+                        return;                       
                     }
                     else {
-                        setText("");
-                        setIsDoubleClicked(false)
+                        if (!isTypingRef.current) {
+                            socket.emit("typing:start", {current,target});
+                            isTypingRef.current = true;
+                        }
+
+                        typingTimerRef.current = setTimeout(() => {
+                            socket.emit("typing:stop", {current,target});
+                            isTypingRef.current = false;
+                        }, 1500);
+                        setText(value.charAt(0).toUpperCase() + value.slice(1))
                     }
                 }}
             />
