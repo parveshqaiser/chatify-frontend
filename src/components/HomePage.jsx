@@ -6,8 +6,7 @@ import bgImage from "../assets/chat-br.jpg";
 
 import { useGetAllUsersQuery, useGetUserDetailsQuery } from "../redux/api.js";
 import { LoadingMessage } from "./Spinner.jsx";
-import { socketConnection } from "../utils/socket-client.js";
-import { useNavigate } from "react-router-dom";
+import { createSocketConnection, disconnectSocket } from "../utils/socket-client.js";
 
 
 function HomePage() {
@@ -33,7 +32,7 @@ function HomePage() {
         let userId = currentUser?.data?._id;
 
         if (!userId) return;
-        let socket = socketConnection();
+        let socket = createSocketConnection();
 
         let handleOnlineUsers = (userIds) => {
             setOnlineUserIds(userIds);
@@ -45,7 +44,8 @@ function HomePage() {
 
         return () => {
             socket.off("onlineUsers", handleOnlineUsers);
-            socket.disconnect();
+            // socket.disconnect();
+            disconnectSocket();
         };
     }, [currentUser?.data?._id]);
 
