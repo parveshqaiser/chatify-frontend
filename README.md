@@ -21,7 +21,7 @@ pending :
     logout modularity ,             done
     group by date,                  done (some bus is there)
     try mongodb grouping            
-    message typing      
+    message typing                  done
 
     delete account
 
