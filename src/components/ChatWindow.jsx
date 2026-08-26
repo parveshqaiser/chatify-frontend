@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FileText, Mic, Paperclip, Send, Smile, Images, Phone, Info, MoveLeft, X, Search, MessageSquare, Pencil, Trash2 } from "lucide-react";
+import { FileText, Paperclip, Send, Smile, Images, Info, X, Search, Pencil, Trash2 } from "lucide-react";
 import EmojiPicker from 'emoji-picker-react';
 import UserViewModal from "./UserViewModal.jsx";
 import DeleteConversationModal from "./DeleteConversationModal.jsx";
@@ -336,7 +336,7 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
         {groupedMessages.map((group) => (
             <div key={group.date}>
 
-                <div className="flex justify-center my-3">
+                <div className="flex justify-center my-2">
                     <span className="px-3 py-1 rounded-full bg-green-700 text-[10px]">
                     {dayjs(group.date).format("DD MMM YYYY")}
                     </span>
@@ -350,55 +350,53 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
                     <nav
                         ref={scrollBar}
                         key={m._id}
-                        className={`px-3 py-2 rounded-lg text-sm chat ${
+                        className={`px-2 py-0.5 rounded-lg text-sm chat ${
                         m?.senderId?._id === selectedUser?._id
                             ? "chat-start"
                             : "chat-end"
                         }`}
                     >
-                        <span className="chat-header text-[10px]">
-                        {dayjs(m?.createdAt).format("HH:mm")}
-                        </span>
+                        <span className="chat-header text-[10px]">{dayjs(m?.createdAt).format("HH:mm")}</span>
 
                         <div
-                        onDoubleClick={() => {
-                            setActiveMsgId(m._id);
-                            setIsDoubleClicked(true);
-                        }}
-                        className={`chat-bubble cursor-pointer select-none ${
-                            m?.senderId?._id === selectedUser?._id
-                            ? "chat-bubble-primary"
-                            : "chat-bubble-neutral"
-                        }`}
+                            onDoubleClick={() => {
+                                setActiveMsgId(m._id);
+                                setIsDoubleClicked(true);
+                            }}
+                            className={`chat-bubble cursor-pointer select-none ${
+                                m?.senderId?._id === selectedUser?._id
+                                ? "chat-bubble-primary"
+                                : "chat-bubble-neutral"
+                            }`}
                         >
-                        <HighlightMessage
-                            text={m?.msg || ""}
-                            searchQuery={findText}
-                        />
+                            <HighlightMessage
+                                text={m?.msg || ""}
+                                searchQuery={findText}
+                            />
                         </div>
 
                         <div className="chat-footer opacity-50 flex items-center gap-2">
-                        Delivered
+                            Delivered
 
-                        <span className="text-[10px]">
-                            {isMine ? "You" : ""}
-                        </span>
-
-                        {isDoubleClicked && isMine && isActive && (
-                            <span className="flex items-center gap-1 ml-1">
-                            <Pencil
-                                size={14}
-                                className="cursor-pointer text-warning"
-                                onClick={() => setText(m.msg)}
-                            />
-
-                            <Trash2
-                                size={14}
-                                className="cursor-pointer text-error"
-                                onClick={() => handleDelete()}
-                            />
+                            <span className="text-[10px]">
+                                {isMine ? "You" : ""}
                             </span>
-                        )}
+
+                            {isDoubleClicked && isMine && isActive && (
+                                <span className="flex items-center gap-1 ml-1">
+                                <Pencil
+                                    size={14}
+                                    className="cursor-pointer text-warning"
+                                    onClick={() => setText(m.msg)}
+                                />
+
+                                <Trash2
+                                    size={14}
+                                    className="cursor-pointer text-error"
+                                    onClick={() => handleDelete()}
+                                />
+                                </span>
+                            )}
                         </div>
                     </nav>
                     );
@@ -437,7 +435,7 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
                 type="text"
                 value={text}
                 placeholder="Type a message..."
-                className="flex-1 bg-transparent px-1 py-2.5 text-sm text-gray-800 outline-none placeholder:text-gray-400 dark:text-gray-200 dark:placeholder:text-gray-500"
+                className="flex-1 bg-transparent px-1 py-2.5 text-sm text-gray-800 outline-none placeholder:text-orange-400 dark:text-gray-200"
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 onChange={(e) => {
                     let {value} = e.target;
