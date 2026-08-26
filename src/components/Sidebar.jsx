@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { LogOutIcon, MessageCirclePlus, MoreVertical, Search, UserCircle } from "lucide-react";
 import { Link  } from "react-router-dom";
 import useLogout from "../hooks/useLogout.js";
+import lastSeenFormat from "../utils/lastseen-sidebar.js";
 
 const Sidebar = ({ users, activeUser, currentUser, onSelectUser }) => {
 
@@ -88,6 +89,7 @@ const Sidebar = ({ users, activeUser, currentUser, onSelectUser }) => {
 		<section className="sidebar-scroll flex-1 overflow-y-auto px-2 pb-2 space-y-1">
 			{filtered.map((user) => {
 			const initials = user.name.slice(0, 2).toUpperCase();
+			console.log("*** user", user);
 			return (
 				<button
 					key={user._id}
@@ -109,7 +111,7 @@ const Sidebar = ({ users, activeUser, currentUser, onSelectUser }) => {
 							<span className="font-semibold text-green-400 truncate text-[14px] ">1</span>
 						</span>
 						<span className="block text-[12px] text-white/70 truncate">
-							{user.status == "online" ? "Active now" : "Last seen recently"}
+							{user.status == "online" ? "Active now" : lastSeenFormat(user?.lastLogin)}
 						</span>
 					</span>
 				</button>
