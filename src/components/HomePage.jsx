@@ -124,7 +124,6 @@ function HomePage() {
             <nav className="flex-1 md:w-3/4">
                 <ChatWindow 
                     selectedUser={activeUser}  
-                    activeUser = {activeUser}
                     currentUser ={currentUser}
                 />
             </nav>

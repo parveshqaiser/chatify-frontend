@@ -10,7 +10,7 @@ import { useClearConversationMutation, useDeleteMessageMutation, useGetAllMessag
 import toast from "react-hot-toast";
 import HighlightMessage from "./HighlightMessage.jsx";
 
-const ChatWindow = ({selectedUser,activeUser,currentUser})=>{ 
+const ChatWindow = ({selectedUser,currentUser})=>{ 
 
     let [deleteMessage] = useDeleteMessageMutation();
     let [deleteAll] = useClearConversationMutation();
@@ -21,8 +21,8 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
         error : msgError, 
         refetch: refetchAllMessages
     } = useGetAllMessagesQuery(
-        activeUser?._id,
-        { skip: !activeUser }
+        selectedUser?._id,
+        { skip: !selectedUser }
     );
 
     // Query for fetching more messages
@@ -50,7 +50,7 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
     const [allMessages, setAllMessages] = useState([]);
 
      useEffect(() => {
-        if (!activeUser?._id) {
+        if (!selectedUser?._id) {
             setAllMessages([]);
             return;
         }
@@ -60,7 +60,7 @@ const ChatWindow = ({selectedUser,activeUser,currentUser})=>{
         }else {
             setAllMessages([]);
         }
-    }, [activeUser?._id, msg]);
+    }, [selectedUser?._id, msg]);
 
 
     useEffect(()=>{

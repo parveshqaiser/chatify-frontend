@@ -13,6 +13,7 @@ import { Toaster } from 'react-hot-toast';
 import { Provider } from 'react-redux';
 import appStore from './redux/store.js';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import FileUpload from './test/Fetch.jsx';
 
 
 function App() {
@@ -32,6 +33,8 @@ function App() {
                     <Route path="/home" element={<HomePage />} />
                     <Route path="/profile" element={<UserProfile />} />
                 </Route>
+
+				<Route path='/test' element={<FileUpload></FileUpload>}></Route>
 
 				<Route path='*' element={<PageNotFound />}></Route>
 			</Routes>
