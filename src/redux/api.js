@@ -191,8 +191,22 @@ export const api = createApi({
             }),
             invalidatesTags: (result, error, targetUserId) => 
                 [{ type: 'Messages', id: targetUserId }, { type: 'Conversation' }],
-        })
+        }),
+
+        // v2 chat messages
+
+        uploadPresignedUrl : builder.mutation({
+            query : (data)=>({
+                method : "POST",
+                url : `/v2/chat/upload/file`,
+                body : data
+            })
+        }),
     })
+
+  
+
+   
 });
 
 export const {
@@ -205,5 +219,6 @@ export const {
     useLazyGetAllMessagesQuery,
     useDeleteMessageMutation,
     useEditMessageMutation,
-    useClearConversationMutation
+    useClearConversationMutation,
+    useUploadPresignedUrlMutation,
 } = api;
