@@ -7,7 +7,6 @@ import lastSeenFormat from "../utils/lastseen-sidebar.js";
 
 const Sidebar = ({ users, activeUser, currentUser, onSelectUser }) => {
 
-
 	let logoutHandler = useLogout(); 
 
 	const [search, setSearch] = useState(""); // search input
@@ -89,7 +88,6 @@ const Sidebar = ({ users, activeUser, currentUser, onSelectUser }) => {
 		<section className="sidebar-scroll flex-1 overflow-y-auto px-2 pb-2 space-y-1">
 			{filtered.map((user) => {
 			const initials = user.name.slice(0, 2).toUpperCase();
-			console.log("*** user", user);
 			return (
 				<button
 					key={user._id}

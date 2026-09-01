@@ -161,7 +161,7 @@ export const api = createApi({
         }),
 
         getAllMessages : builder.query({
-            query: (targetUserId) => `/chat/${targetUserId}`,
+            query: (targetUserId) => `/v1/chat/${targetUserId}`,
         }),
 
         deleteMessage: builder.mutation({
