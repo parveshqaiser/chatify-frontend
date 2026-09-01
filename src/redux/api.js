@@ -127,41 +127,26 @@ export const api = createApi({
     endpoints: (builder) => ({
 
         getUserDetails: builder.query({
-            query: () => '/auth/current-user',
+            query: () => '/v1/auth/current-user',
             providesTags: ['User'],
         }),
 
         getAllUsers: builder.query({
-            query: () => "/auth/allusers",
+            query: () => "/v1/auth/allusers",
             providesTags: ['User'],
         }),
 
         logout: builder.mutation({
             query: () => ({
                 method: "GET",
-                url: "/auth/logout"
+                url: "/v1/auth/logout"
             }),
-            /*
-            // Invalidate all cache on logout
-            invalidatesTags: ['User', 'Messages', 'Conversation'],
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-                try {
-                    await queryFulfilled;
-                    // Reset all cache after successful logout
-                    dispatch(api.util.resetApiState());
-                    // Redirect to login
-                    window.location.href = '/';
-                } catch (error) {
-                    console.error('Logout failed:', error);
-                }
-            }
-            */
         }),
 
         updateProfile: builder.mutation({
             query: ({ name, bio }) => ({
                 method: "PATCH",
-                url: "/auth/update-profile",
+                url: "/v1/auth/update-profile",
                 body: { name, bio }
             }),
             invalidatesTags: ['User'],
@@ -170,7 +155,7 @@ export const api = createApi({
         updatePassword: builder.mutation({
             query: (data) => ({
                 method: "POST",
-                url: "/auth/change-password",
+                url: "/v1/auth/change-password",
                 body: data
             }),
         }),
@@ -182,7 +167,7 @@ export const api = createApi({
         deleteMessage: builder.mutation({
             query: ({ targetUserId, messageId }) => ({
                 method: "DELETE",
-                url: `/chat/${targetUserId}/message/${messageId}`,
+                url: `/v2/chat/${targetUserId}/message/${messageId}`,
             }),
             invalidatesTags: (result, error, { targetUserId }) => 
                 [{ type: 'Messages', id: targetUserId }],
@@ -192,7 +177,7 @@ export const api = createApi({
         editMessage: builder.mutation({
             query: ({ targetUserId, messageId, text }) => ({
                 method: "PATCH",
-                url: `/chat/${targetUserId}/message/${messageId}`,
+                url: `/v2/chat/${targetUserId}/message/${messageId}`,
                 body: { text }
             }),
             invalidatesTags: (result, error, { targetUserId }) => 

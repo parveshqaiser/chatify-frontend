@@ -57,7 +57,7 @@ const RegistrationPage = () => {
         setLoading(true);
 
         try {
-            let res = await axios.post(BASE_URL + "/auth/register", formData);
+            let res = await axios.post(BASE_URL + "/v1/auth/register", formData);
 
              if(res.data.success){
                 toast.success(res.data.message);
