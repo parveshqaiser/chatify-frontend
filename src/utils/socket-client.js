@@ -1,11 +1,11 @@
 
 import { io } from "socket.io-client";
 
-let BASE_URL = "http://localhost:7500";
+let SOCKET_URL = "http://localhost:7500";
 
 /*
 export const socketConnection = ()=>{
-    return io(BASE_URL)
+    return io(SOCKET_URL)
 }
 */
 
@@ -13,7 +13,7 @@ let socket = null;
 
 export let createSocketConnection = () => {
     if (!socket) {
-        socket = io(BASE_URL);
+        socket = io(SOCKET_URL);
     }
     return socket;
 };
