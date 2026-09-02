@@ -128,7 +128,6 @@ function HomePage() {
                     currentUser ={currentUser}
                 />
             </nav>
-
            
         </div>
     </main>

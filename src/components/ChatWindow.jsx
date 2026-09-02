@@ -7,10 +7,10 @@ import DeleteConversationModal from "./DeleteConversationModal.jsx";
 import robot from "../assets/robot.gif";
 import dayjs from "dayjs";
 import { createSocketConnection } from "../utils/socket-client.js";
-import { useClearConversationMutation, useDeleteMessageMutation, useGetAllMessagesQuery, useLazyGetAllMessagesQuery, useUploadPresignedUrlMutation } from "../redux/api.js";
+import { useClearConversationMutation, useDeleteMessageMutation,useGetAllNewMessagesQuery, useLazyGetAllMessagesQuery, useUploadPresignedUrlMutation } from "../redux/api.js";
 import toast from "react-hot-toast";
-import HighlightMessage from "./HighlightMessage.jsx";
 import axios from "axios";
+import MessageContent from "./MessageContent.jsx";
 
 const ALternateChatWindow = ({selectedUser,currentUser})=>{ 
 
@@ -18,15 +18,7 @@ const ALternateChatWindow = ({selectedUser,currentUser})=>{
     let [deleteAll] = useClearConversationMutation();
     let [uploadFiles] = useUploadPresignedUrlMutation();
 
-    let {
-        data : msg,  
-        isLoading : loadingMsg, 
-        error : msgError, 
-        refetch: refetchAllMessages
-    } = useGetAllMessagesQuery(
-        selectedUser?._id,
-        { skip: !selectedUser }
-    );
+    let {data : newMsg, isLoading, error, refetch: refetchAllmsg} = useGetAllNewMessagesQuery(selectedUser?._id,{skip : !selectedUser});
 
     // Query for fetching more messages
     // let [fetchMoreMessages] = useLazyGetAllMessagesQuery();
@@ -64,12 +56,12 @@ const ALternateChatWindow = ({selectedUser,currentUser})=>{
             return;
         }
 
-        if (msg?.data?.message) {
-            setAllMessages(msg.data.message);
+        if (newMsg?.data) {
+            setAllMessages(newMsg.data);
         }else {
             setAllMessages([]);
         }
-    }, [selectedUser?._id, msg]);
+    }, [selectedUser?._id, newMsg]);
 
 
     useEffect(()=>{
@@ -111,7 +103,7 @@ const ALternateChatWindow = ({selectedUser,currentUser})=>{
         let target = selectedUser._id;
 
         let handleReceiveMessage = () => {
-            refetchAllMessages();
+            refetchAllmsg();
         };
 
         let joinChat = () => {
@@ -252,7 +244,7 @@ const ALternateChatWindow = ({selectedUser,currentUser})=>{
             if(res.success){
                 toast.success(res.message);
                 setIsDoubleClicked(false);
-                refetchAllMessages();
+                refetchAllmsg();
             }
         } catch (error) {
             console.log(error);
@@ -267,7 +259,7 @@ const ALternateChatWindow = ({selectedUser,currentUser})=>{
              if(res.success){
                 toast.success(res.message)
                 setDeleteModal(false);
-                refetchAllMessages();
+                refetchAllmsg();
             }
         } catch (error) {
             console.log(error);
@@ -418,18 +410,14 @@ const ALternateChatWindow = ({selectedUser,currentUser})=>{
                 </div>
 
                 {group.messages.map((m) => {
-                    const isMine = m?.senderId?._id !== selectedUser?._id;
+                    const isMine = m?.senderId?._id == currentUser?.data?._id;
                     const isActive = activeMsgId === m._id;
-
+                    const onlyTextCanBeEdited = m.type === "text";
                     return (
                     <nav
                         ref={scrollBar}
                         key={m._id}
-                        className={`px-2 py-0.5 rounded-lg text-sm chat ${
-                        m?.senderId?._id === selectedUser?._id
-                            ? "chat-start"
-                            : "chat-end"
-                        }`}
+                        className={`px-2 py-0.5 rounded-lg text-sm chat ${isMine? "chat-end": "chat-start"}`}
                     >
                         <span className="chat-header text-[10px]">{dayjs(m?.createdAt).format("HH:mm")}</span>
 
@@ -439,14 +427,11 @@ const ALternateChatWindow = ({selectedUser,currentUser})=>{
                                 setIsDoubleClicked(true);
                             }}
                             className={`chat-bubble cursor-pointer select-none ${
-                                m?.senderId?._id === selectedUser?._id
-                                ? "chat-bubble-primary"
-                                : "chat-bubble-neutral"
-                            }`}
+                               isMine? "chat-bubble-neutral": "chat-bubble-primary"}`}
                         >
-                            <HighlightMessage
-                                text={m?.msg || ""}
-                                searchQuery={findText}
+                            <MessageContent
+                                message={m}
+                                findText={findText}
                             />
                         </div>
 
@@ -457,12 +442,12 @@ const ALternateChatWindow = ({selectedUser,currentUser})=>{
                                 {isMine ? "You" : ""}
                             </span>
 
-                            {isDoubleClicked && isMine && isActive && (
+                            {isDoubleClicked && isMine && isActive && onlyTextCanBeEdited &&(
                                 <span className="flex items-center gap-1 ml-1">
                                 <Pencil
                                     size={14}
                                     className="cursor-pointer text-warning"
-                                    onClick={() => setText(m.msg)}
+                                    onClick={() => setText(m.text)}
                                 />
 
                                 <Trash2

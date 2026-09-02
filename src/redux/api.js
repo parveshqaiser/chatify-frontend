@@ -125,7 +125,7 @@ export const api = createApi({
     baseQuery: baseQueryWithReauth,
     tagTypes: ['User', 'Messages', 'Conversation'],
     endpoints: (builder) => ({
-
+        // auth
         getUserDetails: builder.query({
             query: () => '/v1/auth/current-user',
             providesTags: ['User'],
@@ -160,6 +160,7 @@ export const api = createApi({
             }),
         }),
 
+        // chats 
         getAllMessages : builder.query({
             query: (targetUserId) => `/v1/chat/${targetUserId}`,
         }),
@@ -187,14 +188,13 @@ export const api = createApi({
         clearConversation: builder.mutation({
             query: (targetUserId) => ({
                 method: "DELETE",
-                url: `/chat/${targetUserId}`,
+                url: `/v2/chat/${targetUserId}`,
             }),
             invalidatesTags: (result, error, targetUserId) => 
                 [{ type: 'Messages', id: targetUserId }, { type: 'Conversation' }],
         }),
 
         // v2 chat messages
-
         uploadPresignedUrl : builder.mutation({
             query : (data)=>({
                 method : "POST",
@@ -202,11 +202,13 @@ export const api = createApi({
                 body : data
             })
         }),
+
+        getAllNewMessages : builder.query({
+            query: (targetUserId) => `/v2/chat/${targetUserId}`,
+        }),
+
+
     })
-
-  
-
-   
 });
 
 export const {
@@ -221,4 +223,5 @@ export const {
     useEditMessageMutation,
     useClearConversationMutation,
     useUploadPresignedUrlMutation,
+    useGetAllNewMessagesQuery
 } = api;
