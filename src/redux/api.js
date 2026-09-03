@@ -15,7 +15,7 @@ const handleUnauthorized = async (api, errorMessage = "Session expired. Please l
     try {
         await baseQuery(
             {
-                url: '/auth/emergency-logout',
+                url: '/v1/auth/emergency-logout',
                 method: 'GET',
             },
             api,
@@ -71,11 +71,11 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
                 const release = await mutex.acquire();
 
                 try {
-                    // Try to refresh the token
+                    // Try to refresh the access token
                     const refreshResult = await baseQuery(
                         {
-                            url: '/auth/refresh',
-                            method: 'POST',
+                            url: '/v1/auth/refresh-token',
+                            method: 'GET',
                         },
                         api,
                         extraOptions
@@ -130,19 +130,10 @@ export const api = createApi({
             query: () => '/v1/auth/current-user',
             providesTags: ['User'],
         }),
-
         getAllUsers: builder.query({
             query: () => "/v1/auth/allusers",
             providesTags: ['User'],
         }),
-
-        logout: builder.mutation({
-            query: () => ({
-                method: "GET",
-                url: "/v1/auth/logout"
-            }),
-        }),
-
         updateProfile: builder.mutation({
             query: ({ name, bio }) => ({
                 method: "PATCH",
@@ -151,7 +142,6 @@ export const api = createApi({
             }),
             invalidatesTags: ['User'],
         }),
-
         updatePassword: builder.mutation({
             query: (data) => ({
                 method: "POST",
@@ -159,39 +149,16 @@ export const api = createApi({
                 body: data
             }),
         }),
+        logout: builder.mutation({
+            query: () => ({
+                method: "GET",
+                url: "/v1/auth/logout"
+            }),
+        }),
 
-        // chats 
+        // chats v1
         getAllMessages : builder.query({
             query: (targetUserId) => `/v1/chat/${targetUserId}`,
-        }),
-
-        deleteMessage: builder.mutation({
-            query: ({ targetUserId, messageId }) => ({
-                method: "DELETE",
-                url: `/v2/chat/${targetUserId}/message/${messageId}`,
-            }),
-            invalidatesTags: (result, error, { targetUserId }) => 
-                [{ type: 'Messages', id: targetUserId }],
-        }),
-
-        // not using, socket is managing
-        editMessage: builder.mutation({
-            query: ({ targetUserId, messageId, text }) => ({
-                method: "PATCH",
-                url: `/v2/chat/${targetUserId}/message/${messageId}`,
-                body: { text }
-            }),
-            invalidatesTags: (result, error, { targetUserId }) => 
-                [{ type: 'Messages', id: targetUserId }],
-        }),
-
-        clearConversation: builder.mutation({
-            query: (targetUserId) => ({
-                method: "DELETE",
-                url: `/v2/chat/${targetUserId}`,
-            }),
-            invalidatesTags: (result, error, targetUserId) => 
-                [{ type: 'Messages', id: targetUserId }, { type: 'Conversation' }],
         }),
 
         // v2 chat messages
@@ -202,12 +169,25 @@ export const api = createApi({
                 body : data
             })
         }),
-
         getAllNewMessages : builder.query({
             query: (targetUserId) => `/v2/chat/${targetUserId}`,
         }),
-
-
+        deleteMessage: builder.mutation({
+            query: ({ targetUserId, messageId }) => ({
+                method: "DELETE",
+                url: `/v2/chat/${targetUserId}/message/${messageId}`,
+            }),
+            invalidatesTags: (result, error, { targetUserId }) => 
+                [{ type: 'Messages', id: targetUserId }],
+        }),
+        clearConversation: builder.mutation({
+            query: (targetUserId) => ({
+                method: "DELETE",
+                url: `/v2/chat/${targetUserId}`,
+            }),
+            invalidatesTags: (result, error, targetUserId) => 
+                [{ type: 'Messages', id: targetUserId }, { type: 'Conversation' }],
+        }),
     })
 });
 
@@ -225,3 +205,17 @@ export const {
     useUploadPresignedUrlMutation,
     useGetAllNewMessagesQuery
 } = api;
+
+
+/*
+    editMessage: builder.mutation({
+        query: ({ targetUserId, messageId, text }) => ({
+            method: "PATCH",
+            url: `/v2/chat/${targetUserId}/message/${messageId}`,
+            body: { text }
+        }),
+        invalidatesTags: (result, error, { targetUserId }) => 
+            [{ type: 'Messages', id: targetUserId }],
+    }),
+
+*/
