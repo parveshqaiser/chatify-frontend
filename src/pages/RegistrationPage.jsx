@@ -72,7 +72,7 @@ const RegistrationPage = () => {
         } catch (error) {
             console.log(error);
             setLoading(false);
-            toast.error(error?.response?.data?.message || error?.message, {duration:2000})
+            toast.error(error?.response?.data?.message || error?.message, {duration:3000})
         }finally {
             setLoading(false);
         }
