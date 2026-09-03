@@ -28,7 +28,7 @@ const ALternateChatWindow = ({selectedUser,currentUser})=>{
     const [fileIcons, setFileIcons] = useState(false);  // icons in send message
     const [moreInfo, setMoreInfo] = useState(false);  // more info button in header
     const [searchOpen, setSearchOpen] = useState(false);  // input field for conversation
-    const [activeMsgId, setActiveMsgId] = useState(null);  // selected message id
+    const [activeMsgId, setActiveMsgId] = useState(null);  // selected message id for editing & deleting
    
     const [showEmojiPicker, setShowEmojiPicker] = useState(false); // emoji picker visibility
     const emojiPickerRef = useRef(null);
@@ -177,6 +177,8 @@ const ALternateChatWindow = ({selectedUser,currentUser})=>{
                 text: text?.trim() || "",
                 type: "text",
                 file: null,
+                messageId : activeMsgId,
+                isEdit : isDoubleClicked
             };
 
             if (selectedFile) 
@@ -220,7 +222,7 @@ const ALternateChatWindow = ({selectedUser,currentUser})=>{
                     size: selectedFile.size,
                 };
             }
-
+          
             let socket = createSocketConnection();
             socket.emit("sendMessage",messagePayload);
 
