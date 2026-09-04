@@ -27,14 +27,14 @@ pending :
 
     v2
 
-    check editing
-    check delete for all messages
-    check clear all 
+    check editing                   done
+    check delete for all messages   
+    check clear all                 done
     on view, get all uploaded docs
     modify user proile
     clear front end unnneccary code
     perform code optimization techniques
-    clear unused rtk query api's (creates confusion)
+    clear unused rtk query api's (creates confusion) 
 
 
 check notes :
