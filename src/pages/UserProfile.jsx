@@ -15,6 +15,7 @@ import useLogout from '../hooks/useLogout.js';
 const UserProfile = () => {
 
 	let {data : user, isLoading , isError,error, refetch} = useGetUserDetailsQuery();
+	// chat statistics need to work on this.
 	let [updateProfle] = useUpdateProfileMutation();
 	let [updatePassword] = useUpdatePasswordMutation();
 
