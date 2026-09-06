@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import MessageContent from "./MessageContent.jsx";
 
-const ALternateChatWindow = ({selectedUser,currentUser})=>{ 
+const ChatWindow = ({selectedUser,currentUser})=>{ 
 
     let [deleteMessage] = useDeleteMessageMutation();
     let [deleteAll] = useClearConversationMutation();
@@ -438,22 +438,22 @@ const ALternateChatWindow = ({selectedUser,currentUser})=>{
                         </div>
 
                         <div className="chat-footer opacity-50 flex items-center gap-2">
-                            Delivered
+                            {/* Delivered */}
 
                             <span className="text-[10px]">
-                                {isMine ? "You" : ""}
+                                { isMine ? "You" : ""}
                             </span>
 
-                            {isDoubleClicked && isMine && isActive && onlyTextCanBeEdited &&(
+                            {isDoubleClicked && isMine && isActive &&(
                                 <span className="flex items-center gap-1 ml-1">
-                                <Pencil
-                                    size={14}
+                                {onlyTextCanBeEdited && <Pencil
+                                    size={16}
                                     className="cursor-pointer text-warning"
                                     onClick={() => setText(m.text)}
-                                />
+                                />}
 
                                 <Trash2
-                                    size={14}
+                                    size={16}
                                     className="cursor-pointer text-error"
                                     onClick={() => handleDelete()}
                                 />
@@ -632,4 +632,4 @@ const ALternateChatWindow = ({selectedUser,currentUser})=>{
     );
 }
 
-export default ALternateChatWindow;
+export default ChatWindow;
