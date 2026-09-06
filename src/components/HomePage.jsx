@@ -7,7 +7,6 @@ import bgImage from "../assets/chat-br.jpg";
 import { useGetAllUsersQuery, useGetUserDetailsQuery } from "../redux/api.js";
 import { LoadingMessage } from "./Spinner.jsx";
 import { createSocketConnection, disconnectSocket } from "../utils/socket-client.js";
-import ALternateChatWindow from "./AlternateChatWindow.jsx";
 
 
 function HomePage() {

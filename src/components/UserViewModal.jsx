@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, X, Info, Paperclip, Smile, Send,Images,FileText,User,Mail,Calendar,Download,File,Image,FileArchive,FileCode} from 'lucide-react';
+import { X, Send,FileText,Mail,Download,File,Image,FileArchive,FileCode, CircleUserRound} from 'lucide-react';
 
 const UserViewModal = ({user, onClose }) => {
  
@@ -54,15 +54,18 @@ const UserViewModal = ({user, onClose }) => {
                     <div className="flex-1">
                         <h4 className="text-md font-bold text-gray-900 dark:text-white">{user?.name || "User Name"}</h4>
                       
-                        <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
                             <Mail size={14} />
                             {user?.email || "user@example.com"}
+                            <CircleUserRound size={14} />
+                            {user?.username || "NA"}
                         </p>
                     </div>
                 </aside>
 
                 {/* bio */}
                 <blockquote className="mb-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    <span className='italic'>My Bio : &nbsp;</span>
                     <span className="text-sm text-gray-700 dark:text-gray-300">
                         {user?.bio || "Software developer passionate about creating beautiful and functional user interfaces"}
                     </span>
