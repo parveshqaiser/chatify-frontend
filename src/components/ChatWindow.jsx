@@ -622,7 +622,8 @@ const ChatWindow = ({selectedUser,currentUser})=>{
             </button>
         </article>
     </section>
-    <UserViewModal user={selectedUser}/>
+    <UserViewModal user={selectedUser} allMessages={allMessages}/>
+
     <DeleteConversationModal 
         onDelete={handleDeleteAll} 
         deleteModal={deleteModal} 

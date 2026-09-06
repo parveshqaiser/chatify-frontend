@@ -1,23 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Send,FileText,Mail,Download,File,Image,FileArchive,FileCode, CircleUserRound} from 'lucide-react';
+import dayjs from 'dayjs';
 
-const UserViewModal = ({user, onClose }) => {
+const UserViewModal = ({user, allMessages }) => {
+
+    let files  = allMessages?.filter(item => item.type == "media" || item.type == "document").map(item=> {
+            return {
+                id : item._id,
+                date : item.createdAt,
+                url : item.file.url,
+                name : item.file.fileName,
+                type : item.type,
+                size : item.file.size,
+            }
+        });
  
-    const files = [
-        { id: 1, name: "profile_picture.jpg", type: "image", size: "2.4 MB", date: "2024-01-15" },
-        { id: 2, name: "resume_2024.pdf", type: "pdf", size: "856 KB", date: "2024-01-20" },
-        { id: 3, name: "project_notes.txt", type: "text", size: "45 KB", date: "2024-01-22" },
-        { id: 4, name: "presentation.pptx", type: "presentation", size: "4.2 MB", date: "2024-01-18" },
-        { id: 5, name: "team_photo.jpg", type: "image", size: "3.1 MB", date: "2024-01-10" },
-        { id: 6, name: "budget_2024.xlsx", type: "spreadsheet", size: "1.8 MB", date: "2024-01-05" },
-        { id: 7, name: "team_photo.jpg", type: "image", size: "3.1 MB", date: "2024-01-10" },
-        { id: 8, name: "budget_2024.xlsx", type: "spreadsheet", size: "1.8 MB", date: "2024-01-05" },
-    ];
+    // files = [
+    //     { id: 1, name: "profile_picture.jpg", type: "media", size: "2.4 MB", date: "2024-01-15" },
+    //     { id: 2, name: "resume_2024.pdf", type: "document", size: "856 KB", date: "2024-01-20" },
+    //     { id: 3, name: "project_notes.txt", type: "text", size: "45 KB", date: "2024-01-22" },
+    //     { id: 4, name: "presentation.pptx", type: "presentation", size: "4.2 MB", date: "2024-01-18" },
+    //     { id: 5, name: "team_photo.jpg", type: "media", size: "3.1 MB", date: "2024-01-10" },
+    //     { id: 6, name: "budget_2024.xlsx", type: "spreadsheet", size: "1.8 MB", date: "2024-01-05" },
+    //     { id: 7, name: "team_photo.jpg", type: "media", size: "3.1 MB", date: "2024-01-10" },
+    //     { id: 8, name: "budget_2024.xlsx", type: "spreadsheet", size: "1.8 MB", date: "2024-01-05" },
+    // ];
+
+    function formatFileSize(bytes) {
+        let kb = bytes / 1024;
+        let mb = kb / 1024;
+
+        return kb <=1024 ?  Number(kb.toFixed(2)) + " KB" : Number(mb.toFixed(2)) + " MB" 
+    }
 
     const getFileIcon = (type) => {
         switch(type) {
-        case 'image': return <Image size={20} className="text-yellow-300" />;
-        case 'pdf': return <FileArchive size={20} className="text-red-400" />;
+        case 'media': return <Image size={20} className="text-yellow-300" />;
+        case 'document': return <FileArchive size={20} className="text-red-400" />;
         case 'text': return <FileText size={20} className="text-white" />;
         case 'presentation': return <FileCode size={20} className="text-orange-500" />;
         case 'spreadsheet': return <FileArchive size={20} className="text-green-300" />;
@@ -92,16 +111,16 @@ const UserViewModal = ({user, onClose }) => {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
-                                        {file.name}
+                                        {file.name} 
                                     </p>
                                     <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                        <span>{file.size}</span>
+                                        <span>{formatFileSize(file?.size)}</span>
                                         <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-500"></span>
-                                        <span>{file.date}</span>
+                                        <span>{dayjs(file?.date).format("DD-MM-YYYY") || "NA"}</span>
                                     </div>
                                 </div>
-                                <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600">
-                                    <Download size={16} className="text-gray-500 dark:text-gray-400" />
+                                <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer">
+                                    <Download size={16} className="text-gray-500 dark:text-gray-400" onClick={() => window.open(file.url, "_blank")} />
                                 </button>
                             </div>
                             ))}
