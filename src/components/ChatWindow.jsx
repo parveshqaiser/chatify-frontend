@@ -49,6 +49,7 @@ const ChatWindow = ({selectedUser,currentUser})=>{
     const [filePreview, setFilePreview] = useState(null);
     const fileInputRef = useRef(null);  // for selecting images/videos
     const documentRef = useRef(null); // for selecting pdf/word
+    const [fileLoading, setFileLoading] = useState(false);
 
      useEffect(() => {
         if (!selectedUser?._id) {
@@ -188,6 +189,7 @@ const ChatWindow = ({selectedUser,currentUser})=>{
                     fileType: selectedFile.type,
                 };
 
+                setFileLoading(true);
                 let res = await uploadFiles(data).unwrap();
 
                 let { uploadUrl, key, publicUrl } = res.data;
@@ -207,6 +209,7 @@ const ChatWindow = ({selectedUser,currentUser})=>{
                         console.log(`Upload Progress: ${percentCompleted}%`);
                     },
                 });
+                setFileLoading(false);
 
                 // Determine message type
                 let isImage = selectedFile.type.startsWith("image/");
@@ -232,7 +235,8 @@ const ChatWindow = ({selectedUser,currentUser})=>{
 
         } catch (error) {
             console.log("some error", error);
-            toast.error(error.message || "Some error in uploading")
+            toast.error(error.message || "Some error in uploading");
+            setFileLoading(false)
         }
     }
 
@@ -616,7 +620,8 @@ const ChatWindow = ({selectedUser,currentUser})=>{
             {/* handle send */}
             <button
                 onClick={handleSend}
-                className="rounded-full cursor-pointer bg-indigo-500 p-2 text-white shadow-md transition-colors hover:bg-indigo-600"
+                disabled={fileLoading}
+                className={`rounded-full ${fileLoading ?"cursor-not-allowed": "cursor-pointer"}  bg-indigo-500 p-2 text-white shadow-md transition-colors hover:bg-indigo-600`}
             >
                 <Send size={18} />
             </button>
