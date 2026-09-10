@@ -1,15 +1,5 @@
 # React + Vite
 
-login page
-signup page
-
-home page
-    sidebar
-    chatwindow
-profile page
-add connection page
-
-
 pending : 
     rtk interceptor,                done (needs to see)
     get all online users,           done
@@ -27,16 +17,16 @@ pending :
 
     v2
 
-    check editing of text & deleting of image   done
-    check delete for all messages               done
-    check clear all                             done
-    on view, get all uploaded docs              done
+    check editing of text & deleting of image                   done
+    check delete for all messages                               done
+    check clear all                                             done
+    on view, get all uploaded docs                              done
     modify user proile
-    clear front end unnneccary code             done
+    clear front end unnneccary code                             done
     perform code optimization techniques
     clear unused rtk query api's (creates confusion) 
     add social links profile like github, linkedin
-
+    added profile picture uploader                              done
 
 check notes :
     online users,

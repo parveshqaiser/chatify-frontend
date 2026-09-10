@@ -310,7 +310,7 @@ const ChatWindow = ({selectedUser,currentUser})=>{
         <header className="flex items-center justify-between gap-2 border-b bg-slate-700 border-slate-700 px-3 sm:px-4 py-3">
             <div className="flex items-center gap-3 min-w-0 flex-1">
                 <img
-                    src={selectedUser.avatar}
+                    src={selectedUser.avatar?.url}
                     alt={selectedUser.name}
                     className="h-10 w-10 rounded-full object-cover shrink-0"
                 />

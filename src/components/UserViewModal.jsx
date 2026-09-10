@@ -62,7 +62,7 @@ const UserViewModal = ({user, allMessages }) => {
                 <aside className="flex items-center gap-4 mb-4">
                     <div className="relative">
                         <img
-                            src={user?.avatar || "https://images.template.net/547758/Avatar-Profile-Picture-Template-edit-online.webp"}
+                            src={user?.avatar?.url || "https://images.template.net/547758/Avatar-Profile-Picture-Template-edit-online.webp"}
                             alt={user?.name || "User"}
                             className="w-18 h-18 rounded-full object-cover border-3 border-indigo-100 dark:border-indigo-900"
                         />
