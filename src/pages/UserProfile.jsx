@@ -70,7 +70,6 @@ const UserProfile = () => {
 
 	const handleFileChange = (e)=>{
 		let file = e.target.files[0];
-		console.log(file);
 		if (file) {
 			if (file.size > 5 * 1024 * 1024) {
 				return toast.error('File size should be less than 5MB');				
@@ -135,7 +134,6 @@ const UserProfile = () => {
 		try {
 			setIsBtnLoading(true);
 			let croppedBlob = await getCroppedImg(cropImageRef.current, completedCrop);
-			console.log("croppedBlob ", croppedBlob);
 
 			let formData = new FormData();
 			formData.append("avatar", croppedBlob);
