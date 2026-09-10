@@ -1,0 +1,364 @@
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+.profile-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: #1a1a1a;
+}
+
+.profile-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+}
+
+.profile-details {
+    flex: 1;
+}
+
+.detail-item {
+    display: flex;
+    align-items: baseline;
+    padding: 12px 0;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-item .label {
+    font-weight: 500;
+    color: #666;
+    min-width: 120px;
+    font-size: 14px;
+}
+
+.detail-item .value {
+    color: #1a1a1a;
+    font-size: 14px;
+}
+
+.detail-item.bio {
+    margin-top: 10px;
+}
+
+.profile-picture-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    min-width: 200px;
+}
+
+.profile-picture-container {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f0f0f0;
+    border: 2px solid #e0e0e0;
+}
+
+.profile-picture {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-picture-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+    padding: 10px;
+}
+
+.change-picture-btn {
+    background: none;
+    border: none;
+    color: #0066cc;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.change-picture-btn:hover {
+    background-color: #f0f7ff;
+}
+
+/* ===== MODAL STYLES - FIXED ===== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    padding: 20px;
+    animation: fadeIn 0.2s ease-in;
+}
+
+.modal-content {
+    background: #151B23;
+    border-radius: 12px;
+    max-width: 650px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease-out;
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid green;
+    flex-shrink: 0;
+    background: #151B23;
+}
+
+.modal-header h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+    color: white;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #999;
+    cursor: pointer;
+    padding: 0 8px;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: #bb1313;
+}
+
+/* Modal Body - Scrollable */
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 0;
+}
+
+/* Crop Wrapper - Ensures proper sizing */
+.crop-wrapper {
+    width: 100%;
+    max-height: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f8f8;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ReactCrop container fixes */
+.react-crop-container {
+    width: 100% !important;
+    max-height: 450px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.crop-image {
+    max-width: 100%;
+    max-height: 450px;
+    width: auto;
+    height: auto;
+    display: block;
+}
+
+/* Crop Instructions */
+.crop-instructions {
+    text-align: center;
+    margin-top: 16px;
+    color: #666;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.crop-instructions p {
+     margin: 4px 0;
+}
+
+.crop-instructions .hint {
+    color: #999;
+    font-size: 12px;
+}
+
+/* Modal Footer - Fixed at bottom */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 10px 20px;
+    /* border-top: 1px solid green; */
+    background: #151B23;
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+.cancel-btn, .save-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.cancel-btn {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.cancel-btn:hover:not(:disabled) {
+    background: #e0e0e0;
+}
+
+.save-btn {
+    background: #0066cc;
+    color: white;
+}
+
+.save-btn:hover:not(:disabled) {
+    background: #0052a3;
+    transform: translateY(-1px);
+}
+
+.save-btn:disabled, .cancel-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.loading-spinner {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .profile-info {
+        flex-direction: column-reverse;
+        align-items: center;
+    }
+    
+    .profile-details {
+        width: 100%;
+    }
+  
+    .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+  
+    .detail-item .label {
+        min-width: auto;
+    }
+    
+    .modal-content {
+        max-width: 95%;
+        max-height: 95vh;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .crop-wrapper {
+        max-height: 350px;
+    }
+
+    .crop-image {
+        max-height: 350px;
+    }
+
+    .modal-footer {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+    }
+
+  .cancel-btn,.save-btn {
+        flex: 1;
+        min-width: 100px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+        margin: 0;
+    }
+
+    .crop-wrapper {
+        max-height: 280px;
+    }
+
+    .crop-image {
+        max-height: 280px;
+    }
+
+    .modal-header {
+        padding: 16px;
+    }
+
+    .modal-header h2 {
+        font-size: 18px;
+    }
+}

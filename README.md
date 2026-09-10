@@ -30,9 +30,9 @@ pending :
     check editing of text & deleting of image   done
     check delete for all messages               done
     check clear all                             done
-    on view, get all uploaded docs
+    on view, get all uploaded docs              done
     modify user proile
-    clear front end unnneccary code
+    clear front end unnneccary code             done
     perform code optimization techniques
     clear unused rtk query api's (creates confusion) 
     add social links profile like github, linkedin

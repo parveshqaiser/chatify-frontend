@@ -1,34 +1,53 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link} from 'react-router-dom';
-import {User,Mail,CalendarDays,Clock3,Pencil,Camera,Lock,Image,FileText,Video,HardDrive,Users,
+import {User,Mail,Pencil,Camera,Lock,Image,FileText,Video,HardDrive,Users,
 	MessageCircle,Send,ShieldCheck,Crown,UserX,ArrowUpRight,LogOut,AtSign,BadgeInfo,HomeIcon,
 } from "lucide-react";
 
 import { groups, blockedUsers } from '../utils/constants';
-import {useGetUserDetailsQuery, useUpdatePasswordMutation, useUpdateProfileMutation } from '../redux/api.js';
+import {useChangeAvatarMutation, useGetUserDetailsQuery, useUpdatePasswordMutation, useUpdateProfileMutation } from '../redux/api.js';
 import toast from 'react-hot-toast';
 import { LoadingMessage } from '../components/Spinner.jsx';
 import dayjs from 'dayjs';
 import useLogout from '../hooks/useLogout.js';
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
+import "../profile.css";
 
 const UserProfile = () => {
 
-	let {data : user, isLoading , isError,error, refetch} = useGetUserDetailsQuery();
-	// chat statistics need to work on this.
+	let {data : user, isLoading , isError,refetch} = useGetUserDetailsQuery();
 	let [updateProfle] = useUpdateProfileMutation();
 	let [updatePassword] = useUpdatePasswordMutation();
+	let [changeAvatar] = useChangeAvatarMutation();
 
 	let logoutHandler = useLogout();
 
 	let [name, setName] = useState("");
 	let [bio, setBio] = useState("");
-
 	let [pwdValues, setPwdValues] = useState({
 		password : "",
 		newPassword : "",
 		confirmPassword : "",
 	});
+
+	let profilePictureRef = useRef(null);
+
+	let [showModal, setShowModal] = useState(false);
+    let [selectedImage, setSelectedImage] = useState(null);
+	let [completedCrop, setCompletedCrop] = useState(null);
+	let [isBtnLoading, setIsBtnLoading] = useState(false);
+
+	let cropImageRef = useRef();
+
+    let [crop, setCrop] = useState({
+        unit: '%',
+        width: 80,
+        height: 80,
+        x: 10,
+        y: 10
+    });
 
 	useEffect(() => {
 		if (user?.data) {
@@ -49,8 +68,104 @@ const UserProfile = () => {
 		</div>
 	}
 
-	const handleSubmitProfile = async()=>{
+	const handleFileChange = (e)=>{
+		let file = e.target.files[0];
+		console.log(file);
+		if (file) {
+			if (file.size > 5 * 1024 * 1024) {
+				return toast.error('File size should be less than 5MB');				
+			}
+			setSelectedImage(URL.createObjectURL(file));
+			setShowModal(true);	
+		}
+	}
 
+	let handleCancel = () => {
+        setShowModal(false);
+        setSelectedImage(null);
+        setCrop({
+            unit: '%',
+            width: 80,
+            height: 80,
+            x: 10,
+            y: 10
+        });
+        setCompletedCrop(null);
+        if (profilePictureRef.current) {
+            profilePictureRef.current.value = '';
+        }
+    };
+
+	// Generate cropped image
+    let getCroppedImg = (image, crop) => {
+        const canvas = document.createElement('canvas');
+        const scaleX = image.naturalWidth / image.width;
+        const scaleY = image.naturalHeight / image.height;
+        
+        canvas.width = crop.width;
+        canvas.height = crop.height;
+        
+        const ctx = canvas.getContext('2d');
+        
+        ctx.drawImage(
+            image,
+            crop.x * scaleX,
+            crop.y * scaleY,
+            crop.width * scaleX,
+            crop.height * scaleY,
+            0,
+            0,
+            crop.width,
+            crop.height
+        );
+    
+        return new Promise((resolve) => {
+            canvas.toBlob((blob) => {
+                resolve(blob);
+            }, 'image/jpeg', 0.95);
+        });
+    };
+
+	// api hit to change avatar
+	const handleChangeAvatar = async() =>{
+		if (!completedCrop || !cropImageRef.current) {
+            return toast.error('Please crop the image first');
+        }
+
+		try {
+			setIsBtnLoading(true);
+			let croppedBlob = await getCroppedImg(cropImageRef.current, completedCrop);
+			console.log("croppedBlob ", croppedBlob);
+
+			let formData = new FormData();
+			formData.append("avatar", croppedBlob);
+
+			let res = await changeAvatar(formData).unwrap();
+			if(res.success){
+				toast.success(res.message);
+				setIsBtnLoading(false);
+				await refetch();
+			}
+
+			setShowModal(false);
+            setSelectedImage(null);
+			setCompletedCrop(null);
+            setCrop({
+                unit: '%',
+                width: 80,
+                height: 80,
+                x: 10,
+                y: 10
+            });
+
+		} catch (error) {
+			setIsBtnLoading(false);
+			toast.error(error?.data?.message || error?.message || "Some Error in Uploading Avatar");
+		}
+	}
+
+	// api hit to change name, bio
+	const handleSubmitProfile = async()=>{
 		if(!name.trim() || !bio.trim()){
 			return toast.error("Name & Bio Cannot be empty")
 		}
@@ -116,11 +231,10 @@ const UserProfile = () => {
 						<HomeIcon size={18} />
 						Home
 					</Link>
-				</div>
-				
+				</div>				
 			</header>
 
-			{/* prifile */}
+			{/* view profile */}
 			<section className="card bg-base-200 shadow-xl">
 				<aside className="card-body">
 					<div className="flex flex-col gap-6 lg:flex-row lg:items-start">
@@ -129,7 +243,7 @@ const UserProfile = () => {
 							<div className="avatar">
 								<div className="w-28 rounded-full ring ring-primary ring-offset-2 ring-offset-base-200">
 									<img
-										src="https://i.pravatar.cc/300"
+										src={user?.data?.avatar?.url || "https://i.pravatar.cc/300"}
 										alt="Profile"
 									/>
 								</div>
@@ -189,15 +303,72 @@ const UserProfile = () => {
 							<div className="flex flex-col items-center gap-4">
 								<div className="avatar">
 									<div className="w-24 rounded-full">
-										<img src="https://i.pravatar.cc/300" />
+										<img src={user?.data?.avatar?.url || "https://i.pravatar.cc/300"} /> 
 									</div>
 								</div>
 
-								<button className="btn btn-dash btn-sm">
+								<button className="btn btn-dash btn-sm" onClick={()=> profilePictureRef.current.click()} >
 									<Camera size={16} /> Change Avatar
 								</button>
-							</div>
 
+								<input
+									ref={profilePictureRef}
+									type="file"
+									accept="image/*"
+									className="hidden"
+									onChange={handleFileChange}
+								/>
+							</div>
+							 {showModal && selectedImage && (
+								<article className="modal-overlay">
+									<nav className="modal-content">
+										<div className="modal-header">
+											<h2>Crop Your New Profile Picture</h2>
+											<button className="close-btn" onClick={handleCancel}>×</button>
+										</div>
+										
+										<div className="modal-body">
+											<div className="crop-container">
+												<ReactCrop
+													crop={crop}
+													onChange={setCrop}
+													onComplete={(cropDimension)=> setCompletedCrop(cropDimension)}
+													aspect={1}
+													circularCrop
+												>
+												<img
+													ref={cropImageRef}
+													src={selectedImage}
+													alt="Crop preview"
+													className="crop-image"
+												/>
+												</ReactCrop>
+											</div>
+										
+											<div className="crop-instructions">
+												<p>Drag to adjust the crop area</p>
+												<p className="hint">Image will be cropped as a circle</p>
+											</div>
+										</div>
+										
+										<div className="modal-footer">
+											<button 
+												className="cancel-btn"
+												onClick={handleCancel}												
+											>
+												Cancel
+											</button>
+											<button 
+												disabled={isBtnLoading}
+												className="save-btn"
+												onClick={handleChangeAvatar}												
+											>
+												{isBtnLoading ? "⏳ Saving...": 'Save Changes'}
+											</button>
+										</div>
+									</nav>
+								</article>
+							)}
 							<input
 								type="text"
 								placeholder="Full Name"								
