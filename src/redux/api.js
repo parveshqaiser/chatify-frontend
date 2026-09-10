@@ -155,6 +155,13 @@ export const api = createApi({
                 url: "/v1/auth/logout"
             }),
         }),
+        changeAvatar: builder.mutation({
+            query: (data) => ({
+                method: "POST",
+                url: "/v1/auth/change-avatar",
+                body: data
+            }),
+        }),
 
         // chats v1
         getAllMessages : builder.query({
@@ -203,7 +210,8 @@ export const {
     useEditMessageMutation,
     useClearConversationMutation,
     useUploadPresignedUrlMutation,
-    useGetAllNewMessagesQuery
+    useGetAllNewMessagesQuery,
+    useChangeAvatarMutation,
 } = api;
 
 
