@@ -25,7 +25,7 @@ pending :
     clear front end unnneccary code                             done
     perform code optimization techniques
     clear unused rtk query api's (creates confusion) 
-    add social links profile like github, linkedin
+    add social links profile like github, linkedin              pending
     added profile picture uploader                              done
 
 check notes :
