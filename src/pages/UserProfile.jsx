@@ -61,7 +61,7 @@ const UserProfile = () => {
 			<LoadingMessage />
 		)
 	}
-
+	
 	if(isError){
 		return <div className="flex items-center justify-center min-h-screen">
 			<h2 className='text-xl text-red-500'>Some Error Occured While Trying to Fetch Profile Data.. Please Try again later</h2>
@@ -298,12 +298,13 @@ const UserProfile = () => {
 								<Pencil size={18} /> Edit Profile
 							</h2>
 
-							<div className="flex flex-col items-center gap-4">
+							<div className="flex flex-col items-center gap-2">
 								<div className="avatar">
 									<div className="w-24 rounded-full">
 										<img src={user?.data?.avatar?.url || "https://i.pravatar.cc/300"} /> 
 									</div>
 								</div>
+								<span className='text-[11px] text-orange-400'>Last Avatar Updated on {dayjs(user?.data?.avatar?.createdAt).format("D MMM YYYY") || "NA"}</span>
 
 								<button className="btn btn-dash btn-sm" onClick={()=> profilePictureRef.current.click()} >
 									<Camera size={16} /> Change Avatar
