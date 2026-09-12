@@ -7,6 +7,13 @@ export let escapeRegExp =(value)=> {
 	return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+export let platforms = [
+    { value: "linkedin", label: "LinkedIn" },
+    { value: "twitter", label: "Twitter" },
+    { value: "facebook", label: "Facebook" },
+    { value: "instagram", label: "Instagram" },
+    { value : "github", label : "Git Hub"}
+];
 
 export let initialFormData = {
     username : "",
@@ -19,7 +26,6 @@ export let groups = [
 	{ name: 'Design Weekly', creator: false },
 	{ name: 'Frontend Guild', creator: true },
 	{ name: 'Coffee & Code', creator: false },
-	{ name: 'Book Club', creator: true },
 ];
 
 export let blockedUsers = ['spamdealer99', 'trolling_tom', 'fake_recruiter'];

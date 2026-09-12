@@ -3,9 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link} from 'react-router-dom';
 import {User,Mail,Pencil,Camera,Lock,Image,FileText,Video,HardDrive,Users,
 	MessageCircle,Send,ShieldCheck,Crown,UserX,ArrowUpRight,LogOut,AtSign,BadgeInfo,HomeIcon,
+	Share2,X,
+	CirclePlus,
 } from "lucide-react";
 
-import { groups, blockedUsers } from '../utils/constants';
+import { groups, blockedUsers, platforms } from '../utils/constants';
 import {useChangeAvatarMutation, useGetUserDetailsQuery, useUpdatePasswordMutation, useUpdateProfileMutation } from '../redux/api.js';
 import toast from 'react-hot-toast';
 import { LoadingMessage } from '../components/Spinner.jsx';
@@ -232,8 +234,8 @@ const UserProfile = () => {
 				</div>				
 			</header>
 
-			{/* view profile */}
-			<section className="card bg-base-200 shadow-xl">
+			{/* view profile & logout*/}
+			<section className="card bg-base-200 shadow-xl border">
 				<aside className="card-body">
 					<div className="flex flex-col gap-6 lg:flex-row lg:items-start">
 						
@@ -399,6 +401,54 @@ const UserProfile = () => {
 						</div>
 					</aside>
 
+					<aside className="card bg-base-100 shadow-lg">
+						<div className="card-body">
+							<h2 className="card-title">
+								<Share2 size={20} />
+								Add Social Accounts
+							</h2>
+
+							<div className="flex items-center gap-2">
+								<select 
+									defaultValue="" 
+									className="select select-secondary w-28 sm:w-28 shrink-0"
+								>
+									<option disabled value="">
+										Select Media
+									</option>
+									{platforms.map((p, idx) => (
+										<option key={p.value || idx} value={p.value}>
+											{p.label}
+										</option>
+									))}
+								</select>
+								<input
+									type="url"
+									placeholder="Add URL"
+									className="input input-secondary flex-1"
+								/>
+								<button
+									type="button"
+									className="btn btn-ghost btn-circle btn-sm text-error hover:bg-error/10 shrink-0"
+									title="Remove"
+								>
+									<X size={18} />
+								</button>
+							</div>
+
+							<button 
+								className="btn btn-ghost btn-sm text-primary flex items-center gap-2 self-start"
+							>
+								<CirclePlus size={16} />
+								<span>Add another account</span>
+							</button>
+							
+							<button className='btn btn-secondary'>
+								Submit
+							</button>
+						</div>
+					</aside>
+
 					{/* Storage */}
 					<aside className="card bg-base-100 shadow-lg">
 						<div className="card-body">
@@ -447,6 +497,7 @@ const UserProfile = () => {
 							</div>
 						</div>
 					</aside>
+
 
 					{/*GROUPS  */}
 					<aside className="card bg-base-100 shadow-lg">
