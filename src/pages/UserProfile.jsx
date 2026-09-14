@@ -34,6 +34,14 @@ const UserProfile = () => {
 		confirmPassword : "",
 	});
 
+	// let [socialLinks, setSocialLinks] = useState([{
+	// 	handle: "", url : {value : "", error : ""}
+	// }]);
+
+	let [socialLinks, setSocialLinks] = useState([
+		{handle: "", url :""}
+	]);
+
 	let profilePictureRef = useRef(null);
 
 	let [showModal, setShowModal] = useState(false);
@@ -209,8 +217,74 @@ const UserProfile = () => {
 				})
 			}
 		} catch (error) {
-			console.log(error);
 			toast.error(error?.data?.message || "Failed to update password");
+		}
+	}
+
+	let handleSocialLinks = (action, value, idx)=>{
+
+		let newValues = [...socialLinks];
+
+		newValues = newValues.map((val, index)=> {
+			if(index == idx){
+				return {
+					...val,
+					[action] : value
+				}
+			}
+			return val;
+		});
+		setSocialLinks(newValues);
+	}
+
+	function isValidUrl(url) 
+	{
+		try {
+			const parsedUrl = new URL(url);
+
+			return (
+				parsedUrl.protocol === "http:" ||
+				parsedUrl.protocol === "https:"
+			);
+		} catch {
+			return false;
+		}
+	}
+
+	let handleAddSocials = ()=>{
+
+		let isEmpty = socialLinks.some(item => item.handle == "" || item.url?.trim() == "");
+
+		if(isEmpty){
+			return toast.error("Dropdown Cannot be empty");
+		}
+
+		let invalidIndex = socialLinks.findIndex((item) => !isValidUrl(item.url));
+		// console.log("index ", invalidIndex);
+
+		if (invalidIndex !== -1) {
+			const invalidItem = socialLinks[invalidIndex];
+			// console.log("invalidItem ", invalidItem);
+			return toast.error(`Invalid ${invalidItem.handle || "social"} URL`);
+		}
+
+		let selectedPlatforms = socialLinks.map((item) => item.handle);
+		let nextHandle = platforms.find(platform => !selectedPlatforms.includes(platform.value));
+		
+		if(socialLinks.length ==5){
+			return toast.error("Maximum of 5 social links allowed.");
+		}
+
+		setSocialLinks([...socialLinks, {handle: nextHandle.value, url : ""}]);
+
+	}
+
+	let handleRemoveLinks = (index)=>{
+	
+		if(socialLinks.length >1){
+			let remove = socialLinks.filter((_, idx) => index !==idx);
+			
+			setSocialLinks(remove);
 		}
 	}
 
@@ -235,7 +309,7 @@ const UserProfile = () => {
 			</header>
 
 			{/* view profile & logout*/}
-			<section className="card bg-base-200 shadow-xl border">
+			<section className="card bg-base-200 shadow-xl">
 				<aside className="card-body">
 					<div className="flex flex-col gap-6 lg:flex-row lg:items-start">
 						
@@ -405,42 +479,56 @@ const UserProfile = () => {
 						<div className="card-body">
 							<h2 className="card-title">
 								<Share2 size={20} />
-								Add Social Accounts
+								Add Social Links
 							</h2>
 
-							<div className="flex items-center gap-2">
+							{socialLinks.map((val, index)=>(
+							<div className="flex items-center gap-2" key={val.handle}>
 								<select 
-									defaultValue="" 
+									// defaultValue=""	
+									value={val.handle}								
+									onChange={(e)=> handleSocialLinks("handle",e.target.value , index)}
 									className="select select-secondary w-28 sm:w-28 shrink-0"
 								>
 									<option disabled value="">
 										Select Media
 									</option>
-									{platforms.map((p, idx) => (
-										<option key={p.value || idx} value={p.value}>
-											{p.label}
-										</option>
-									))}
+									{platforms.map((p, idx) => {
+										let isSelected = socialLinks.some((s, idx)=> idx !== index && s.handle == p.value);
+										return(
+											<option disabled={isSelected} value={p.value}>
+												{p.label}
+											</option>
+										)		
+									}
+									)}										
 								</select>
+								
 								<input
-									type="url"
+									type="url"	
+									value={val.url}								
+									onChange={(e)=> handleSocialLinks("url",e.target.value , index)}
 									placeholder="Add URL"
 									className="input input-secondary flex-1"
 								/>
-								<button
-									type="button"
+								
+								{socialLinks.length>1 && <button
+									onClick={()=>handleRemoveLinks(index)}
 									className="btn btn-ghost btn-circle btn-sm text-error hover:bg-error/10 shrink-0"
 									title="Remove"
 								>
 									<X size={18} />
-								</button>
+								</button>}
 							</div>
+							))}
+							
 
 							<button 
+								onClick={handleAddSocials}
 								className="btn btn-ghost btn-sm text-primary flex items-center gap-2 self-start"
 							>
 								<CirclePlus size={16} />
-								<span>Add another account</span>
+								<span >Add another account</span>
 							</button>
 							
 							<button className='btn btn-secondary'>
