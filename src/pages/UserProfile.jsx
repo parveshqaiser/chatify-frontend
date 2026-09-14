@@ -241,7 +241,6 @@ const UserProfile = () => {
 	{
 		try {
 			const parsedUrl = new URL(url);
-
 			return (
 				parsedUrl.protocol === "http:" ||
 				parsedUrl.protocol === "https:"
@@ -272,7 +271,7 @@ const UserProfile = () => {
 		let nextHandle = platforms.find(platform => !selectedPlatforms.includes(platform.value));
 		
 		if(socialLinks.length ==5){
-			return toast.error("Maximum of 5 social links allowed.");
+			return toast.error("Maximum of 5 links allowed.");
 		}
 
 		setSocialLinks([...socialLinks, {handle: nextHandle.value, url : ""}]);
@@ -283,7 +282,6 @@ const UserProfile = () => {
 	
 		if(socialLinks.length >1){
 			let remove = socialLinks.filter((_, idx) => index !==idx);
-			
 			setSocialLinks(remove);
 		}
 	}
