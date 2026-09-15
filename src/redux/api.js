@@ -162,6 +162,13 @@ export const api = createApi({
                 body: data
             }),
         }),
+        addSocialLinks: builder.mutation({
+            query: (data) => ({
+                method: "POST",
+                url: "/v1/auth/add-social-link",
+                body: data
+            }),
+        }),
 
         // chats v1
         getAllMessages : builder.query({
@@ -212,6 +219,7 @@ export const {
     useUploadPresignedUrlMutation,
     useGetAllNewMessagesQuery,
     useChangeAvatarMutation,
+    useAddSocialLinksMutation,
 } = api;
 
 

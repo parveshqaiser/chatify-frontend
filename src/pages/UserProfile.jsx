@@ -8,7 +8,7 @@ import {User,Mail,Pencil,Camera,Lock,Image,FileText,Video,HardDrive,Users,
 } from "lucide-react";
 
 import { groups, blockedUsers, platforms } from '../utils/constants';
-import {useChangeAvatarMutation, useGetUserDetailsQuery, useUpdatePasswordMutation, useUpdateProfileMutation } from '../redux/api.js';
+import {useAddSocialLinksMutation, useChangeAvatarMutation, useGetUserDetailsQuery, useUpdatePasswordMutation, useUpdateProfileMutation } from '../redux/api.js';
 import toast from 'react-hot-toast';
 import { LoadingMessage } from '../components/Spinner.jsx';
 import dayjs from 'dayjs';
@@ -23,7 +23,7 @@ const UserProfile = () => {
 	let [updateProfle] = useUpdateProfileMutation();
 	let [updatePassword] = useUpdatePasswordMutation();
 	let [changeAvatar] = useChangeAvatarMutation();
-
+	let [addSocials] = useAddSocialLinksMutation();
 	let logoutHandler = useLogout();
 
 	let [name, setName] = useState("");
@@ -34,13 +34,11 @@ const UserProfile = () => {
 		confirmPassword : "",
 	});
 
-	// let [socialLinks, setSocialLinks] = useState([{
-	// 	handle: "", url : {value : "", error : ""}
-	// }]);
-
 	let [socialLinks, setSocialLinks] = useState([
 		{handle: "", url :""}
 	]);
+
+	let [isSubmitLinkDisabled , setIsSubmitLinkDisabled] = useState(true);
 
 	let profilePictureRef = useRef(null);
 
@@ -266,7 +264,7 @@ const UserProfile = () => {
 			// console.log("invalidItem ", invalidItem);
 			return toast.error(`Invalid ${invalidItem.handle || "social"} URL`);
 		}
-
+	
 		let selectedPlatforms = socialLinks.map((item) => item.handle);
 		let nextHandle = platforms.find(platform => !selectedPlatforms.includes(platform.value));
 		
@@ -283,6 +281,37 @@ const UserProfile = () => {
 		if(socialLinks.length >1){
 			let remove = socialLinks.filter((_, idx) => index !==idx);
 			setSocialLinks(remove);
+		}
+	}
+
+	let hanldleSubmitSocialLinks = async()=>{
+		try {
+
+			let isEmpty = socialLinks.some(item => item.handle == "" || item.url?.trim() == "");
+
+			if(isEmpty){
+				return toast.error("Please Select Handle & URL before submiting");
+			}
+
+			let links = socialLinks.map(val =>{
+				return {
+					platform: val.handle,
+					url : val.url
+				}
+			});
+
+			let res = await addSocials(links).unwrap();
+			// console.log(res);
+
+			if(res.success){
+				toast.success(res?.message);
+				setSocialLinks([{handle :"", url :""}]);
+				// setIsSubmitLinkDisabled(true);
+			}
+
+		} catch (error) {
+			console.log(error);
+			toast.error(error?.data?.message || "Failed to Submit Social Links");
 		}
 	}
 
@@ -529,7 +558,7 @@ const UserProfile = () => {
 								<span >Add another account</span>
 							</button>
 							
-							<button className='btn btn-secondary'>
+							<button onClick={hanldleSubmitSocialLinks} className='btn btn-secondary'>
 								Submit
 							</button>
 						</div>
