@@ -5,6 +5,7 @@ import {User,Mail,Pencil,Camera,Lock,Image,FileText,Video,HardDrive,Users,
 	MessageCircle,Send,ShieldCheck,Crown,UserX,ArrowUpRight,LogOut,AtSign,BadgeInfo,HomeIcon,
 	Share2,X,
 	CirclePlus,
+	Link2Icon,
 } from "lucide-react";
 
 import { groups, blockedUsers, platforms } from '../utils/constants';
@@ -37,8 +38,6 @@ const UserProfile = () => {
 	let [socialLinks, setSocialLinks] = useState([
 		{handle: "", url :""}
 	]);
-
-	let [isSubmitLinkDisabled , setIsSubmitLinkDisabled] = useState(true);
 
 	let profilePictureRef = useRef(null);
 
@@ -293,6 +292,13 @@ const UserProfile = () => {
 				return toast.error("Please Select Handle & URL before submiting");
 			}
 
+			let invalidIndex = socialLinks.findIndex((item) => !isValidUrl(item.url));
+
+			if (invalidIndex !== -1) {
+				let invalidItem = socialLinks[invalidIndex];
+				return toast.error(`Invalid ${invalidItem.handle || "social"} URL`);
+			}
+
 			let links = socialLinks.map(val =>{
 				return {
 					platform: val.handle,
@@ -304,9 +310,9 @@ const UserProfile = () => {
 			// console.log(res);
 
 			if(res.success){
+				await refetch();
 				toast.success(res?.message);
 				setSocialLinks([{handle :"", url :""}]);
-				// setIsSubmitLinkDisabled(true);
 			}
 
 		} catch (error) {
@@ -613,7 +619,6 @@ const UserProfile = () => {
 						</div>
 					</aside>
 
-
 					{/*GROUPS  */}
 					<aside className="card bg-base-100 shadow-lg">
 						<div className="card-body p-5">
@@ -712,6 +717,29 @@ const UserProfile = () => {
 							</button>
 						</div>
 					</aside>
+
+					{!!user?.data?.socials?.length && <aside className="card bg-base-100 shadow-lg">
+						<div className="card-body">
+							<h2 className="card-title">
+								<Link2Icon size={20} />
+								Social Information
+							</h2>
+
+							<div className="flex flex-wrap gap-3 mt-2">
+								{user?.data?.socials?.map((social) => (
+									<a
+										key={social.platform}
+										href={social.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										className={`badge badge-outline ${social.platform == "linkedin" ?"badge-primary" : "badge-secondary"} gap-2 px-4 py-3 hover:badge-success`}
+									>
+										{social.platform}
+									</a>
+								))}
+							</div>
+						</div>
+					</aside>}
 
 					{/* Account Info*/}
 					<aside className="card bg-base-100 shadow-lg">
