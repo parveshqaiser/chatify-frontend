@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { X, Send,FileText,Mail,Download,File,Image,FileArchive,FileCode, CircleUserRound} from 'lucide-react';
 import dayjs from 'dayjs';
+import { LiaInstagram, LiaLinkedinIn } from 'react-icons/lia';
+import { IoLogoGithub } from 'react-icons/io';
+import { TiSocialFacebook } from 'react-icons/ti';
+import { FaXTwitter } from 'react-icons/fa6';
 
 const UserViewModal = ({user, allMessages }) => {
 
@@ -43,6 +47,18 @@ const UserViewModal = ({user, allMessages }) => {
         default: return <File size={20} className="text-gray-700" />;
         }
     };
+
+    const socialIcons = (social)=>{
+        switch(social.platform){
+            case 'linkedin' : return <a  href={social.url} target="_blank" rel="noopener noreferrer"> <LiaLinkedinIn size={20} className='text-blue-400 hover:animate-spin' /> </a>
+            case 'instagram' : return <a  href={social.url} target="_blank" rel="noopener noreferrer"> <LiaInstagram size={20} className='text bg-pink-400 hover:animate-spin' /> </a>
+            case 'github' : return <a  href={social.url} target="_blank" rel="noopener noreferrer"> <IoLogoGithub size={20} className='text-black hover:animate-spin' /> </a>
+            case 'facebook' : return <a  href={social.url} target="_blank" rel="noopener noreferrer"> <TiSocialFacebook size={20} className='text-blue-500 hover:animate-spin' /> </a>
+            case 'twitter' : return <a  href={social.url} target="_blank" rel="noopener noreferrer"> <FaXTwitter size={20} className='text-violet-500 hover:animate-spin' /> </a>
+            default: null;
+        }
+    }
+
 
     return (
     <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
@@ -89,6 +105,15 @@ const UserViewModal = ({user, allMessages }) => {
                         {user?.bio || "Software developer passionate about creating beautiful and functional user interfaces"}
                     </span>
                 </blockquote>
+
+                {<blockquote className="mb-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    <span className="italic">Connect me on : &nbsp;</span>
+
+                    <span className="inline-flex items-center gap-5">
+                        {user?.socials?.length ? user?.socials?.map((social) =>  socialIcons(social)) : "Not Added"}
+                    </span>
+                </blockquote>}
+
 
                 {/*shared files  */}
                 <aside>
