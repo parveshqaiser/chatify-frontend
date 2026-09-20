@@ -50,11 +50,11 @@ const UserViewModal = ({user, allMessages }) => {
 
     const socialIcons = (social)=>{
         switch(social.platform){
-            case 'linkedin' : return <a  href={social.url} target="_blank" rel="noopener noreferrer"> <LiaLinkedinIn size={20} className='text-blue-400 hover:animate-spin' /> </a>
-            case 'instagram' : return <a  href={social.url} target="_blank" rel="noopener noreferrer"> <LiaInstagram size={20} className='text bg-pink-400 hover:animate-spin' /> </a>
-            case 'github' : return <a  href={social.url} target="_blank" rel="noopener noreferrer"> <IoLogoGithub size={20} className='text-black hover:animate-spin' /> </a>
-            case 'facebook' : return <a  href={social.url} target="_blank" rel="noopener noreferrer"> <TiSocialFacebook size={20} className='text-blue-500 hover:animate-spin' /> </a>
-            case 'twitter' : return <a  href={social.url} target="_blank" rel="noopener noreferrer"> <FaXTwitter size={20} className='text-violet-500 hover:animate-spin' /> </a>
+            case 'linkedin' : return <a key={social.platform} href={social.url} target="_blank" rel="noopener noreferrer"> <LiaLinkedinIn size={20} className='text-blue-400 hover:animate-bounce' /> </a>
+            case 'instagram' : return <a key={social.platform}  href={social.url} target="_blank" rel="noopener noreferrer"> <LiaInstagram size={20} className='text bg-pink-400 hover:animate-bounce' /> </a>
+            case 'github' : return <a key={social.platform} href={social.url} target="_blank" rel="noopener noreferrer"> <IoLogoGithub size={20} className='text-black hover:animate-bounce' /> </a>
+            case 'facebook' : return <a key={social.platform} href={social.url} target="_blank" rel="noopener noreferrer"> <TiSocialFacebook size={20} className='text-blue-500 hover:animate-bounce' /> </a>
+            case 'twitter' : return <a key={social.platform}  href={social.url} target="_blank" rel="noopener noreferrer"> <FaXTwitter size={20} className='text-violet-500 hover:animate-bounce' /> </a>
             default: null;
         }
     }
@@ -106,6 +106,7 @@ const UserViewModal = ({user, allMessages }) => {
                     </span>
                 </blockquote>
 
+                {/* connect me on */}
                 {<blockquote className="mb-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <span className="italic">Connect me on : &nbsp;</span>
 
@@ -124,8 +125,8 @@ const UserViewModal = ({user, allMessages }) => {
                         </h5>
                     </div>
 
-                    <div className="max-h-64 overflow-y-auto pr-2 custom-scrollbar-files">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="max-h-64 overflow-y-auto pr-2 ">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 custom-scrollbar-file">
                             {files.map((file) => (
                             <div 
                                 key={file.id}
@@ -157,23 +158,24 @@ const UserViewModal = ({user, allMessages }) => {
 
         <style>{`
             .custom-scrollbar-files::-webkit-scrollbar {
-            width: 4px;
+                width: 4px;
+                // overflow-y: auto;
             }
             .custom-scrollbar-files::-webkit-scrollbar-track {
-            background: transparent;
+                background: transparent;
             }
             .custom-scrollbar-files::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 20px;
+                background: #cbd5e1;
+                border-radius: 20px;
             }
             .custom-scrollbar-files::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+                background: #94a3b8;
             }
             .dark .custom-scrollbar-files::-webkit-scrollbar-thumb {
-            background: #475569;
+                background: #475569;
             }
             .dark .custom-scrollbar-files::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
+                background: #64748b;
             }
         `}</style>
     </dialog>

@@ -321,6 +321,8 @@ const UserProfile = () => {
 		}
 	}
 
+	let handleRemoveSocial = async()=> {}
+
 	return (
 	<main className="min-h-screen bg-base-200 p-4 md:p-8">
 		<div className="mx-auto max-w-7xl space-y-8">
@@ -727,15 +729,34 @@ const UserProfile = () => {
 
 							<div className="flex flex-wrap gap-3 mt-2">
 								{user?.data?.socials?.map((social) => (
+								<div
+									key={social.platform}
+									className="relative group"
+								>
 									<a
-										key={social.platform}
+										// key={social.platform}
 										href={social.url}
 										target="_blank"
 										rel="noopener noreferrer"
 										className={`badge badge-outline ${social.platform == "linkedin" ?"badge-primary" : "badge-secondary"} gap-2 px-4 py-3 hover:badge-success`}
 									>
 										{social.platform}
+										{/* <span className='hidden hover:block'>X</span> */}
 									</a>
+									 <button									
+										onClick={() => handleRemoveSocial(social.platform)}
+										className="absolute right-0 -top-2.75 -translate-y-1/2
+												hidden group-hover:flex
+												items-center justify-center
+												w-4 h-4 rounded-full
+												bg-red-500 text-white
+												hover:bg-red-600
+												text-xs cursor-pointer"
+										title="Remove"
+									>
+										×
+									</button>
+								</div>
 								))}
 							</div>
 						</div>
