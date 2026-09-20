@@ -169,6 +169,13 @@ export const api = createApi({
                 body: data
             }),
         }),
+        removeSocialLinks : builder.mutation({
+            query: (platform) => ({
+                method: "PATCH",
+                url: `/v1/auth/remove-social-link/${platform}`,
+                body: platform
+            }),
+        }),
 
         // chats v1
         getAllMessages : builder.query({
@@ -220,6 +227,7 @@ export const {
     useGetAllNewMessagesQuery,
     useChangeAvatarMutation,
     useAddSocialLinksMutation,
+    useRemoveSocialLinksMutation
 } = api;
 
 

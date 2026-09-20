@@ -9,7 +9,7 @@ import {User,Mail,Pencil,Camera,Lock,Image,FileText,Video,HardDrive,Users,
 } from "lucide-react";
 
 import { groups, blockedUsers, platforms } from '../utils/constants';
-import {useAddSocialLinksMutation, useChangeAvatarMutation, useGetUserDetailsQuery, useUpdatePasswordMutation, useUpdateProfileMutation } from '../redux/api.js';
+import {useAddSocialLinksMutation, useChangeAvatarMutation, useGetUserDetailsQuery, useRemoveSocialLinksMutation, useUpdatePasswordMutation, useUpdateProfileMutation } from '../redux/api.js';
 import toast from 'react-hot-toast';
 import { LoadingMessage } from '../components/Spinner.jsx';
 import dayjs from 'dayjs';
@@ -25,6 +25,7 @@ const UserProfile = () => {
 	let [updatePassword] = useUpdatePasswordMutation();
 	let [changeAvatar] = useChangeAvatarMutation();
 	let [addSocials] = useAddSocialLinksMutation();
+	let [removeSocials] = useRemoveSocialLinksMutation();
 	let logoutHandler = useLogout();
 
 	let [name, setName] = useState("");
@@ -321,7 +322,20 @@ const UserProfile = () => {
 		}
 	}
 
-	let handleRemoveSocial = async()=> {}
+	let handleRemoveSocial = async(val)=> {
+
+		try {
+			let res = await removeSocials(val).unwrap();
+
+			if(res.success){
+				await refetch();
+				toast.success(res?.message);
+			}
+		} catch (error) {
+			console.log(error);
+			toast.error(error?.data?.message || "Failed to Remove Social Links");
+		}
+	}
 
 	return (
 	<main className="min-h-screen bg-base-200 p-4 md:p-8">
@@ -734,24 +748,28 @@ const UserProfile = () => {
 									className="relative group"
 								>
 									<a
-										// key={social.platform}
 										href={social.url}
 										target="_blank"
 										rel="noopener noreferrer"
-										className={`badge badge-outline ${social.platform == "linkedin" ?"badge-primary" : "badge-secondary"} gap-2 px-4 py-3 hover:badge-success`}
+										className={`badge badge-outline ${
+										social.platform === "linkedin"
+											? "badge-primary"
+											: "badge-secondary"
+										} gap-2 px-4 py-3 hover:badge-success`}
 									>
 										{social.platform}
-										{/* <span className='hidden hover:block'>X</span> */}
 									</a>
-									 <button									
+
+									<button
 										onClick={() => handleRemoveSocial(social.platform)}
-										className="absolute right-0 -top-2.75 -translate-y-1/2
-												hidden group-hover:flex
-												items-center justify-center
-												w-4 h-4 rounded-full
-												bg-red-500 text-white
-												hover:bg-red-600
-												text-xs cursor-pointer"
+										className="absolute right-0 -top-3.5
+										hidden group-hover:flex
+										items-center justify-center
+										w-4 h-4 rounded-full
+										bg-red-500 text-white
+										hover:bg-red-600
+										text-xs cursor-pointer
+										z-10"
 										title="Remove"
 									>
 										×
