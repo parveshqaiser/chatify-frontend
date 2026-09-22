@@ -21,12 +21,19 @@ pending :
     check delete for all messages                               done
     check clear all                                             done
     on view, get all uploaded docs                              done
-    modify user proile
+    modify user proile                                          done
     clear front end unnneccary code                             done
     perform code optimization techniques
-    clear unused rtk query api's (creates confusion) 
-    add social links profile like github, linkedin              pending
+    clear unused rtk query api's (creates confusion)            
+    add social links profile like github, linkedin              done
     added profile picture uploader                              done
+    view modal (all shared files)                               issue exist
+
+    
+    group msg
+
+    create group page
+    chat group page     
 
 check notes :
     online users,

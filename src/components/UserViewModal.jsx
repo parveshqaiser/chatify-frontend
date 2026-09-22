@@ -107,11 +107,11 @@ const UserViewModal = ({user, allMessages }) => {
                 </blockquote>
 
                 {/* connect me on */}
-                {<blockquote className="mb-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                {<blockquote className="mb-3 p-2 flex items-center bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <span className="italic">Connect me on : &nbsp;</span>
 
-                    <span className="inline-flex items-center gap-5">
-                        {user?.socials?.length ? user?.socials?.map((social) =>  socialIcons(social)) : "Not Added"}
+                    <span className="inline-flex items-center gap-3">
+                        {user?.socials?.length ? user?.socials?.map((social) =>  socialIcons(social)) : "No Socials Added"}
                     </span>
                 </blockquote>}
 
