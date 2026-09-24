@@ -32,7 +32,7 @@ pending :
     
     group msg
 
-    create group page
+    create group page                                           going on
     chat group page     
 
 check notes :
