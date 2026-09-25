@@ -13,6 +13,7 @@ import { Toaster } from 'react-hot-toast';
 import { Provider } from 'react-redux';
 import appStore from './redux/store.js';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import GroupChatPage from './pages/GroupChatPage.jsx';
 
 function App() {
 	
@@ -30,6 +31,7 @@ function App() {
 				<Route element={<ProtectedRoute />}>
                     <Route path="/home" element={<HomePage />} />
                     <Route path="/profile" element={<UserProfile />} />
+					<Route path="/group" element={<GroupChatPage />} />
                 </Route>
 
 				<Route path='*' element={<PageNotFound />}></Route>
