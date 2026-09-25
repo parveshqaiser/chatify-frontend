@@ -20,7 +20,8 @@ import "../profile.css";
 
 const UserProfile = () => {
 
-	let {data : user, isLoading , isError,refetch} = useGetUserDetailsQuery();
+	let { data: { data: userData } = {}, isLoading , isError,refetch} = useGetUserDetailsQuery();
+
 	let [updateProfle] = useUpdateProfileMutation();
 	let [updatePassword] = useUpdatePasswordMutation();
 	let [changeAvatar] = useChangeAvatarMutation();
@@ -58,11 +59,11 @@ const UserProfile = () => {
     });
 
 	useEffect(() => {
-		if (user?.data) {
-			setName(user.data.name);
-			setBio(user.data.bio);
+		if (userData) {
+			setName(userData?.name);
+			setBio(userData?.bio);
 		}
-	},[user?.data]);
+	},[userData]);
 
 	if(isLoading){
 		return(
@@ -366,7 +367,7 @@ const UserProfile = () => {
 							<div className="avatar">
 								<div className="w-28 rounded-full ring ring-primary ring-offset-2 ring-offset-base-200">
 									<img
-										src={user?.data?.avatar?.url || "https://i.pravatar.cc/300"}
+										src={userData?.avatar?.url || "https://i.pravatar.cc/300"}
 										alt="Profile"
 									/>
 								</div>
@@ -377,17 +378,17 @@ const UserProfile = () => {
 						<div className="flex-1 space-y-2">
 							<h2 className="flex items-center gap-2 text-[22px] font-bold">
 								<User size={22} className="" />
-								{user?.data?.name || "John Doe"}
+								{userData?.name || "John Doe"}
 							</h2>
 
 							<div className="flex items-center gap-2 text-base-content/80">
 								<AtSign size={18} className="" />
-								<span>{user?.data?.username || "dimpu123"}</span>
+								<span>{userData?.username || "dimpu123"}</span>
 							</div>
 
 							<div className="flex items-center gap-2 text-base-content/80 break-all">
 								<Mail size={18} className="" />
-								<span>{user?.data?.email || "johndoe@gmail.com"}</span>
+								<span>{userData?.email || "johndoe@gmail.com"}</span>
 							</div>
 
 							<div className="flex items-start gap-2 text-base-content/80">
@@ -397,7 +398,7 @@ const UserProfile = () => {
 								/>
 
 								<p className='italic'>
-									{user?.data?.bio || "NA"}
+									{userData?.bio || "NA"}
 								</p>
 							</div>
 						</div>
@@ -426,10 +427,12 @@ const UserProfile = () => {
 							<div className="flex flex-col items-center gap-2">
 								<div className="avatar">
 									<div className="w-24 rounded-full">
-										<img src={user?.data?.avatar?.url || "https://i.pravatar.cc/300"} /> 
+										<img src={userData?.avatar?.url || "https://i.pravatar.cc/300"} /> 
 									</div>
 								</div>
-								<span className='text-[11px] text-orange-400'>Last Avatar Updated on {dayjs(user?.data?.avatar?.createdAt).format("D MMM YYYY") || "NA"}</span>
+
+								<span className='text-[11px] text-orange-400'>Last Avatar Updated on {
+									dayjs(userData?.avatar?.createdAt).format("D MMM YYYY") || "NA"}</span>
 
 								<button className="btn btn-dash btn-sm" onClick={()=> profilePictureRef.current.click()} >
 									<Camera size={16} /> Change Avatar
@@ -597,8 +600,7 @@ const UserProfile = () => {
 							<div className="space-y-4 mt-3">
 								<div className="flex justify-between">
 									<span className="flex items-center gap-2">
-									<Image size={18} />
-									Images
+										<Image size={18} /> Images
 									</span>
 
 									<span className="font-semibold">58</span>
@@ -606,8 +608,7 @@ const UserProfile = () => {
 
 								<div className="flex justify-between">
 									<span className="flex items-center gap-2">
-									<Video size={18} />
-									Videos
+									<Video size={18} /> Videos
 									</span>
 
 									<span className="font-semibold">12</span>
@@ -615,8 +616,7 @@ const UserProfile = () => {
 
 								<div className="flex justify-between">
 									<span className="flex items-center gap-2">
-									<FileText size={18} />
-									Documents
+										<FileText size={18} /> Documents
 									</span>
 
 									<span className="font-semibold">26</span>
@@ -720,9 +720,9 @@ const UserProfile = () => {
 								className="input input-warning"
 							/>
 
-							{user?.data?.lastPasswordUpdated && 
+							{userData?.lastPasswordUpdated && 
 								<p className="text-sm text-base-content/60">							
-									Password last changed on {dayjs(user?.data?.lastPasswordUpdated).format("D MMMM YYYY") || "NA"}
+									Password last changed on {dayjs(userData?.lastPasswordUpdated).format("D MMMM YYYY") || "NA"}
 								</p>
 							}
 							<button 
@@ -734,7 +734,7 @@ const UserProfile = () => {
 						</div>
 					</aside>
 
-					{!!user?.data?.socials?.length && <aside className="card bg-base-100 shadow-lg">
+					{!!userData?.socials?.length && <aside className="card bg-base-100 shadow-lg">
 						<div className="card-body">
 							<h2 className="card-title">
 								<Link2Icon size={20} />
@@ -742,7 +742,7 @@ const UserProfile = () => {
 							</h2>
 
 							<div className="flex flex-wrap gap-3 mt-2">
-								{user?.data?.socials?.map((social) => (
+								{userData?.socials?.map((social) => (
 								<div
 									key={social.platform}
 									className="relative group"
@@ -802,12 +802,14 @@ const UserProfile = () => {
 
 								<div className="flex justify-between">
 									<span>Member Since</span>
-									<span>{dayjs(user?.data?.createdAt).format("D MMMM YYYY") || "NA"}</span>
+									<span>{dayjs(userData?.createdAt).format("D MMMM YYYY") || "NA"}</span>
 								</div>
-
 								<div className="flex justify-between">
 									<span>Last Login</span>
-									<span>{dayjs(user?.data?.previousLogin).format("D MMMM YYYY") || "NA"}</span>
+									{userData?.previousLogin
+										? dayjs(userData?.previousLogin).format("D MMMM YYYY")
+										: "NA"
+									}
 								</div>
 							</div>
 						</div>
