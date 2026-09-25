@@ -54,6 +54,7 @@ const GroupChatPage = () => {
     const [groupName, setGroupName] = useState('');  // grorp name
     const [groupImage, setGroupImage] = useState(''); // image of group
     const [searchUsername, setSearchUsername] = useState("");  // search people by usernme
+    const [description,setDescription] = useState("");
     const [selectedUsers, setSelectedUsers] = useState([]); 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -63,6 +64,7 @@ const GroupChatPage = () => {
         setGroupName("");
         setGroupImage("");
         setSearchUsername("");
+        setSelectedUsers([])
     }
 
     const handleImageChange = (e) => {
@@ -118,7 +120,7 @@ const GroupChatPage = () => {
                     </p>
                 </header>
 
-                <section className="px-7 pb-7">
+                <section className="px-7 pb-5">
 
                     <article className="flex justify-center my-2">
                         <button
@@ -157,13 +159,24 @@ const GroupChatPage = () => {
                         className="w-full text-center font-medium bg-transparent border-b-2 border-base-content/10 focus:border-primary outline-none py-2 placeholder:text-base-content/30 placeholder:font-normal transition-colors"
                     />
 
+                    <input
+                        type="text"
+                        placeholder="Brief Description.."
+                        value={description}
+                        onChange={(e) => {
+                            let val = e.target.value;
+                            setDescription(val.charAt(0).toUpperCase() + val.slice(1))
+                        }}
+                        className="w-full mt-2 placeholder:font-light text-center transition-colors border-b-2 border-base-content/10 focus:border-warning outline-none py-2"
+                    />
+
                     <div className="relative mt-6">
                         <label className="text-xs font-medium uppercase tracking-wide text-base-content/40">
                             Add Members
                         </label>
 
                         {selectedUsers.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-2.5 mb-2.5 border">
+                            <div className="flex flex-wrap gap-2 mt-2.5 mb-2.5">
                                 {selectedUsers.map((user) => (
                                     <span
                                         key={user.id}
@@ -222,7 +235,7 @@ const GroupChatPage = () => {
                     </div>
                 </section>
 
-                <footer className="flex gap-2 px-7 py-5 border-t border-base-content/10 bg-base-200/40 rounded-b-3xl">
+                <footer className="flex gap-2 px-3 py-3 border-t border-base-content/10 bg-base-200/40 rounded-b-3xl">
                     <button className="btn btn-ghost flex-1 rounded-xl" onClick={closeModal}>
                         Cancel
                     </button>
