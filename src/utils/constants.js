@@ -44,3 +44,15 @@ export const initialMessages = {
 	],
 };
 
+//  create group
+const ALL_USERS = [
+	{ id: 1, username: 'aarav_k' },
+	{ id: 2, username: 'meera.j' },
+	{ id: 3, username: 'rohan99' },
+	{ id: 4, username: 'priya_s' },
+	{ id: 5, username: 'devansh' },
+	{ id: 6, username: 'ishaan_r' },
+	{ id: 7, username: 'parveshq' },
+	{ id: 8, username: 'bidi123' },
+]
+

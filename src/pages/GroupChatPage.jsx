@@ -1,55 +1,19 @@
 import { HomeIcon, MessageCirclePlus } from 'lucide-react'
-import React, { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CameraAvatarSVG, PlusIconSVG, SearchIconSVG } from '../utils/svg-icons.jsx'
-
-const ALL_USERS = [
-    { id: 1, username: 'aarav_k' },
-    { id: 2, username: 'meera.j' },
-    { id: 3, username: 'rohan99' },
-    { id: 4, username: 'priya_s' },
-    { id: 5, username: 'devansh' },
-    { id: 6, username: 'ishaan_r' },
-    { id: 7, username: 'parveshq' },
-    { id: 8, username: 'bidi123' },
-]
-
-// Deterministic gradient per username, so each badge/avatar has a stable identity
-const PALETTES = [
-    ['#7C5CFF', '#4C3BCF'],
-    ['#FF6B9D', '#C13584'],
-    ['#2DD4BF', '#0EA5A5'],
-    ['#FFA45B', '#E8703A'],
-    ['#5CC8FF', '#2E8FE0'],
-    ['#B892FF', '#7B4FE0'],
-]
-const paletteFor = (str) => {
-    let hash = 0
-    for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash)
-    return PALETTES[Math.abs(hash) % PALETTES.length]
-}
-
-const Avatar = ({ username, size = 36 }) => {
-    const [from, to] = paletteFor(username)
-    return (
-        <div
-            className="rounded-full flex items-center justify-center font-semibold text-white shrink-0 select-none"
-            style={{
-                width: size,
-                height: size,
-                fontSize: size * 0.4,
-                background: `linear-gradient(135deg, ${from}, ${to})`,
-            }}
-        >
-            {username.charAt(0).toUpperCase()}
-        </div>
-    )
-}
+import { useCreateGroupMutation, useGetAllUsersQuery, useGetUserDetailsQuery } from '../redux/api.js'
+import toast from 'react-hot-toast'
+import { LoadingMessage } from '../components/Spinner.jsx'
 
 const GroupChatPage = () => {
 
     const dialogRef = useRef(null);
     const fileInputRef = useRef(null);
+
+    let {data: { data: allUsers } = {}, isLoading: isAllUsersLoading, isError, error} = useGetAllUsersQuery();  // all users
+    let {data : {data : currentUser} = {}, isLoading : currentUserLoading} = useGetUserDetailsQuery(); // current user
+    const [createGroup] = useCreateGroupMutation();
 
     const [groupName, setGroupName] = useState('');  // grorp name
     const [groupImage, setGroupImage] = useState(''); // image of group
@@ -63,6 +27,7 @@ const GroupChatPage = () => {
         dialogRef.current?.close();
         setGroupName("");
         setGroupImage("");
+        setDescription("");
         setSearchUsername("");
         setSelectedUsers([])
     }
@@ -76,10 +41,16 @@ const GroupChatPage = () => {
     const filteredUsers = useMemo(() => {
         if (!searchUsername.trim()) return []
         const q = searchUsername.toLowerCase();
-        return ALL_USERS.filter(
-            (u) => u.username.toLowerCase().includes(q) && !selectedUsers.some((s) => s.id === u.id)
+        return allUsers.filter(
+            (u) => u.username.toLowerCase().includes(q) && !selectedUsers.some((s) => s._id === u._id)
         )
-    }, [searchUsername, selectedUsers])
+    }, [searchUsername, selectedUsers]);
+
+    if(isAllUsersLoading){
+        return(
+            <LoadingMessage />
+        )
+    }
 
     const addUser = (user) => {
         setSelectedUsers((prev) => [...prev, user]);
@@ -89,8 +60,44 @@ const GroupChatPage = () => {
     }
 
     const removeUser = (userId) => {
-        let del = selectedUsers.filter(user => user.id !== userId);
+        let del = selectedUsers.filter(user => user._id !== userId);
         setSelectedUsers(del);
+    }
+
+    let handleCreateGroup = async()=>{
+        try {
+            let {_id: userId, username} = currentUser;
+
+            const selectedMembers = [{ userId, username },
+                ...selectedUsers.map(({ _id, username }) => ({
+                    userId: _id,
+                    username,
+                })),
+            ];
+
+            if(!groupName || groupName.trim()==""){
+                return toast.error("Group Name Required")
+            }
+
+            if(selectedMembers.length <=1){
+                return toast.error("Please Add Members");
+            }
+
+            let data = {
+                groupName,
+                description : description || "",
+                members : selectedMembers
+            };
+
+            let res = await createGroup(data).unwrap();
+            if(res.success){
+                toast.success(res.message);
+                closeModal();
+            }
+        } catch (error) {
+            console.log(error);
+			toast.error(error?.data?.message || "Failed to Create Group");
+        }
     }
 
     return (
@@ -121,14 +128,13 @@ const GroupChatPage = () => {
                 </header>
 
                 <section className="px-7 pb-5">
-
                     <article className="flex justify-center my-2">
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             className="group relative"
                         >
                             <div
-                                className="w-20 h-20  rounded-full flex items-center justify-center overflow-hidden transition-all duration-200 ring-2 ring-dashed ring-base-content/20 group-hover:ring-primary group-hover:ring-offset-2 group-hover:ring-offset-base-100"
+                                className="w-22 h-22  rounded-full flex items-center justify-center overflow-hidden transition-all duration-200 ring-2 ring-blue-600 hover:ring-purple-500"
                                 style={!groupImage ? { background: 'linear-gradient(135deg, rgba(124,92,255,0.12), rgba(45,212,191,0.12))'} : undefined}
                             >
                                 {groupImage ? (
@@ -167,7 +173,7 @@ const GroupChatPage = () => {
                             let val = e.target.value;
                             setDescription(val.charAt(0).toUpperCase() + val.slice(1))
                         }}
-                        className="w-full mt-2 placeholder:font-light text-center transition-colors border-b-2 border-base-content/10 focus:border-warning outline-none py-2"
+                        className="w-full text-sm mt-2 placeholder:font-light text-center transition-colors border-b-2 border-base-content/10 focus:border-warning outline-none py-2"
                     />
 
                     <div className="relative mt-6">
@@ -179,14 +185,14 @@ const GroupChatPage = () => {
                             <div className="flex flex-wrap gap-2 mt-2.5 mb-2.5">
                                 {selectedUsers.map((user) => (
                                     <span
-                                        key={user.id}
+                                        key={user?._id}
                                         className="inline-flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-full bg-base-200 border border-base-content/5"
                                     >
-                                        <Avatar username={user.username} size={20} />
+                                        <img src={user?.avatar?.url} className="w-6 h-6 rounded-full"  />
                                         <span className="text-sm font-medium">{user.username}</span>
                                         <button                                           
                                             aria-label={`Remove ${user.username}`}
-                                            onClick={() => removeUser(user.id)}
+                                            onClick={() => removeUser(user?._id)}
                                             className="w-4 h-4 rounded-full flex items-center justify-center text-base-content/40 hover:text-base-content hover:bg-base-content/10 transition-colors"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -217,12 +223,13 @@ const GroupChatPage = () => {
                             <ul className="absolute z-20 mt-1.5 w-full max-h-48 overflow-y-auto rounded-xl border border-base-content/10 bg-base-100 shadow-xl py-1.5">
                                 {filteredUsers.length > 0 ? (
                                     filteredUsers.map((user) => (
-                                        <li key={user.id}>
+                                        // const initials = user.name.slice(0, 2).toUpperCase();
+                                        <li key={user._id}>
                                             <button                                            
                                                 onClick={() => addUser(user)}
                                                 className="w-full flex items-center gap-2.5 px-3.5 py-2 hover:bg-base-200 transition-colors text-left"
                                             >
-                                                <Avatar username={user.username} size={26} />
+                                                <img src={user?.avatar?.url} className="w-6 h-6 rounded-full"  />
                                                 <span className="text-sm font-medium">{user.username}</span>
                                             </button>
                                         </li>
@@ -239,7 +246,7 @@ const GroupChatPage = () => {
                     <button className="btn btn-ghost flex-1 rounded-xl" onClick={closeModal}>
                         Cancel
                     </button>
-                    <button className='btn btn-success btn-outline'>Create</button>
+                    <button onClick={handleCreateGroup} className='btn btn-success btn-outline'>Create</button>
                 </footer>
             </main>
 

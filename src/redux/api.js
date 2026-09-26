@@ -209,6 +209,17 @@ export const api = createApi({
             invalidatesTags: (result, error, targetUserId) => 
                 [{ type: 'Messages', id: targetUserId }, { type: 'Conversation' }],
         }),
+
+        // group chats
+
+        createGroup : builder.mutation({
+            query : (data)=>({
+                method : "POST",
+                url : `/v1/group`,
+                body : data
+            })
+        }),
+
     })
 });
 
@@ -227,7 +238,8 @@ export const {
     useGetAllNewMessagesQuery,
     useChangeAvatarMutation,
     useAddSocialLinksMutation,
-    useRemoveSocialLinksMutation
+    useRemoveSocialLinksMutation,
+    useCreateGroupMutation
 } = api;
 
 
