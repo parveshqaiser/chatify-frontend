@@ -16,11 +16,16 @@ const GroupChatPage = () => {
     const [createGroup] = useCreateGroupMutation();
 
     const [groupName, setGroupName] = useState('');  // grorp name
-    const [groupImage, setGroupImage] = useState(''); // image of group
-    const [searchUsername, setSearchUsername] = useState("");  // search people by usernme
     const [description,setDescription] = useState("");
+    const [groupImage, setGroupImage] = useState(''); // group image for showing in UI
+    const [selectedFile, setSelectedFile] = useState(null);
+
+    const [searchUsername, setSearchUsername] = useState("");  // search people by usernme
     const [selectedUsers, setSelectedUsers] = useState([]); 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    const [isBtnLoading, setIsBtnLoading] = useState(false);
+    
 
     const openModal = () => dialogRef.current?.showModal()
     const closeModal = () => {
@@ -29,12 +34,17 @@ const GroupChatPage = () => {
         setGroupImage("");
         setDescription("");
         setSearchUsername("");
-        setSelectedUsers([])
+        setSelectedUsers([]);
+        setSelectedFile(null);
+        if(fileInputRef.current){
+            fileInputRef.current.value ="";
+        }
     }
 
     const handleImageChange = (e) => {
-        const file = e.target.files?.[0]
-        if (!file) return
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setSelectedFile(file);
         setGroupImage(URL.createObjectURL(file))
     }
 
@@ -68,6 +78,7 @@ const GroupChatPage = () => {
         try {
             let {_id: userId, username} = currentUser;
 
+            setIsBtnLoading(true);
             const selectedMembers = [{ userId, username },
                 ...selectedUsers.map(({ _id, username }) => ({
                     userId: _id,
@@ -83,19 +94,22 @@ const GroupChatPage = () => {
                 return toast.error("Please Add Members");
             }
 
-            let data = {
-                groupName,
-                description : description || "",
-                members : selectedMembers
-            };
+            let formData = new FormData();
+			formData.append("image",selectedFile);
+            formData.append("groupName",groupName);
+            formData.append("description",description|| "");
+            formData.append("members",JSON.stringify(selectedMembers));
 
-            let res = await createGroup(data).unwrap();
+            let res = await createGroup(formData).unwrap();
             if(res.success){
                 toast.success(res.message);
+                setIsBtnLoading(false);
                 closeModal();
+
             }
         } catch (error) {
             console.log(error);
+            setIsBtnLoading(false);
 			toast.error(error?.data?.message || "Failed to Create Group");
         }
     }
@@ -246,7 +260,13 @@ const GroupChatPage = () => {
                     <button className="btn btn-ghost flex-1 rounded-xl" onClick={closeModal}>
                         Cancel
                     </button>
-                    <button onClick={handleCreateGroup} className='btn btn-success btn-outline'>Create</button>
+                    <button 
+                        disabled={isBtnLoading}
+                        onClick={handleCreateGroup} 
+                        className='btn btn-success btn-outline'
+                    >
+                        {isBtnLoading ? "⏳ Saving...": "Create"}
+                    </button>
                 </footer>
             </main>
 
