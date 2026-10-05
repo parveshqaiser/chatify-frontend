@@ -78,7 +78,6 @@ const GroupChatPage = () => {
         try {
             let {_id: userId, username} = currentUser;
 
-            setIsBtnLoading(true);
             const selectedMembers = [{ userId, username },
                 ...selectedUsers.map(({ _id, username }) => ({
                     userId: _id,
@@ -100,6 +99,7 @@ const GroupChatPage = () => {
             formData.append("description",description|| "");
             formData.append("members",JSON.stringify(selectedMembers));
 
+            setIsBtnLoading(true);
             let res = await createGroup(formData).unwrap();
             if(res.success){
                 toast.success(res.message);
