@@ -131,6 +131,7 @@ const GroupChatPage = () => {
             </div>				
         </header>
 
+        {/* Modal  */}
         <dialog ref={dialogRef} className="modal">
             <main className="modal-box max-w-md p-0 overflow-visible rounded-3xl border border-base-content/10 bg-base-100 shadow-2xl">
                
