@@ -2,77 +2,19 @@ import { Crown, HomeIcon, MessageCirclePlus } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CameraAvatarSVG, PlusIconSVG, SearchIconSVG } from '../utils/svg-icons.jsx'
-import { useCreateGroupMutation, useGetAllUsersQuery, useGetUserDetailsQuery } from '../redux/api.js'
+import { useCreateGroupMutation, useFetchGroupDetailsQuery, useGetAllUsersQuery, useGetUserDetailsQuery } from '../redux/api.js'
 import toast from 'react-hot-toast'
-import { LoadingMessage } from '../components/Spinner.jsx'
+import { LoadingMessage } from '../components/Spinner.jsx';
+import { GROUPS } from '../utils/constants.js';
 
 const GroupChatPage = () => {
-
-    const GROUPS = [
-    {
-        _id: 'g1',
-          avatar: { url: 'https://res.cloudinary.com/dp0v0zb7z/image/upload/v1790491803/group-photo/den9obtypdbxafwj1gts.jpg' },
-        groupName: 'Weekend Trip',
-        description: 'Planning the Coorg getaway',
-        members: [
-            { userId: 'u1', username: 'aarav_k' },
-            { userId: 'u2', username: 'meera.j' },
-            { userId: 'u3', username: 'rohan99' },
-            { userId: 'u4', username: 'priya_s' },
-            { userId: 'u5', username: 'devansh' },
-        ],
-        isActive: true,
-        creator : true,
-    },
-    {
-        _id: 'g2',
-        avatar: { url: "https://res.cloudinary.com/dp0v0zb7z/image/upload/v1792768803/group-photo/eayssolc6uz1nafbmq1g.jpg"},
-        groupName: 'Design Team',
-        description: 'Figma links, feedback, memes',
-        members: [
-            { userId: 'u2', username: 'meera.j' },
-            { userId: 'u6', username: 'ishaan_r' },
-        ],
-        isActive: true,
-        creator : false,
-    },
-    {
-        _id: 'g3',
-        avatar: { url: '' },
-        groupName: 'College Friends',
-        description: null,
-        members: [
-            { userId: 'u1', username: 'aarav_k' },
-            { userId: 'u3', username: 'rohan99' },
-            { userId: 'u4', username: 'priya_s' },
-            { userId: 'u5', username: 'devansh' },
-            { userId: 'u6', username: 'ishaan_r' },
-            { userId: 'u2', username: 'meera.j' },
-            { userId: 'u7', username: 'kabir_m' },
-        ],
-        isActive: true,
-        creator : true,
-    },
-    {
-        _id: 'g4',
-        avatar: { url: '' },
-        groupName: 'Cricket Sunday',
-        description: 'Ground booking & scores',
-        members: [
-            { userId: 'u3', username: 'rohan99' },
-            { userId: 'u5', username: 'devansh' },
-            { userId: 'u6', username: 'ishaan_r' },
-        ],
-        isActive: true,
-        creator : false,
-    }];
-
 
     const dialogRef = useRef(null);
     const fileInputRef = useRef(null);
 
-    let {data: { data: allUsers } = {}, isLoading: isAllUsersLoading, isError, error} = useGetAllUsersQuery();  // all users
+    let {data: { data: allUsers } = [], isLoading: isAllUsersLoading, isError, error} = useGetAllUsersQuery();  // all users
     let {data : {data : currentUser} = {}, isLoading : currentUserLoading} = useGetUserDetailsQuery(); // current user
+    let {data : {data : groupDetails}= [], isLoading : isGroupLoading , refetch} = useFetchGroupDetailsQuery();
     const [createGroup] = useCreateGroupMutation();
 
     const [groupName, setGroupName] = useState('');  // grorp name
@@ -85,14 +27,7 @@ const GroupChatPage = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const [isBtnLoading, setIsBtnLoading] = useState(false);
-    const [search, setSearch] = useState("");
-
-    const filteredGroups = useMemo(() => {
-        const q = search.trim().toLowerCase()
-        if (!q) return GROUPS;
-        return GROUPS.filter((g) => g.groupName.toLowerCase().includes(q))
-    }, [search])
-    
+    const [search, setSearch] = useState(""); // serach by group name
 
     const openModal = () => dialogRef.current?.showModal()
     const closeModal = () => {
@@ -123,7 +58,19 @@ const GroupChatPage = () => {
         )
     }, [searchUsername, selectedUsers]);
 
+    const filteredGroups = useMemo(() => {
+        let q = search.trim().toLowerCase()
+        if (!q) return groupDetails;
+        return groupDetails.filter((g) => g.groupName.toLowerCase().includes(q))
+    }, [search, groupDetails]);
+
     if(isAllUsersLoading){
+        return(
+            <LoadingMessage />
+        )
+    }
+
+    if(isGroupLoading){
         return(
             <LoadingMessage />
         )
@@ -171,6 +118,7 @@ const GroupChatPage = () => {
             if(res.success){
                 toast.success(res.message);
                 setIsBtnLoading(false);
+                refetch();
                 closeModal();
 
             }
@@ -182,19 +130,19 @@ const GroupChatPage = () => {
     }
     
     const GroupAvatar = ({ group }) =>
-        group.avatar?.url ? (
+        group.groupAvatar?.url ? (
             <div className="avatar shrink-0">
-            <div className="w-12 sm:w-14 rounded-2xl">
-                <img src={group.avatar.url} alt={group.groupName} />
-            </div>
+                <div className="w-12 sm:w-14 rounded-2xl">
+                    <img src={group?.groupAvatar?.url} alt={group?.groupName} />
+                </div>
             </div>
         ) : (
             <div className="avatar avatar-placeholder shrink-0">
-            <div className="bg-violet-300 text-neutral-content w-12 sm:w-14 rounded-2xl">
-                <span className="text-lg sm:text-xl">
-                {group.groupName.charAt(0).toUpperCase()}
-                </span>
-            </div>
+                <div className="bg-violet-300 text-neutral-content w-12 sm:w-14 rounded-2xl">
+                    <span className="text-lg sm:text-xl">
+                        {group.groupName.charAt(0).toUpperCase()}
+                    </span>
+                </div>
             </div>
         );
 
@@ -206,24 +154,23 @@ const GroupChatPage = () => {
             <div className="flex items-center gap-2 min-w-0">
                 <div className="avatar-group -space-x-3 shrink-0">
                     {visible.map((m) => (
-                    <div key={m.userId} className="avatar avatar-placeholder" title={m.username}>
-                        <div className="bg-neutral text-neutral-content w-7 sm:w-8">
-                        <span className="text-[10px] sm:text-xs">
-                            {m.username.charAt(0).toUpperCase()}
-                        </span>
+                        <div key={m._id} className="avatar" title={m?.userId?.name}>
+                          
+                            <div className="w-10 sm:w-10 rounded-2xl">
+                                <img src={m?.userId?.avatar?.url} alt={m?.userId?.name} />
+                            </div>
                         </div>
-                    </div>
                     ))}
                     {extra > 0 && (
-                    <div className="avatar avatar-placeholder">
-                        <div className="bg-neutral text-neutral-content w-7 sm:w-8">
-                        <span className="text-[10px] sm:text-xs">+{extra}</span>
+                        <div className="avatar avatar-placeholder">
+                            <div className="bg-neutral text-neutral-content w-7 sm:w-8">
+                                <span className="text-[10px] sm:text-xs">+{extra}</span>
+                            </div>
                         </div>
-                    </div>
                     )}
                 </div>
-                <span className="text-xs text-base-content/50 truncate">
-                    {members.length} {members.length === 1 ? 'member' : 'members'}
+                <span className="text-xs text-base-content/50 truncate"> {/* truncate to remove this span for smaller device*/}
+                    {members?.length} {members?.length === 1 ? 'member' : 'members'}
                 </span>
             </div>
             );
@@ -246,18 +193,19 @@ const GroupChatPage = () => {
             </div>				
         </header>
 
+        {/* group layout  */}
         <main className="max-w-4xl mx-auto mt-10 px-4 sm:px-6">
 
             <header className="flex items-end justify-between mb-6">
                 <div>
                     <h1 className="text-lg font-semibold tracking-tight">Your groups</h1>
                     <p className="text-sm text-base-content/50 mt-0.5">
-                        {GROUPS.length} {GROUPS.length === 1 ? 'group' : 'groups'}
+                        {groupDetails?.length} {groupDetails?.length === 1 ? 'group' : 'groups'}
                     </p>
                 </div>
             </header>
 
-           
+            {/* search group */}
             <nav className="relative mb-5">
                 <SearchIconSVG className="w-[18px] h-[18px] absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" />
                 <input
@@ -281,27 +229,26 @@ const GroupChatPage = () => {
                 )}
             </nav>
 
-            {filteredGroups.length > 0 ? (
+            {filteredGroups?.length > 0 ? (
                <ul className="space-y-3">
-                {filteredGroups.map((group) => (
+                {filteredGroups?.map((group) => (
                     <li
                         key={group._id}
                         className="flex items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl bg-base-100 border border-base-content/5 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200"
                     >
                         <GroupAvatar group={group} />
 
-                        {/* Info column — flex-1, min-w-0 so truncation works */}
                         <div className="flex-1 min-w-0">
                             <h3 className="font-semibold truncate flex items-center gap-1">
                                 <span className="truncate">{group.groupName}</span>
-                                {group.creator && (
+                                {group.createdBy == currentUser._id && (
                                     <Crown size={14} className="shrink-0 text-warning" />
                                 )}
                             </h3>
                             <p className="text-sm text-base-content/50 truncate mb-1.5">
                                 {group.description || 'No description'}
                             </p>
-                            <MemberStack members={group.members} />
+                            <MemberStack members={group?.members} />
                         </div>
 
 

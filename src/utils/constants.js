@@ -54,5 +54,66 @@ const ALL_USERS = [
 	{ id: 6, username: 'ishaan_r' },
 	{ id: 7, username: 'parveshq' },
 	{ id: 8, username: 'bidi123' },
-]
+];
+
+// Fetch group
+
+export const GROUPS = [
+    {
+        _id: 'g1',
+          avatar: { url: 'https://res.cloudinary.com/dp0v0zb7z/image/upload/v1790491803/group-photo/den9obtypdbxafwj1gts.jpg' },
+        groupName: 'Weekend Trip',
+        description: 'Planning the Coorg getaway',
+        members: [
+            { userId: 'u1', username: 'aarav_k' },
+            { userId: 'u2', username: 'meera.j' },
+            { userId: 'u3', username: 'rohan99' },
+            { userId: 'u4', username: 'priya_s' },
+            { userId: 'u5', username: 'devansh' },
+        ],
+        isActive: true,
+        creator : true,
+    },
+    {
+        _id: 'g2',
+        avatar: { url: "https://res.cloudinary.com/dp0v0zb7z/image/upload/v1792768803/group-photo/eayssolc6uz1nafbmq1g.jpg"},
+        groupName: 'Design Team',
+        description: 'Figma links, feedback, memes',
+        members: [
+            { userId: 'u2', username: 'meera.j' },
+            { userId: 'u6', username: 'ishaan_r' },
+        ],
+        isActive: true,
+        creator : false,
+    },
+    {
+        _id: 'g3',
+        avatar: { url: '' },
+        groupName: 'College Friends',
+        description: null,
+        members: [
+            { userId: 'u1', username: 'aarav_k' },
+            { userId: 'u3', username: 'rohan99' },
+            { userId: 'u4', username: 'priya_s' },
+            { userId: 'u5', username: 'devansh' },
+            { userId: 'u6', username: 'ishaan_r' },
+            { userId: 'u2', username: 'meera.j' },
+            { userId: 'u7', username: 'kabir_m' },
+        ],
+        isActive: true,
+        creator : true,
+    },
+    {
+        _id: 'g4',
+        avatar: { url: '' },
+        groupName: 'Cricket Sunday',
+        description: 'Ground booking & scores',
+        members: [
+            { userId: 'u3', username: 'rohan99' },
+            { userId: 'u5', username: 'devansh' },
+            { userId: 'u6', username: 'ishaan_r' },
+        ],
+        isActive: true,
+        creator : false,
+}];
 
