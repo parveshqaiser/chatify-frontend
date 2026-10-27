@@ -14,6 +14,7 @@ import { Provider } from 'react-redux';
 import appStore from './redux/store.js';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import GroupChatPage from './pages/GroupChatPage.jsx';
+import GroupListPage from './test/Group-Listing-pgae.jsx';
 
 function App() {
 	
@@ -27,6 +28,7 @@ function App() {
 				<Route index path='/login' element={<LoginPage />}></Route>
 				<Route path='/signup' element={<RegistrationPage />}></Route>
 				<Route path='/register/success' element={<EmailVerificatipnPage />}></Route>
+				<Route path="/test" element={ <GroupListPage />} />
 
 				<Route element={<ProtectedRoute />}>
                     <Route path="/home" element={<HomePage />} />
