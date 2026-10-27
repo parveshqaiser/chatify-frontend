@@ -51,7 +51,7 @@ const RegistrationPage = () => {
         }
 
         if(password.length <=7){
-            return toast.error("Min Password shoudl be 8 chars")
+            return toast.error("Min Password should be 8 chars")
         }
 
         setLoading(true);
@@ -100,6 +100,7 @@ const RegistrationPage = () => {
                     <input
                         type="text"
                         name="username"
+                        value={formData.username}
                         onChange={handleChange}
                         placeholder="Enter your username (Max 8 chars)"
                         maxLength={8}
@@ -124,6 +125,7 @@ const RegistrationPage = () => {
                     <input
                         type="text"
                         name="email"
+                        value={formData.email}
                         onChange={handleChange}
                         placeholder="Enter your email"
                         className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition-all placeholder:text-slate-500 focus:border-cyan-500"
@@ -135,6 +137,7 @@ const RegistrationPage = () => {
                     <input
                         type="password"
                         name="password"
+                        value={formData.password}
                         onChange={handleChange}
                         placeholder="Create a password (Min 8 chars)"
                         minLength={7}
