@@ -219,6 +219,10 @@ export const api = createApi({
                 body : data
             })
         }),
+        fetchGroupDetails : builder.query({
+            query: () => "/v1/group",
+            providesTags: ['Group'],
+        }),
 
     })
 });
@@ -239,7 +243,8 @@ export const {
     useChangeAvatarMutation,
     useAddSocialLinksMutation,
     useRemoveSocialLinksMutation,
-    useCreateGroupMutation
+    useCreateGroupMutation,
+    useFetchGroupDetailsQuery
 } = api;
 
 
