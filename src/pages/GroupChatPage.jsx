@@ -207,7 +207,7 @@ const GroupChatPage = () => {
 
             {/* search group */}
             <nav className="relative mb-5">
-                <SearchIconSVG className="w-[18px] h-[18px] absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" />
+                <SearchIconSVG className="w-4.5 h-4.5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" />
                 <input
                     type="text"
                     value={search}
