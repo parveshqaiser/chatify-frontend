@@ -431,8 +431,9 @@ const UserProfile = () => {
 									</div>
 								</div>
 
-								<span className='text-[11px] text-orange-400'>Last Avatar Updated on {
-									dayjs(userData?.avatar?.createdAt).format("D MMM YYYY") || "NA"}</span>
+								{userData?.avatar?.createdAt && <span className='text-[11px] text-orange-400'>Last Avatar Updated on {
+									dayjs(userData?.avatar?.createdAt).format("D MMM YYYY")} 
+								</span>}
 
 								<button className="btn btn-dash btn-sm" onClick={()=> profilePictureRef.current.click()} >
 									<Camera size={16} /> Change Avatar
@@ -498,6 +499,7 @@ const UserProfile = () => {
 							)}
 							<input
 								type="text"
+								name='Full Name'
 								placeholder="Full Name"								
 								value={name}
 								onChange={(e)=> {
@@ -511,6 +513,7 @@ const UserProfile = () => {
 							<textarea
 								className="textarea textarea-accent"
 								rows={3}
+								name='Bio'
 								value={bio}
 								maxLength={100}
 								onChange={(e)=> {
