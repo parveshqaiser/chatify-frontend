@@ -44,7 +44,7 @@ const Sidebar = ({ users, activeUser, currentUser, onSelectUser }) => {
 							<UserCircle size={18} />
 						</Link>
 					</li>
-					<li className="tooltip" data-tip="Create Group">
+					<li className="tooltip" data-tip="Group">
 						<Link to="/group" >
 							<MessageCirclePlus size={18}/>
 						</Link>
