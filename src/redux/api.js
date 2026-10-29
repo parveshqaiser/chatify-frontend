@@ -224,6 +224,14 @@ export const api = createApi({
             providesTags: ['Group'],
         }),
 
+        updateGroup : builder.mutation({
+            query: ({id,data}) => ({
+                method: "PATCH",
+                url: `/v1/group/${id}/edit`,
+                body: data
+            }),
+        })
+
     })
 });
 
@@ -244,7 +252,8 @@ export const {
     useAddSocialLinksMutation,
     useRemoveSocialLinksMutation,
     useCreateGroupMutation,
-    useFetchGroupDetailsQuery
+    useFetchGroupDetailsQuery,
+    useUpdateGroupMutation
 } = api;
 
 

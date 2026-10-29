@@ -1,11 +1,58 @@
-import { Crown, HomeIcon, MessageCirclePlus } from 'lucide-react'
+import { Crown, EditIcon, Form, HomeIcon, MessageCirclePlus, UserRoundPen } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CameraAvatarSVG, PlusIconSVG, SearchIconSVG } from '../utils/svg-icons.jsx'
-import { useCreateGroupMutation, useFetchGroupDetailsQuery, useGetAllUsersQuery, useGetUserDetailsQuery } from '../redux/api.js'
-import toast from 'react-hot-toast'
+import { useCreateGroupMutation, useFetchGroupDetailsQuery, useGetAllUsersQuery, useGetUserDetailsQuery, useUpdateGroupMutation } from '../redux/api.js'
+import toast, { useToasterStore } from 'react-hot-toast'
 import { LoadingMessage } from '../components/Spinner.jsx';
 import { GROUPS } from '../utils/constants.js';
+
+ const GroupAvatar = ({ group }) =>
+        group.groupAvatar?.url ? (
+            <div className="avatar shrink-0">
+                <div className="w-12 sm:w-14 rounded-2xl">
+                    <img src={group?.groupAvatar?.url} alt={group?.groupName} />
+                </div>
+            </div>
+        ) : (
+            <div className="avatar avatar-placeholder shrink-0">
+                <div className="bg-violet-300 text-neutral-content w-12 sm:w-14 rounded-2xl">
+                    <span className="text-lg sm:text-xl">
+                        {group.groupName.charAt(0).toUpperCase()}
+                    </span>
+                </div>
+            </div>
+        );
+
+const MemberStack = ({ members }) => {
+    const visible = members.slice(0, 4);
+    const extra = members.length - visible.length;
+
+    return (
+        <div className="flex items-center gap-2 min-w-0">
+            <div className="avatar-group -space-x-3 shrink-0">
+                {visible.map((m) => (
+                    <div key={m._id} className="avatar" title={m?.userId?.name}>
+                        
+                        <div className="w-10 sm:w-10 rounded-2xl">
+                            <img src={m?.userId?.avatar?.url} alt={m?.userId?.name} />
+                        </div>
+                    </div>
+                ))}
+                {extra > 0 && (
+                    <div className="avatar avatar-placeholder">
+                        <div className="bg-neutral text-neutral-content w-7 sm:w-8">
+                            <span className="text-[10px] sm:text-xs">+{extra}</span>
+                        </div>
+                    </div>
+                )}
+            </div>
+            <span className="text-xs text-base-content/50 truncate"> {/* truncate to remove this span for smaller device*/}
+                {members?.length} {members?.length === 1 ? 'member' : 'members'}
+            </span>
+        </div>
+        );
+};
 
 const GroupChatPage = () => {
 
@@ -16,11 +63,13 @@ const GroupChatPage = () => {
     let {data : {data : currentUser} = {}, isLoading : currentUserLoading} = useGetUserDetailsQuery(); // current user
     let {data : {data : groupDetails}= [], isLoading : isGroupLoading , refetch} = useFetchGroupDetailsQuery();
     const [createGroup] = useCreateGroupMutation();
+    const [updateGroup] = useUpdateGroupMutation();
 
     const [groupName, setGroupName] = useState('');  // grorp name
     const [description,setDescription] = useState("");
     const [groupImage, setGroupImage] = useState(''); // group image for showing in UI
     const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedGroupId, setSelectedGroupId] = useState(null); // for storing group id while edting
 
     const [searchUsername, setSearchUsername] = useState("");  // search people by usernme
     const [selectedUsers, setSelectedUsers] = useState([]); 
@@ -28,10 +77,13 @@ const GroupChatPage = () => {
 
     const [isBtnLoading, setIsBtnLoading] = useState(false);
     const [search, setSearch] = useState(""); // serach by group name
+    const [isEdit,setIsEdit] = useState(false); // for editing / adding group 
 
-    const openModal = () => dialogRef.current?.showModal()
+    const openModal = () => dialogRef.current?.showModal();
+
     const closeModal = () => {
         dialogRef.current?.close();
+        setIsEdit(false);
         setGroupName("");
         setGroupImage("");
         setDescription("");
@@ -120,7 +172,6 @@ const GroupChatPage = () => {
                 setIsBtnLoading(false);
                 refetch();
                 closeModal();
-
             }
         } catch (error) {
             console.log(error);
@@ -128,53 +179,44 @@ const GroupChatPage = () => {
 			toast.error(error?.data?.message || "Failed to Create Group");
         }
     }
+
+    const handleUpdateGroup = async()=>{
+        try {
+            
+            if(!groupName || groupName.trim()==""){
+                return toast.error("Group Name Required")
+            }
+            let updateFormData = new FormData();
+
+            updateFormData.append("image",selectedFile);
+            updateFormData.append("groupName",groupName);
+            updateFormData.append("description",description|| "");
+
+            let res = await updateGroup({
+                id : selectedGroupId,
+                data : updateFormData}
+            ).unwrap();
+
+            if(res.success){
+                toast.success(res.message);
+                setIsBtnLoading(false);
+                refetch();
+                closeModal();
+            }
+        } catch (error) {
+            console.log(error);
+            setIsBtnLoading(false);
+			toast.error(error?.data?.message || "Failed to Update Group");
+        }
+    }
     
-    const GroupAvatar = ({ group }) =>
-        group.groupAvatar?.url ? (
-            <div className="avatar shrink-0">
-                <div className="w-12 sm:w-14 rounded-2xl">
-                    <img src={group?.groupAvatar?.url} alt={group?.groupName} />
-                </div>
-            </div>
-        ) : (
-            <div className="avatar avatar-placeholder shrink-0">
-                <div className="bg-violet-300 text-neutral-content w-12 sm:w-14 rounded-2xl">
-                    <span className="text-lg sm:text-xl">
-                        {group.groupName.charAt(0).toUpperCase()}
-                    </span>
-                </div>
-            </div>
-        );
-
-    const MemberStack = ({ members }) => {
-        const visible = members.slice(0, 4);
-        const extra = members.length - visible.length;
-
-        return (
-            <div className="flex items-center gap-2 min-w-0">
-                <div className="avatar-group -space-x-3 shrink-0">
-                    {visible.map((m) => (
-                        <div key={m._id} className="avatar" title={m?.userId?.name}>
-                          
-                            <div className="w-10 sm:w-10 rounded-2xl">
-                                <img src={m?.userId?.avatar?.url} alt={m?.userId?.name} />
-                            </div>
-                        </div>
-                    ))}
-                    {extra > 0 && (
-                        <div className="avatar avatar-placeholder">
-                            <div className="bg-neutral text-neutral-content w-7 sm:w-8">
-                                <span className="text-[10px] sm:text-xs">+{extra}</span>
-                            </div>
-                        </div>
-                    )}
-                </div>
-                <span className="text-xs text-base-content/50 truncate"> {/* truncate to remove this span for smaller device*/}
-                    {members?.length} {members?.length === 1 ? 'member' : 'members'}
-                </span>
-            </div>
-            );
-    };
+    const handleEdit= (group)=>{
+        setSelectedGroupId(group._id);
+        setIsEdit(true);
+        setGroupName(group.groupName);
+        setDescription(group.description);
+        setGroupImage(group.groupAvatar.url);
+   }
 
     return (
     <main className='min-h-screen bg-base-200 p-2 md:p-6'>
@@ -230,11 +272,11 @@ const GroupChatPage = () => {
             </nav>
 
             {filteredGroups?.length > 0 ? (
-               <ul className="space-y-3">
-                {filteredGroups?.map((group) => (
+                <ul className="space-y-3">
+                    {filteredGroups?.map((group) => (
                     <li
                         key={group._id}
-                        className="flex items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl bg-base-100 border border-base-content/5 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200"
+                        className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl bg-base-100 border border-base-content/5 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200"
                     >
                         <GroupAvatar group={group} />
 
@@ -251,22 +293,26 @@ const GroupChatPage = () => {
                             <MemberStack members={group?.members} />
                         </div>
 
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                            <Link
+                                to={`/group/${group._id}`}
+                                className="flex-1 sm:flex-none text-center sm:text-left shrink-0 px-4 py-2 rounded-xl text-sm font-medium text-primary bg-primary/10 hover:bg-primary hover:text-primary-content transition-colors"
+                            >
+                                Start Chat
+                            </Link>
 
-                        {/* Desktop/tablet button — inline on the right */}
-                        <button
-                            type="button"
-                            className="hidden sm:inline-flex shrink-0 px-4 lg:px-5 py-2 rounded-xl text-sm font-medium text-primary bg-primary/10 hover:bg-primary hover:text-primary-content transition-colors"
-                        >
-                            Start Chat
-                        </button>
-
-                        {/* Mobile button — full-width under the row */}
-                        <button
-                            type="button"
-                            className="sm:hidden order-last w-full mt-1 px-4 py-2 rounded-xl text-sm font-medium text-primary bg-primary/10 hover:bg-primary hover:text-primary-content transition-colors"
-                        >
-                            Start Chat
-                        </button>
+                            {group.createdBy == currentUser._id && 
+                            <button
+                                onClick={()=> {                                  
+                                    handleEdit(group), 
+                                    openModal()
+                                }}
+                                className="rounded-xl p-2 cursor-pointer"
+                                title="Edit"
+                            >
+                                <UserRoundPen size={14} className="text-warning" />
+                            </button>}
+                        </div>
                     </li>
                 ))}
                 </ul>
@@ -346,7 +392,7 @@ const GroupChatPage = () => {
                         className="w-full text-sm mt-2 placeholder:font-light text-center transition-colors border-b-2 border-base-content/10 focus:border-warning outline-none py-2"
                     />
 
-                    <div className="relative mt-6">
+                    {!isEdit && (<div className="relative mt-6">
                         <label className="text-xs font-medium uppercase tracking-wide text-base-content/40">
                             Add Members
                         </label>
@@ -409,20 +455,26 @@ const GroupChatPage = () => {
                                 )}
                             </ul>
                         )}
-                    </div>
+                    </div>)}
                 </section>
 
                 <footer className="flex gap-2 px-3 py-3 border-t border-base-content/10 bg-base-200/40 rounded-b-3xl">
                     <button className="btn btn-ghost flex-1 rounded-xl" onClick={closeModal}>
                         Cancel
                     </button>
-                    <button 
+                    {!isEdit && <button 
                         disabled={isBtnLoading}
                         onClick={handleCreateGroup} 
                         className='btn btn-success btn-outline'
                     >
                         {isBtnLoading ? "⏳ Saving...": "Create"}
-                    </button>
+                    </button>}
+                    {isEdit && <button  
+                        disabled={isBtnLoading} 
+                        onClick={handleUpdateGroup} 
+                        className='btn btn-warning btn-outline'>
+                            Update
+                        </button>}
                 </footer>
             </main>
 
