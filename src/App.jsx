@@ -14,6 +14,7 @@ import { Provider } from 'react-redux';
 import appStore from './redux/store.js';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import GroupChatPage from './pages/GroupChatPage.jsx';
+import GroupMessage from './components/GroupMessage.jsx';
 
 function App() {
 	
@@ -33,6 +34,7 @@ function App() {
                     <Route path="/home" element={<HomePage />} />
                     <Route path="/profile" element={<UserProfile />} />
 					<Route path="/group" element={<GroupChatPage />} />
+					<Route path="/group/:id" element={<GroupMessage />} />
                 </Route>
 
 				<Route path='*' element={<PageNotFound />}></Route>
