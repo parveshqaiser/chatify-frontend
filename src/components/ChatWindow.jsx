@@ -391,11 +391,6 @@ const ChatWindow = ({selectedUser,currentUser})=>{
                             </li>
                             <li>
                                 <button className="text-[12px]">
-                                    Media Links & Docs
-                                </button>
-                            </li>
-                            <li>
-                                <button className="text-[12px]">
                                     Block
                                 </button>
                             </li>
