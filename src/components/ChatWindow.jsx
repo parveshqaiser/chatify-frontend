@@ -468,7 +468,7 @@ const ChatWindow = ({selectedUser,currentUser})=>{
 
 
         {/* write message field */}
-        <article className="flex items-center gap-2 px-3 py-2 backdrop-blur-sm">
+        <footer className="flex items-center gap-2 px-3 py-2 backdrop-blur-sm">
             <div className="relative">
                 <button
                     onClick={() => setFileIcons(!fileIcons)}
@@ -620,7 +620,7 @@ const ChatWindow = ({selectedUser,currentUser})=>{
             >
                 <Send size={18} />
             </button>
-        </article>
+        </footer>
     </section>
     
     <UserViewModal user={selectedUser} allMessages={allMessages}/>
