@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import EmojiPicker from 'emoji-picker-react';
 import bgImage from "../assets/grp-chat-bg.jpg";
+import AddMembersModal from './AddMembersModal.jsx';
+import GroupViewModal from './GroupViewModal.jsx';
 
 const GroupMessage = () => {
 
@@ -25,6 +27,9 @@ const GroupMessage = () => {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false); // emoji picker visibility
     const emojiPickerRef = useRef(null);
 
+    const [isOpen, setIsOpen] = useState(false);
+    const [openGroupInfo, setOpenGroupInfo] = useState(false);
+
      // close menu/search on Escape
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -37,6 +42,10 @@ const GroupMessage = () => {
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, []);
+
+    function onClose (){
+        setIsOpen(false);
+    }
 
     let handleFileChange = ()=>{}
 
@@ -77,10 +86,10 @@ const GroupMessage = () => {
                     {moreInfo && (
                     <ul className="menu absolute right-0 top-full mt-1 z-50 w-26 rounded-box bg-base-100 shadow-xl">
                         <li>
-                            <button onClick={()=>document.getElementById('my_modal_5').showModal()} className="text-[12px]">Group Info</button>
+                            <button  onClick={()=>setOpenGroupInfo (true)} className="text-[12px]">Group Info</button>
                         </li>
                             <li>
-                            <button className="text-[12px]">
+                            <button onClick={()=> setIsOpen(true)} className="text-[12px]">
                                 Add
                             </button>
                         </li>
@@ -92,8 +101,6 @@ const GroupMessage = () => {
                         
                         <li>
                             <button 
-                                // onClick={()=>document.getElementById('my_modal_3').showModal()}
-                                // onClick={()=>setDeleteModal(true)}  
                                 className="text-[12px]"
                             >
                                 Clear Chat
@@ -255,7 +262,6 @@ const GroupMessage = () => {
                     className="absolute bottom-11.5 right-0 z-50"
                 >
                     <EmojiPicker 
-                        // onEmojiClick={handleEmojiClick}
                         onEmojiClick={(e) => setMessage(prev=> prev + e.emoji)}
                         width={300}
                         height={320}
@@ -266,14 +272,16 @@ const GroupMessage = () => {
 
             {/* handle send */}
             <button
-                // onClick={handleSend}
-                // disabled={fileLoading}
                 className={`rounded-full ${fileLoading ?"cursor-not-allowed": "cursor-pointer"}  bg-indigo-400 p-2 text-white shadow-md transition-colors hover:bg-indigo-600`}
             >
                 <Send size={14} />
             </button>
         </footer>
     </main>
+
+    <GroupViewModal  openGroupInfo={openGroupInfo} onClose={onClose}/>
+    <AddMembersModal isOpen={isOpen} onClose={onClose} />
+
     </>
     )
 }
