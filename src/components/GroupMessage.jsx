@@ -45,6 +45,7 @@ const GroupMessage = () => {
 
     function onClose (){
         setIsOpen(false);
+        setOpenGroupInfo(false);
     }
 
     let handleFileChange = ()=>{}

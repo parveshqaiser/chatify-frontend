@@ -42,14 +42,18 @@ const GroupViewModal = ({openGroupInfo, onClose}) => {
                         <h4 className="text-md font-bold text-gray-900 dark:text-white"> Group Name</h4>
                       
                         <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                            some desccription of the group
+                           Created on : 13/10/2026 by Risav
                         </p>
+                        <p>
+                            You, Ajay, Bijay, Sharma, Hari, Ravi. 
+                        </p>
+                        <p> Admin : Ramesh</p>
                     </div>
                 </aside>
 
                 {/* bio */}
                 <blockquote className="mb-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                   some desccription of the group
+                   Some desccription of the group
                 </blockquote>
 
 
