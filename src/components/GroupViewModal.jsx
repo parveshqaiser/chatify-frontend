@@ -13,9 +13,9 @@ let files = [
         { id: 8, name: "budget_2024.xlsx", type: "spreadsheet", size: "1.8 MB", date: "2024-01-05" },
     ];
 
-const GroupViewModal = ({openGroupInfo, onClose}) => {
+const GroupViewModal = ({isOpen ,onClose}) => {
   return (
-    <dialog id="" open={openGroupInfo} className="modal modal-bottom sm:modal-middle">
+    <dialog id="" open={isOpen} className="modal modal-bottom sm:modal-middle">
         <main className="modal-box max-w-2xl p-0 overflow-hidden bg-white dark:bg-gray-800">
             <header className="sticky top-0 z-10 flex items-center justify-between p-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                 <h3 className="text-md font-semibold text-gray-900 dark:text-white">Group Information</h3>
