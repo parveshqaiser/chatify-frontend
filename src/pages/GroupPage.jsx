@@ -1,28 +1,28 @@
-import { Crown, EditIcon, Form, HomeIcon, MessageCirclePlus, UserRoundPen } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { CircleX, Crown, HomeIcon, MessageCirclePlus, UserRoundPen } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CameraAvatarSVG, PlusIconSVG, SearchIconSVG } from '../utils/svg-icons.jsx'
 import { useCreateGroupMutation, useFetchGroupDetailsQuery, useGetAllUsersQuery, useGetUserDetailsQuery, useUpdateGroupMutation } from '../redux/api.js'
-import toast, { useToasterStore } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { LoadingMessage } from '../components/Spinner.jsx';
-import { GROUPS } from '../utils/constants.js';
+import { tryAcquire } from 'async-mutex'
 
- const GroupAvatar = ({ group }) =>
-        group.groupAvatar?.url ? (
-            <div className="avatar shrink-0">
-                <div className="w-12 sm:w-14 rounded-2xl">
-                    <img src={group?.groupAvatar?.url} alt={group?.groupName} />
-                </div>
+const GroupAvatar = ({ group }) =>
+    group.groupAvatar?.url ? (
+        <div className="avatar shrink-0">
+            <div className="w-12 sm:w-14 rounded-2xl">
+                <img src={group?.groupAvatar?.url} alt={group?.groupName} />
             </div>
-        ) : (
-            <div className="avatar avatar-placeholder shrink-0">
-                <div className="bg-violet-300 text-neutral-content w-12 sm:w-14 rounded-2xl">
-                    <span className="text-lg sm:text-xl">
-                        {group.groupName.charAt(0).toUpperCase()}
-                    </span>
-                </div>
+        </div>
+    ) : (
+        <div className="avatar avatar-placeholder shrink-0">
+            <div className="bg-violet-300 text-neutral-content w-12 sm:w-14 rounded-2xl">
+                <span className="text-lg sm:text-xl">
+                    {group.groupName.charAt(0).toUpperCase()}
+                </span>
             </div>
-        );
+        </div>
+    );
 
 const MemberStack = ({ members }) => {
     const visible = members.slice(0, 4);
@@ -54,16 +54,17 @@ const MemberStack = ({ members }) => {
         );
 };
 
-const GroupChatPage = () => {
-
-    const dialogRef = useRef(null);
-    const fileInputRef = useRef(null);
+const GroupPage = () => {
 
     let {data: { data: allUsers } = [], isLoading: isAllUsersLoading, isError, error} = useGetAllUsersQuery();  // all users
     let {data : {data : currentUser} = {}, isLoading : currentUserLoading} = useGetUserDetailsQuery(); // current user
     let {data : {data : groupDetails}= [], isLoading : isGroupLoading , refetch} = useFetchGroupDetailsQuery();
+
     const [createGroup] = useCreateGroupMutation();
     const [updateGroup] = useUpdateGroupMutation();
+
+    const openAddEditModalRef = useRef(null);  // ref used for opening add/edit group modals
+    const fileInputRef = useRef(null);
 
     const [groupName, setGroupName] = useState('');  // grorp name
     const [description,setDescription] = useState("");
@@ -71,18 +72,19 @@ const GroupChatPage = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [selectedGroupId, setSelectedGroupId] = useState(null); // for storing group id while edting
 
-    const [searchUsername, setSearchUsername] = useState("");  // search people by usernme
+    const [searchUsername, setSearchUsername] = useState("");  // search people by username
     const [selectedUsers, setSelectedUsers] = useState([]); 
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);  // add members dropdown
 
     const [isBtnLoading, setIsBtnLoading] = useState(false);
-    const [search, setSearch] = useState(""); // serach by group name
+    const [searchGroupName, setSearchGroupName] = useState(""); // serach by group name
     const [isEdit,setIsEdit] = useState(false); // for editing / adding group 
+    const [openDeleteGroupModal , setOpenDeleteGroupModal] = useState(false);
 
-    const openModal = () => dialogRef.current?.showModal();
+    const openModal = () => openAddEditModalRef.current?.showModal();
 
     const closeModal = () => {
-        dialogRef.current?.close();
+        openAddEditModalRef.current?.close();
         setIsEdit(false);
         setGroupName("");
         setGroupImage("");
@@ -90,10 +92,22 @@ const GroupChatPage = () => {
         setSearchUsername("");
         setSelectedUsers([]);
         setSelectedFile(null);
+        setOpenDeleteGroupModal(false);
         if(fileInputRef.current){
             fileInputRef.current.value ="";
         }
     }
+
+// Close on Escape key
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+                closeModal();
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, []);
 
     const handleImageChange = (e) => {
         const file = e.target.files?.[0];
@@ -111,10 +125,10 @@ const GroupChatPage = () => {
     }, [searchUsername, selectedUsers]);
 
     const filteredGroups = useMemo(() => {
-        let q = search.trim().toLowerCase()
+        let q = searchGroupName.trim().toLowerCase()
         if (!q) return groupDetails;
         return groupDetails.filter((g) => g.groupName.toLowerCase().includes(q))
-    }, [search, groupDetails]);
+    }, [searchGroupName, groupDetails]);
 
     if(isAllUsersLoading){
         return(
@@ -209,6 +223,16 @@ const GroupChatPage = () => {
 			toast.error(error?.data?.message || "Failed to Update Group");
         }
     }
+
+    const handleDeleteGroup = async()=>{
+        try {
+            console.log("selected id ", selectedGroupId);
+        } catch (error) {
+            console.log(error);
+            setIsBtnLoading(false);
+			toast.error(error?.data?.message || "Failed to Delete Group");
+        }
+    }
     
     const handleEdit= (group)=>{
         setSelectedGroupId(group._id);
@@ -252,16 +276,16 @@ const GroupChatPage = () => {
                 <SearchIconSVG className="w-4.5 h-4.5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" />
                 <input
                     type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    value={searchGroupName}
+                    onChange={(e) => setSearchGroupName(e.target.value)}
                     placeholder="Search groups"
                     className="w-full pl-11 pr-10 py-3 rounded-2xl bg-base-100 border border-base-content/10 shadow-sm focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none text-sm transition"
                 />
-                {search && (
+                {searchGroupName && (
                     <button
                         type="button"
                         aria-label="Clear search"
-                        onClick={() => setSearch('')}
+                        onClick={() => setSearchGroupName('')}
                         className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-base-content/40 hover:bg-base-content/10 hover:text-base-content transition-colors"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -293,7 +317,7 @@ const GroupChatPage = () => {
                             <MemberStack members={group?.members} />
                         </div>
 
-                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <div className="flex items-center gap-1 w-full sm:w-auto">
                             <Link
                                 to={`/group/${group._id}`}
                                 className="flex-1 sm:flex-none text-center sm:text-left shrink-0 px-4 py-2 rounded-xl text-sm font-medium text-primary bg-primary/10 hover:bg-primary hover:text-primary-content transition-colors"
@@ -312,6 +336,13 @@ const GroupChatPage = () => {
                             >
                                 <UserRoundPen size={14} className="text-warning" />
                             </button>}
+                            {<button
+                                onClick={()=>{ handleEdit(group), setOpenDeleteGroupModal(true)}}
+                                className="rounded-xl p-2 cursor-pointer"
+                                title="Delete"
+                            >
+                                <CircleX size={14} className='text-red-600' />
+                            </button>}
                         </div>
                     </li>
                 ))}
@@ -326,21 +357,21 @@ const GroupChatPage = () => {
                     </div>
                     <p className="font-medium">No groups found</p>
                     <p className="text-sm text-base-content/50 mt-0.5">
-                        Nothing matches “<strong>{search}</strong>”. Try a different name.
+                        Nothing matches “<strong>{searchGroupName}</strong>”. Try a different name.
                     </p>
                 </div>
             )}
         </main>
 
-        {/* Modal  */}
-        <dialog ref={dialogRef} className="modal">
+        {/* create/update group Modal  */}
+        <dialog ref={openAddEditModalRef} className="modal">
             <main className="modal-box max-w-md p-0 overflow-visible rounded-3xl border border-base-content/10 bg-base-100 shadow-2xl">
                
                 <header className="px-5 py-3 mb-2">
-                    <h3 className="text-xl font-semibold tracking-tight">New group</h3>
-                    <p className="text-sm text-base-content/50 mt-0.5">
+                    <h3 className="text-xl font-semibold tracking-tight">{isEdit ? "Edit Group" : "New group"}</h3>
+                    {!isEdit && <p className="text-sm text-base-content/50 mt-0.5">
                         Give it a name and add who you want to talk to.
-                    </p>
+                    </p>}
                 </header>
 
                 <section className="px-7 pb-5">
@@ -478,6 +509,38 @@ const GroupChatPage = () => {
                 </footer>
             </main>
 
+            {/* makes backgrund of this page blur when i open some modal */}
+            <form method='dialog' className="modal-backdrop bg-black/40 backdrop-blur-sm">
+                <button>close</button>
+            </form>
+        </dialog>
+
+        {/* delete gorup modal */}
+        <dialog className="modal" open={openDeleteGroupModal}>
+            <main className='modal-box max-w-md'>
+                <header className="text-lg font-semibold mb-2">
+                    Delete this group ?
+                </header>
+                <p className="text-sm text-white mb-6">
+                    Are you sure you want to delete the group ? Deleting will clear all Chats & Remove Members.
+                </p>
+
+                <footer className="flex justify-end gap-2">
+                    <button
+                        onClick={closeModal}
+                        className="px-3 py-1 text-sm rounded border border-gray-300 cursor-pointer"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={handleDeleteGroup}
+                        className="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+                    >
+                        Delete 
+                    </button>
+                </footer>
+            </main>
+
             <form method='dialog' className="modal-backdrop bg-black/40 backdrop-blur-sm">
                 <button>close</button>
             </form>
@@ -486,4 +549,4 @@ const GroupChatPage = () => {
     )
 }
 
-export default GroupChatPage;
+export default GroupPage;
