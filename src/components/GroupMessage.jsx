@@ -28,6 +28,9 @@ const GroupMessage = () => {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false); // emoji picker visibility
     const emojiPickerRef = useRef(null);
 
+    const [activeModal, setActiveModal] = useState(null); 
+    // values --> 'addMember' | 'removeMember' | 'groupInfo' | 'clearChat' | 'block' | 'exitGroup'
+
 
      // close menu/search on Escape
     useEffect(() => {
@@ -41,10 +44,7 @@ const GroupMessage = () => {
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, []);
-
-    const [activeModal, setActiveModal] = useState(null); 
-    // values --> 'addMember' | 'removeMember' | 'groupInfo' | 'clearChat' | 'block' | 'exitGroup'
-
+    
     const closeModal = () => setActiveModal(null);
 
     let handleFileChange = ()=>{}
