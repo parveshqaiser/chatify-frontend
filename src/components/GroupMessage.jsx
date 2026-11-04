@@ -6,6 +6,7 @@ import EmojiPicker from 'emoji-picker-react';
 import bgImage from "../assets/grp-chat-bg.jpg";
 import AddMembersModal from './AddMembersModal.jsx';
 import GroupViewModal from './GroupViewModal.jsx';
+import ExitGroupModal from './ExitGroupModal.jsx';
 
 const GroupMessage = () => {
 
@@ -27,8 +28,6 @@ const GroupMessage = () => {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false); // emoji picker visibility
     const emojiPickerRef = useRef(null);
 
-    const [isOpen, setIsOpen] = useState(false);
-    const [openGroupInfo, setOpenGroupInfo] = useState(false);
 
      // close menu/search on Escape
     useEffect(() => {
@@ -43,10 +42,10 @@ const GroupMessage = () => {
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, []);
 
-    function onClose (){
-        setIsOpen(false);
-        setOpenGroupInfo(false);
-    }
+    const [activeModal, setActiveModal] = useState(null); 
+    // values --> 'addMember' | 'removeMember' | 'groupInfo' | 'clearChat' | 'block' | 'exitGroup'
+
+    const closeModal = () => setActiveModal(null);
 
     let handleFileChange = ()=>{}
 
@@ -87,35 +86,19 @@ const GroupMessage = () => {
                     {moreInfo && (
                     <ul className="menu absolute right-0 top-full mt-1 z-50 w-26 rounded-box bg-base-100 shadow-xl">
                         <li>
-                            <button  onClick={()=>setOpenGroupInfo (true)} className="text-[12px]">Group Info</button>
-                        </li>
-                            <li>
-                            <button onClick={()=> setIsOpen(true)} className="text-[12px]">
-                                Add
-                            </button>
-                        </li>
-                            <li>
-                            <button className="text-[12px]">
-                                Remove
-                            </button>
-                        </li>
-                        
-                        <li>
-                            <button 
-                                className="text-[12px]"
-                            >
-                                Clear Chat
-                            </button>
-                        </li>                            
-                        <li>
-                            <button className="text-[12px]">
-                                Block
-                            </button>
+                        <button onClick={() => setActiveModal('groupInfo')} className="text-[12px]">Group Info</button>
                         </li>
                         <li>
-                            <button className="text-[12px]">
-                                Exit Group
-                            </button>
+                        <button onClick={() => setActiveModal('addMember')} className="text-[12px]">Add</button>
+                        </li>
+                        <li>
+                        <button onClick={() => setActiveModal('removeMember')} className="text-[12px]">Remove</button>
+                        </li>
+                        <li>
+                        <button onClick={() => setActiveModal('clearChat')} className="text-[12px]">Clear Chat</button>
+                        </li>                       
+                        <li>
+                        <button onClick={() => setActiveModal('exitGroup')} className="text-[12px]">Exit Group</button>
                         </li>
                     </ul>
                     )}
@@ -123,6 +106,7 @@ const GroupMessage = () => {
             </div>
         </header>
 
+        {/* chat */}
         <section className='chat-scroll flex-1 min-h-0 overflow-y-auto p-2 space-y-1'>
             <div className="chat chat-start">
                 <div className="chat-image avatar">
@@ -280,8 +264,9 @@ const GroupMessage = () => {
         </footer>
     </main>
 
-    <GroupViewModal  openGroupInfo={openGroupInfo} onClose={onClose}/>
-    <AddMembersModal isOpen={isOpen} onClose={onClose} />
+    <GroupViewModal isOpen={activeModal === 'groupInfo'}  onClose={closeModal}/>
+    <AddMembersModal isOpen={activeModal === 'addMember'}  onClose={closeModal} />
+    <ExitGroupModal  isOpen={activeModal === 'exitGroup'}  onClose={closeModal}/>
 
     </>
     )
