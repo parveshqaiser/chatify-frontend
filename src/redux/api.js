@@ -230,6 +230,13 @@ export const api = createApi({
                 url: `/v1/group/${id}/edit`,
                 body: data
             }),
+        }),
+
+        deleteGroup : builder.mutation({
+            query: (id) => ({
+                method: "DELETE",
+                url: `/v1/group/${id}`,
+            }),
         })
 
     })
@@ -253,7 +260,8 @@ export const {
     useRemoveSocialLinksMutation,
     useCreateGroupMutation,
     useFetchGroupDetailsQuery,
-    useUpdateGroupMutation
+    useUpdateGroupMutation,
+    useDeleteGroupMutation
 } = api;
 
 
