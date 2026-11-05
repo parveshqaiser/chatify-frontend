@@ -1,11 +1,12 @@
-import { CircleX, Crown, HomeIcon, MessageCirclePlus, UserRoundPen } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { CameraAvatarSVG, PlusIconSVG, SearchIconSVG } from '../utils/svg-icons.jsx'
-import { useCreateGroupMutation, useFetchGroupDetailsQuery, useGetAllUsersQuery, useGetUserDetailsQuery, useUpdateGroupMutation } from '../redux/api.js'
-import toast from 'react-hot-toast'
+import { CircleX, Crown, HomeIcon, MessageCirclePlus, UserRoundPen } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { SearchIconSVG } from '../utils/svg-icons.jsx';
+import { useFetchGroupDetailsQuery, useGetAllUsersQuery, useGetUserDetailsQuery } from '../redux/api.js';
 import { LoadingMessage } from '../components/Spinner.jsx';
-import { tryAcquire } from 'async-mutex'
+import CreateEditGroupModal from '../components/CreateEditGroupModal.jsx';
+import DeleteGroupModal from '../components/DeleteGroupModal.jsx';
+import toast from 'react-hot-toast';
 
 const GroupAvatar = ({ group }) =>
     group.groupAvatar?.url ? (
@@ -33,7 +34,6 @@ const MemberStack = ({ members }) => {
             <div className="avatar-group -space-x-3 shrink-0">
                 {visible.map((m) => (
                     <div key={m._id} className="avatar" title={m?.userId?.name}>
-                        
                         <div className="w-10 sm:w-10 rounded-2xl">
                             <img src={m?.userId?.avatar?.url} alt={m?.userId?.name} />
                         </div>
@@ -47,506 +47,202 @@ const MemberStack = ({ members }) => {
                     </div>
                 )}
             </div>
-            <span className="text-xs text-base-content/50 truncate"> {/* truncate to remove this span for smaller device*/}
+            <span className="text-xs text-base-content/50 truncate">
                 {members?.length} {members?.length === 1 ? 'member' : 'members'}
             </span>
         </div>
-        );
+    );
 };
 
 const GroupPage = () => {
+    const { data: { data: allUsers } = [], isLoading: isAllUsersLoading } = useGetAllUsersQuery();
+    const { data: { data: currentUser } = {} } = useGetUserDetailsQuery();
+    const { data: { data: groupDetails } = [], isLoading: isGroupLoading, refetch } = useFetchGroupDetailsQuery();
 
-    let {data: { data: allUsers } = [], isLoading: isAllUsersLoading, isError, error} = useGetAllUsersQuery();  // all users
-    let {data : {data : currentUser} = {}, isLoading : currentUserLoading} = useGetUserDetailsQuery(); // current user
-    let {data : {data : groupDetails}= [], isLoading : isGroupLoading , refetch} = useFetchGroupDetailsQuery();
-
-    const [createGroup] = useCreateGroupMutation();
-    const [updateGroup] = useUpdateGroupMutation();
-
-    const openAddEditModalRef = useRef(null);  // ref used for opening add/edit group modals
-    const fileInputRef = useRef(null);
-
-    const [groupName, setGroupName] = useState('');  // grorp name
-    const [description,setDescription] = useState("");
-    const [groupImage, setGroupImage] = useState(''); // group image for showing in UI
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [selectedGroupId, setSelectedGroupId] = useState(null); // for storing group id while edting
-
-    const [searchUsername, setSearchUsername] = useState("");  // search people by username
-    const [selectedUsers, setSelectedUsers] = useState([]); 
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);  // add members dropdown
-
-    const [isBtnLoading, setIsBtnLoading] = useState(false);
-    const [searchGroupName, setSearchGroupName] = useState(""); // serach by group name
-    const [isEdit,setIsEdit] = useState(false); // for editing / adding group 
-    const [openDeleteGroupModal , setOpenDeleteGroupModal] = useState(false);
-
-    const openModal = () => openAddEditModalRef.current?.showModal();
-
-    const closeModal = () => {
-        openAddEditModalRef.current?.close();
-        setIsEdit(false);
-        setGroupName("");
-        setGroupImage("");
-        setDescription("");
-        setSearchUsername("");
-        setSelectedUsers([]);
-        setSelectedFile(null);
-        setOpenDeleteGroupModal(false);
-        if(fileInputRef.current){
-            fileInputRef.current.value ="";
-        }
-    }
-
-// Close on Escape key
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.key === "Escape") {
-                closeModal();
-            }
-        };
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, []);
-
-    const handleImageChange = (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        setSelectedFile(file);
-        setGroupImage(URL.createObjectURL(file))
-    }
-
-    const filteredUsers = useMemo(() => {
-        if (!searchUsername.trim()) return []
-        const q = searchUsername.toLowerCase();
-        return allUsers.filter(
-            (u) => u.username.toLowerCase().includes(q) && !selectedUsers.some((s) => s._id === u._id)
-        )
-    }, [searchUsername, selectedUsers]);
+    const [searchGroupName, setSearchGroupName] = useState('');
+    const [groupModal, setGroupModal] = useState({ isOpen: false, group: null });
+    const [deleteModal, setDeleteModal] = useState({ isOpen: false, group: null });
 
     const filteredGroups = useMemo(() => {
-        let q = searchGroupName.trim().toLowerCase()
+        let q = searchGroupName.trim().toLowerCase();
         if (!q) return groupDetails;
-        return groupDetails.filter((g) => g.groupName.toLowerCase().includes(q))
+        return groupDetails.filter((g) => g.groupName.toLowerCase().includes(q));
     }, [searchGroupName, groupDetails]);
 
-    if(isAllUsersLoading){
-        return(
-            <LoadingMessage />
-        )
+    if (isAllUsersLoading || isGroupLoading) {
+        return <LoadingMessage />;
     }
 
-    if(isGroupLoading){
-        return(
-            <LoadingMessage />
-        )
-    }
+    const handleOpenCreate = () => {
+        setGroupModal({ isOpen: true, group: null });
+    };
 
-    const addUser = (user) => {
-        setSelectedUsers((prev) => [...prev, user]);
-        // setSelectedUsers([...selectedUsers , user])
-        setSearchUsername("");
-        setIsDropdownOpen(false)
-    }
+    const handleOpenEdit = (group) => {
+        setGroupModal({ isOpen: true, group : group });
+    };
 
-    const removeUser = (userId) => {
-        let del = selectedUsers.filter(user => user._id !== userId);
-        setSelectedUsers(del);
-    }
+    // const handle =(action, value)=>{
+    //     setGroupModal({ isOpen: true, group : action == "create" ? null : value});
+    // }
 
-    const handleCreateGroup = async()=>{
+    const handleOpenDelete = (group) => {
+        setDeleteModal({ isOpen: true, group });
+    };
+
+    const handleConfirmDelete = async (group) => {
         try {
-            let {_id: userId, username} = currentUser;
-
-            const selectedMembers = [{ userId, username },
-                ...selectedUsers.map(({ _id, username }) => ({
-                    userId: _id,
-                    username,
-                })),
-            ];
-
-            if(!groupName || groupName.trim()==""){
-                return toast.error("Group Name Required")
-            }
-
-            if(selectedMembers.length <=1){
-                return toast.error("Please Add Members");
-            }
-
-            let formData = new FormData();
-			formData.append("image",selectedFile);
-            formData.append("groupName",groupName);
-            formData.append("description",description|| "");
-            formData.append("members",JSON.stringify(selectedMembers));
-
-            setIsBtnLoading(true);
-            let res = await createGroup(formData).unwrap();
-            if(res.success){
-                toast.success(res.message);
-                setIsBtnLoading(false);
-                refetch();
-                closeModal();
-            }
+            console.log('Deleting group:', group?._id);
+        
+            toast.success(`Group "${group?.groupName}" deleted`);
+            setDeleteModal({ isOpen: false, group: null });
+            refetch();
         } catch (error) {
-            console.log(error);
-            setIsBtnLoading(false);
-			toast.error(error?.data?.message || "Failed to Create Group");
+            console.error(error);
+            toast.error(error?.data?.message || 'Failed to Delete Group');
         }
-    }
-
-    const handleUpdateGroup = async()=>{
-        try {
-            
-            if(!groupName || groupName.trim()==""){
-                return toast.error("Group Name Required")
-            }
-            let updateFormData = new FormData();
-
-            updateFormData.append("image",selectedFile);
-            updateFormData.append("groupName",groupName);
-            updateFormData.append("description",description|| "");
-
-            let res = await updateGroup({
-                id : selectedGroupId,
-                data : updateFormData}
-            ).unwrap();
-
-            if(res.success){
-                toast.success(res.message);
-                setIsBtnLoading(false);
-                refetch();
-                closeModal();
-            }
-        } catch (error) {
-            console.log(error);
-            setIsBtnLoading(false);
-			toast.error(error?.data?.message || "Failed to Update Group");
-        }
-    }
-
-    const handleDeleteGroup = async()=>{
-        try {
-            console.log("selected id ", selectedGroupId);
-        } catch (error) {
-            console.log(error);
-            setIsBtnLoading(false);
-			toast.error(error?.data?.message || "Failed to Delete Group");
-        }
-    }
-    
-    const handleEdit= (group)=>{
-        setSelectedGroupId(group._id);
-        setIsEdit(true);
-        setGroupName(group.groupName);
-        setDescription(group.description);
-        setGroupImage(group.groupAvatar.url);
-   }
+    };
 
     return (
-    <main className='min-h-screen bg-base-200 p-2 md:p-6'>
-        <header className="flex flex-col gap-6 lg:flex-row lg:justify-between lg:items-center">
-            <div>
-                <h1 className="text-xl font-bold">Create Group Chat</h1>
-                <button className="btn btn-success btn-sm mt-2" onClick={openModal}>
-                    <MessageCirclePlus size={16} /> New Group
-                </button>
-            </div> 
-            <div>
-                <Link to={"/home"} className="btn btn-error btn-outline w-full lg:w-auto">
-                    <HomeIcon size={16} />
-                    Home
-                </Link>
-            </div>				
-        </header>
-
-        {/* group layout  */}
-        <main className="max-w-4xl mx-auto mt-10 px-4 sm:px-6">
-
-            <header className="flex items-end justify-between mb-6">
+        <main className="min-h-screen bg-base-200 p-2 md:p-6">
+            <header className="flex flex-col gap-6 lg:flex-row lg:justify-between lg:items-center">
                 <div>
-                    <h1 className="text-lg font-semibold tracking-tight">Your groups</h1>
-                    <p className="text-sm text-base-content/50 mt-0.5">
-                        {groupDetails?.length} {groupDetails?.length === 1 ? 'group' : 'groups'}
-                    </p>
+                    <h1 className="text-xl font-bold">Create Group Chat</h1>
+                    <button className="btn btn-success btn-sm mt-2" onClick={handleOpenCreate}>
+                        <MessageCirclePlus size={16} /> New Group
+                    </button>
+                </div>
+                <div>
+                    <Link to="/home" className="btn btn-error btn-outline w-full lg:w-auto">
+                        <HomeIcon size={16} />
+                        Home
+                    </Link>
                 </div>
             </header>
 
-            {/* search group */}
-            <nav className="relative mb-5">
-                <SearchIconSVG className="w-4.5 h-4.5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" />
-                <input
-                    type="text"
-                    value={searchGroupName}
-                    onChange={(e) => setSearchGroupName(e.target.value)}
-                    placeholder="Search groups"
-                    className="w-full pl-11 pr-10 py-3 rounded-2xl bg-base-100 border border-base-content/10 shadow-sm focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none text-sm transition"
-                />
-                {searchGroupName && (
-                    <button
-                        type="button"
-                        aria-label="Clear search"
-                        onClick={() => setSearchGroupName('')}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-base-content/40 hover:bg-base-content/10 hover:text-base-content transition-colors"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                )}
-            </nav>
-
-            {filteredGroups?.length > 0 ? (
-                <ul className="space-y-3">
-                    {filteredGroups?.map((group) => (
-                    <li
-                        key={group._id}
-                        className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl bg-base-100 border border-base-content/5 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200"
-                    >
-                        <GroupAvatar group={group} />
-
-                        <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold truncate flex items-center gap-1">
-                                <span className="truncate">{group.groupName}</span>
-                                {group.createdBy == currentUser._id && (
-                                    <Crown size={14} className="shrink-0 text-warning" />
-                                )}
-                            </h3>
-                            <p className="text-sm text-base-content/50 truncate mb-1.5">
-                                {group.description || 'No description'}
-                            </p>
-                            <MemberStack members={group?.members} />
-                        </div>
-
-                        <div className="flex items-center gap-1 w-full sm:w-auto">
-                            <Link
-                                to={`/group/${group._id}`}
-                                className="flex-1 sm:flex-none text-center sm:text-left shrink-0 px-4 py-2 rounded-xl text-sm font-medium text-primary bg-primary/10 hover:bg-primary hover:text-primary-content transition-colors"
-                            >
-                                Start Chat
-                            </Link>
-
-                            {group.createdBy == currentUser._id && 
-                            <button
-                                onClick={()=> {                                  
-                                    handleEdit(group), 
-                                    openModal()
-                                }}
-                                className="rounded-xl p-2 cursor-pointer"
-                                title="Edit"
-                            >
-                                <UserRoundPen size={14} className="text-warning" />
-                            </button>}
-                            {<button
-                                onClick={()=>{ handleEdit(group), setOpenDeleteGroupModal(true)}}
-                                className="rounded-xl p-2 cursor-pointer"
-                                title="Delete"
-                            >
-                                <CircleX size={14} className='text-red-600' />
-                            </button>}
-                        </div>
-                    </li>
-                ))}
-                </ul>
-            ) : (
-                <div className="flex flex-col items-center text-center py-4 rounded-2xl bg-base-100 border border-dashed border-base-content/15">
-                    <div className="w-14 h-14 rounded-full bg-base-200 flex items-center justify-center mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                            <circle cx="11" cy="11" r="7" />
-                            <path strokeLinecap="round" d="M21 21l-4.3-4.3" />
-                        </svg>
+            {/* Group layout */}
+            <section className="max-w-4xl mx-auto mt-10 px-4 sm:px-6">
+                <header className="flex items-end justify-between mb-6">
+                    <div>
+                        <h2 className="text-lg font-semibold tracking-tight">Your groups</h2>
+                        <p className="text-sm text-base-content/50 mt-0.5">
+                            {groupDetails?.length} {groupDetails?.length === 1 ? 'group' : 'groups'}
+                        </p>
                     </div>
-                    <p className="font-medium">No groups found</p>
-                    <p className="text-sm text-base-content/50 mt-0.5">
-                        Nothing matches “<strong>{searchGroupName}</strong>”. Try a different name.
-                    </p>
-                </div>
-            )}
-        </main>
-
-        {/* create/update group Modal  */}
-        <dialog ref={openAddEditModalRef} className="modal">
-            <main className="modal-box max-w-md p-0 overflow-visible rounded-3xl border border-base-content/10 bg-base-100 shadow-2xl">
-               
-                <header className="px-5 py-3 mb-2">
-                    <h3 className="text-xl font-semibold tracking-tight">{isEdit ? "Edit Group" : "New group"}</h3>
-                    {!isEdit && <p className="text-sm text-base-content/50 mt-0.5">
-                        Give it a name and add who you want to talk to.
-                    </p>}
                 </header>
 
-                <section className="px-7 pb-5">
-                    <article className="flex justify-center my-2">
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="group relative"
+                {/* Search groups */}
+                <nav className="relative mb-5">
+                    <SearchIconSVG className="w-4.5 h-4.5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" />
+                    <input
+                        type="text"
+                        value={searchGroupName}
+                        onChange={(e) => setSearchGroupName(e.target.value)}
+                        placeholder="Search groups"
+                        className="w-full pl-11 pr-10 py-3 rounded-2xl bg-base-100 border border-base-content/10 shadow-sm focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none text-sm transition"
+                    />
+                    {searchGroupName && (
+                        <button                           
+                            aria-label="Clear search"
+                            onClick={() => setSearchGroupName('')}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-base-content/40 hover:bg-base-content/10 hover:text-base-content transition-colors cursor-pointer"
                         >
-                            <div
-                                className="w-22 h-22  rounded-full flex items-center justify-center overflow-hidden transition-all duration-200 ring-2 ring-blue-600 hover:ring-purple-500"
-                                style={!groupImage ? { background: 'linear-gradient(135deg, rgba(124,92,255,0.12), rgba(45,212,191,0.12))'} : undefined}
-                            >
-                                {groupImage ? (
-                                    <img src={groupImage} alt="Group" className="w-full h-full object-cover" />
-                                ) : (
-                                   <PlusIconSVG   className="w-7 h-7 text-base-content/30 group-hover:text-primary transition-colors" />
-                                )}
-                            </div>
-                            <CameraAvatarSVG className='absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-primary-content flex items-center justify-center shadow-md' />
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                         </button>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleImageChange}
-                        />
-                    </article>
+                    )}
+                </nav>
 
-                    <input
-                        type="text"
-                        placeholder="Group name"
-                        value={groupName}
-                        onChange={(e) => {
-                            let val = e.target.value;
-                            setGroupName(val.charAt(0).toUpperCase() + val.slice(1))
-                        }}
-                        className="w-full text-center font-medium bg-transparent border-b-2 border-base-content/10 focus:border-primary outline-none py-2 placeholder:text-base-content/30 placeholder:font-normal transition-colors"
-                    />
+                {filteredGroups?.length > 0 ? (
+                    <ul className="space-y-3">
+                        {filteredGroups.map((group) => (
+                            <li
+                                key={group._id}
+                                className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl bg-base-100 border border-base-content/5 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200"
+                            >
+                                <GroupAvatar group={group} />
 
-                    <input
-                        type="text"
-                        placeholder="Brief Description.."
-                        value={description}
-                        onChange={(e) => {
-                            let val = e.target.value;
-                            setDescription(val.charAt(0).toUpperCase() + val.slice(1))
-                        }}
-                        className="w-full text-sm mt-2 placeholder:font-light text-center transition-colors border-b-2 border-base-content/10 focus:border-warning outline-none py-2"
-                    />
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="font-semibold truncate flex items-center gap-1">
+                                        <span className="truncate">{group.groupName}</span>
+                                        {group.createdBy === currentUser?._id && (
+                                            <Crown size={14} className="shrink-0 text-warning" />
+                                        )}
+                                    </h3>
+                                    <p className="text-sm text-base-content/50 truncate mb-1.5">
+                                        {group.description || 'No description'}
+                                    </p>
+                                    <MemberStack members={group?.members || []} />
+                                </div>
 
-                    {!isEdit && (<div className="relative mt-6">
-                        <label className="text-xs font-medium uppercase tracking-wide text-base-content/40">
-                            Add Members
-                        </label>
-
-                        {selectedUsers.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-2.5 mb-2.5">
-                                {selectedUsers.map((user) => (
-                                    <span
-                                        key={user?._id}
-                                        className="inline-flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-full bg-base-200 border border-base-content/5"
+                                <div className="flex items-center gap-1 w-full sm:w-auto">
+                                    <Link
+                                        to={`/group/${group._id}`}
+                                        className="flex-1 sm:flex-none text-center sm:text-left shrink-0 px-4 py-2 rounded-xl text-sm font-medium text-primary bg-primary/10 hover:bg-primary hover:text-primary-content transition-colors"
                                     >
-                                        <img src={user?.avatar?.url} className="w-6 h-6 rounded-full"  />
-                                        <span className="text-sm font-medium">{user.username}</span>
+                                        Start Chat
+                                    </Link>
+
+                                    {group.createdBy === currentUser?._id && (
                                         <button                                           
-                                            aria-label={`Remove ${user.username}`}
-                                            onClick={() => removeUser(user?._id)}
-                                            className="w-4 h-4 rounded-full flex items-center justify-center text-base-content/40 hover:text-base-content hover:bg-base-content/10 transition-colors"
+                                            onClick={() => handleOpenEdit(group)}
+                                            className="rounded-xl p-2 cursor-pointer hover:bg-base-200 transition-colors"
+                                            title="Edit"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
+                                            <UserRoundPen size={14} className="text-warning" />
                                         </button>
-                                    </span>
-                                ))}
-                            </div>
-                        )}
+                                    )}
 
-                        <div className="relative mt-2">
-                            <SearchIconSVG className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-base-content/30" />
-                            <input
-                                type="text"
-                                placeholder="Search by username"
-                                value={searchUsername}
-                                onChange={(e) => {
-                                    setSearchUsername(e.target.value)
-                                    setIsDropdownOpen(true)
-                                }}
-                                onFocus={() => setIsDropdownOpen(true)}
-                                className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-base-200 border border-transparent focus:border-primary/40 focus:bg-base-100 outline-none text-sm transition-colors"
-                            />
+                                    <button                                       
+                                        onClick={() => handleOpenDelete(group)}
+                                        className="rounded-xl p-2 cursor-pointer hover:bg-base-200 transition-colors"
+                                        title="Delete"
+                                    >
+                                        <CircleX size={14} className="text-red-600" />
+                                    </button>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <div className="flex flex-col items-center text-center py-8 rounded-2xl bg-base-100 border border-dashed border-base-content/15">
+                        <div className="w-14 h-14 rounded-full bg-base-200 flex items-center justify-center mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                <circle cx="11" cy="11" r="7" />
+                                <path strokeLinecap="round" d="M21 21l-4.3-4.3" />
+                            </svg>
                         </div>
+                        <p className="font-medium">No groups found</p>
+                        <p className="text-sm text-base-content/50 mt-0.5">
+                            {searchGroupName ? (
+                                <>Nothing matches &ldquo;<strong>{searchGroupName}</strong>&rdquo;. Try a different name.</>
+                            ) : (
+                                <>You don&apos;t have any groups yet. Click &ldquo;New Group&rdquo; to create one.</>
+                            )}
+                        </p>
+                    </div>
+                )}
+            </section>
 
-                        {isDropdownOpen && searchUsername && (
-                            <ul className="absolute z-20 mt-1.5 w-full max-h-48 overflow-y-auto rounded-xl border border-base-content/10 bg-base-100 shadow-xl py-1.5">
-                                {filteredUsers.length > 0 ? (
-                                    filteredUsers.map((user) => (
-                                        // const initials = user.name.slice(0, 2).toUpperCase();
-                                        <li key={user._id}>
-                                            <button                                            
-                                                onClick={() => addUser(user)}
-                                                className="w-full flex items-center gap-2.5 px-3.5 py-2 hover:bg-base-200 transition-colors text-left"
-                                            >
-                                                <img src={user?.avatar?.url} className="w-6 h-6 rounded-full"  />
-                                                <span className="text-sm font-medium">{user.username}</span>
-                                            </button>
-                                        </li>
-                                    ))
-                                ) : (
-                                    <li className="px-3.5 py-2 text-sm text-base-content/40">No users found</li>
-                                )}
-                            </ul>
-                        )}
-                    </div>)}
-                </section>
+            {/* Create / Edit Group Modal */}
+            <CreateEditGroupModal
+                isOpen={groupModal.isOpen}
+                group={groupModal.group}
+                onClose={() => setGroupModal({ isOpen: false, group: null })}
+                allUsers={allUsers}
+                currentUser={currentUser}
+                onSuccess={refetch}
+            />
 
-                <footer className="flex gap-2 px-3 py-3 border-t border-base-content/10 bg-base-200/40 rounded-b-3xl">
-                    <button className="btn btn-ghost flex-1 rounded-xl" onClick={closeModal}>
-                        Cancel
-                    </button>
-                    {!isEdit && <button 
-                        disabled={isBtnLoading}
-                        onClick={handleCreateGroup} 
-                        className='btn btn-success btn-outline'
-                    >
-                        {isBtnLoading ? "⏳ Saving...": "Create"}
-                    </button>}
-                    {isEdit && <button  
-                        disabled={isBtnLoading} 
-                        onClick={handleUpdateGroup} 
-                        className='btn btn-warning btn-outline'>
-                            Update
-                        </button>}
-                </footer>
-            </main>
-
-            {/* makes backgrund of this page blur when i open some modal */}
-            <form method='dialog' className="modal-backdrop bg-black/40 backdrop-blur-sm">
-                <button>close</button>
-            </form>
-        </dialog>
-
-        {/* delete gorup modal */}
-        <dialog className="modal" open={openDeleteGroupModal}>
-            <main className='modal-box max-w-md'>
-                <header className="text-lg font-semibold mb-2">
-                    Delete this group ?
-                </header>
-                <p className="text-sm text-white mb-6">
-                    Are you sure you want to delete the group ? Deleting will clear all Chats & Remove Members.
-                </p>
-
-                <footer className="flex justify-end gap-2">
-                    <button
-                        onClick={closeModal}
-                        className="px-3 py-1 text-sm rounded border border-gray-300 cursor-pointer"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleDeleteGroup}
-                        className="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700 cursor-pointer"
-                    >
-                        Delete 
-                    </button>
-                </footer>
-            </main>
-
-            <form method='dialog' className="modal-backdrop bg-black/40 backdrop-blur-sm">
-                <button>close</button>
-            </form>
-        </dialog>
-    </main>
-    )
-}
+            {/* Delete Group Modal */}
+            <DeleteGroupModal
+                isOpen={deleteModal.isOpen}
+                group={deleteModal.group}
+                onClose={() => setDeleteModal({ isOpen: false, group: null })}
+                onConfirm={handleConfirmDelete}
+            />
+        </main>
+    );
+};
 
 export default GroupPage;
