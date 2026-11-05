@@ -11,7 +11,7 @@ const ExitGroupModal = ({ isOpen, onClose, onConfirm }) => {
     >
         <main className="modal-box max-w-md">
             <header className="text-lg font-semibold mb-2">
-                Leave this group?
+                Leave "Meme Factory" ?
             </header>
 
             <p className="text-sm text-white mb-6">
