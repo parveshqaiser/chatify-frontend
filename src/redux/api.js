@@ -210,8 +210,7 @@ export const api = createApi({
                 [{ type: 'Messages', id: targetUserId }, { type: 'Conversation' }],
         }),
 
-        // group chats
-
+        // group page
         createGroup : builder.mutation({
             query : (data)=>({
                 method : "POST",
