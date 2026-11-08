@@ -72,6 +72,7 @@ const CreateEditGroupModal = ({
             URL.revokeObjectURL(groupImage);
         }
         onClose();
+        setIsBtnLoading(false);
     };
 
     const handleImageChange = (e) => {
@@ -109,18 +110,16 @@ const CreateEditGroupModal = ({
 
     const handleCreateGroup = async () => {
         try {
+
             if (!groupName || groupName.trim() === '') {
                 return toast.error('Group Name Required');
             }
 
-            const { _id: userId, username } = currentUser || {};
-            const selectedMembers = [
-                { userId, username },
-                ...selectedUsers.map(({ _id, username: uName }) => ({
-                    userId: _id,
-                    username: uName,
-                })),
-            ];
+            let { _id } = currentUser || {};
+
+            // let selectedMembers  =  [{_id}, ...selectedUsers.map(val => val._id)];
+            let selectedMembers  =  selectedUsers.map(val => val._id)
+            selectedMembers.push(_id);
 
             if (selectedMembers.length <= 1) {
                 return toast.error('Please Add Members');
@@ -138,7 +137,7 @@ const CreateEditGroupModal = ({
             if (res.success) {
                 toast.success(res.message);
                 setIsBtnLoading(false);
-                onSuccess?.();
+                onSuccess?.(); // refetch
                 handleClose();
             }
         } catch (error) {
