@@ -160,54 +160,62 @@ const GroupPage = () => {
 
             {filteredGroups?.length > 0 ? (
                 <ul className="space-y-3">
-                    {filteredGroups.map((group) => (
-                        <li
-                            key={group._id}
-                            className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl bg-base-100 border border-base-content/5 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200"
-                        >
-                            <GroupAvatar group={group} />
+                    {filteredGroups.map((group) => {
 
-                            <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold truncate flex items-center gap-1">
-                                    <span className="truncate">{group.groupName}</span>
-                                    {group.createdBy === currentUser?._id && (
-                                        <Crown size={14} className="shrink-0 text-warning" />
-                                    )}
-                                </h3>
-                                <p className="text-sm text-base-content/50 truncate mb-1.5">
-                                    {group.description || 'No description'}
-                                </p>
-                                <MemberStack members={group?.members || []} />
-                            </div>
+                    let isAdmin = group.members?.some(
+                        (member) =>
+                            member.userId._id === currentUser?._id &&
+                            member.role === "admin"
+                    );                
+                    return (
+                    <li
+                        key={group._id}
+                        className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl bg-base-100 border border-base-content/5 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200"
+                    >
+                        <GroupAvatar group={group} />
 
-                            <div className="flex items-center gap-1 w-full sm:w-auto">
-                                <Link
-                                    to={`/group/${group._id}`}
-                                    className="flex-1 sm:flex-none text-center sm:text-left shrink-0 px-4 py-2 rounded-xl text-sm font-medium text-primary bg-primary/10 hover:bg-primary hover:text-primary-content transition-colors"
-                                >
-                                    Start Chat
-                                </Link>
-
+                        <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold truncate flex items-center gap-1">
+                                <span className="truncate">{group.groupName}</span>
                                 {group.createdBy === currentUser?._id && (
-                                    <button                                           
-                                        onClick={() => handleOpenEdit(group)}
-                                        className="rounded-xl p-2 cursor-pointer hover:bg-base-200 transition-colors"
-                                        title="Edit"
-                                    >
-                                        <UserRoundPen size={14} className="text-warning" />
-                                    </button>
+                                    <Crown size={14} className="shrink-0 text-warning" />
                                 )}
+                            </h3>
+                            <p className="text-sm text-base-content/50 truncate mb-1.5">
+                                {group.description || 'No description'}
+                            </p>
+                            <MemberStack members={group?.members || []} />
+                        </div>
 
-                                <button                                       
-                                    onClick={() => handleOpenDelete(group)}
+                        <div className="flex items-center gap-1 w-full sm:w-auto">
+                            <Link
+                                to={`/group/${group._id}`}
+                                className="flex-1 sm:flex-none text-center sm:text-left shrink-0 px-4 py-2 rounded-xl text-sm font-medium text-primary bg-primary/10 hover:bg-primary hover:text-primary-content transition-colors"
+                            >
+                                Start Chat
+                            </Link>
+
+                            {isAdmin && 
+                                <button                                           
+                                    onClick={() => handleOpenEdit(group)}
                                     className="rounded-xl p-2 cursor-pointer hover:bg-base-200 transition-colors"
-                                    title="Delete"
+                                    title="Edit"
                                 >
-                                    <CircleX size={14} className="text-red-600" />
+                                    <UserRoundPen size={14} className="text-warning" />
                                 </button>
-                            </div>
-                        </li>
-                    ))}
+                            }
+
+                            {isAdmin && <button                                       
+                                onClick={() => handleOpenDelete(group)}
+                                className="rounded-xl p-2 cursor-pointer hover:bg-base-200 transition-colors"
+                                title="Delete"
+                            >
+                                <CircleX size={14} className="text-red-600" />
+                            </button>}
+                        </div>
+                    </li>
+                    )                       
+                })}
                 </ul>
             ) : (
                 <div className="flex flex-col items-center text-center py-8 rounded-2xl bg-base-100 border border-dashed border-base-content/15">
