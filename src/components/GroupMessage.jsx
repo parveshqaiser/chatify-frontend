@@ -1,5 +1,5 @@
 
-import { FileText, Images, Info, Paperclip, Send, Smile } from 'lucide-react';
+import { FileText, HomeIcon, Images, Info, Paperclip, Send, Smile } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import EmojiPicker from 'emoji-picker-react';
@@ -7,6 +7,7 @@ import bgImage from "../assets/grp-chat-bg.jpg";
 import AddMembersModal from './AddMembersModal.jsx';
 import GroupViewModal from './GroupViewModal.jsx';
 import ExitGroupModal from './ExitGroupModal.jsx';
+import { Link } from 'react-router-dom';
 
 const GroupMessage = () => {
 
@@ -75,7 +76,13 @@ const GroupMessage = () => {
 
             <div className="flex items-center gap-1 shrink-0">
 
-                {!searchOpen &&<div className="relative shrink-0" ref={menuRef}>
+                {!searchOpen && <div className="relative shrink-0" ref={menuRef}>
+
+                    <button className='rounded-full p-2'>
+                        <Link to={"/home"}>
+                            <HomeIcon size={20}  className={"text-gray-300"}/>
+                        </Link>
+                    </button>
                     <button
                         onClick={() => setMoreInfo(!moreInfo)}
                         className="rounded-full p-2 transition hover:bg-white/10"
