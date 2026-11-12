@@ -8,11 +8,17 @@ import AddMembersModal from './AddMembersModal.jsx';
 import GroupViewModal from './GroupViewModal.jsx';
 import ExitGroupModal from './ExitGroupModal.jsx';
 import { Link } from 'react-router-dom';
+import { useFetchGroupMessageQuery, useGetUserDetailsQuery } from '../redux/api.js';
+import { LoadingMessage } from './Spinner.jsx';
+import dayjs from 'dayjs';
 
 const GroupMessage = () => {
 
     let {id} = useParams();
     let menuRef = useRef();
+
+    let { data: { data: grpMessage } = [], isLoading: isGroupLoading, refetch } = useFetchGroupMessageQuery(id);
+    let { data : {data : currentUser} = {}, isLoading : isCurUserLoading} = useGetUserDetailsQuery();
 
     const [searchOpen, setSearchOpen] = useState(false);
     const [moreInfo, setMoreInfo] = useState(false);  // more info button in header
@@ -50,7 +56,21 @@ const GroupMessage = () => {
 
     let handleFileChange = ()=>{}
 
+    if(isGroupLoading){
+        return <LoadingMessage />
+    }
 
+    let groupedMessages = grpMessage?.allMessages.reduce((groups, message) => {
+        let date = new Date(message.createdAt).toLocaleDateString("en-IN");
+
+        if (!groups[date]) {
+            groups[date] = [];
+        }
+
+        groups[date].push(message);
+        return groups;
+    }, {});
+    
     return (
     <>
     <main className="max-w-4xl w-full mx-auto h-[calc(100dvh-1rem)] flex flex-col backdrop-blur-sm my-2">
@@ -62,14 +82,15 @@ const GroupMessage = () => {
         <header className="shrink-0 flex items-center justify-between gap-2 bg-indigo-500 px-2 sm:px-3 py-3">
             <div className="flex items-center gap-3 min-w-0 flex-1">
                 <img
-                    src={"https://res.cloudinary.com/dp0v0zb7z/image/upload/v1790095083/avatars/nir7pxgahvzado2rff4s.jpg"}
+                    src={grpMessage?.group?.groupAvatar?.url}
                     alt={"Group Avatar"}
                     className="h-10 w-10 rounded-full object-cover shrink-0"
                 />
                 <div className="min-w-0">
-                    <h2 className="text-sm font-semibold text-white truncate">Group Name</h2>
-                    <p className={`text-xs`}>
-                        Sam, Ravi, Raj, Asif
+                    <h2 className="text-sm font-semibold text-white truncate">{grpMessage?.group?.groupName}</h2>
+                    <p className={`text-xs text-yellow-300`}>
+                        {/* group members empty  */}
+                        Created By : {grpMessage?.group?.createdBy?.name} on {dayjs(grpMessage?.group?.createdAt).format("DD MMM YYYY")} 
                     </p>
                 </div>
             </div>
@@ -116,38 +137,35 @@ const GroupMessage = () => {
             </div>
         </header>
 
-        {/* chat */}
-        <section className='chat-scroll flex-1 min-h-0 overflow-y-auto p-2 space-y-1'>
-            <div className="chat chat-start">
-                <div className="chat-image avatar">
-                    <div className="w-10 rounded-full">
-                        <img
-                            alt="Tailwind CSS chat bubble component"
-                            src="https://img.daisyui.com/images/profile/demo/kenobee@192.webp"
-                        />
+        <section className='flex-1 min-h-0 overflow-y-auto p-2 space-y-1'>
+            {Object.entries(groupedMessages).map(([date, msg])=>(
+                <nav key={date}>
+                     <div className="flex justify-center my-2">
+                        <span className="px-3 py-1 rounded-full bg-green-700 text-[10px]">
+                            {date}
+                        </span>
                     </div>
-                </div>
-                <div className="chat-header">
-                    <time className="text-xs opacity-50">12:45</time>
-                </div>
-                <p className="chat-bubble">You were the Chosen One!</p>
-                <div className="chat-footer opacity-50">Delivered</div>
-            </div>
-            <div className="chat chat-end">
-                <div className="chat-image avatar">
-                    <div className="w-10 rounded-full">
-                    <img
-                        alt="Tailwind CSS chat bubble component"
-                        src="https://img.daisyui.com/images/profile/demo/anakeen@192.webp"
-                    />
-                    </div>
-                </div>
-                <div className="chat-header">                
-                    <time className="text-xs opacity-50">12:46</time>
-                </div>
-                <p className="chat-bubble">I hate you!</p>
-                <div className="chat-footer opacity-50">Seen at 12:46</div>
-            </div>
+                    {msg?.map((m)=>{
+                        let isMine = m?.senderId?._id == currentUser?._id;
+                        let others = m?.senderId?.name;
+                      
+                        return(
+                        <aside key={m?._id} className={`px-2 py-0.5 rounded-lg text-sm chat ${isMine? "chat-end": "chat-start"}`}>
+                            <span className="chat-header text-[10px]">{dayjs(m?.createdAt).format("HH:mm")}</span>
+                            <div  
+                                className={`chat-bubble cursor-pointer select-none ${isMine? "chat-bubble-neutral": "chat-bubble-primary"}`}>
+                                {m.text}
+                            </div>
+                            <div className="chat-footer opacity-50 flex items-center gap-2">                                   
+                                <span className="text-[11px]">
+                                    { isMine ? "You" : others}
+                                </span>       
+                            </div>
+                        </aside>
+                        )
+                    })}
+                </nav>
+            ))}
         </section>
 
         <footer className="shrink-0 flex items-center gap-2 px-2 py-2 backdrop-blur-sm">

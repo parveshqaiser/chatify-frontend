@@ -244,7 +244,12 @@ export const api = createApi({
                 url: `/v1/group/${id}/add-members`,
                 body: data
             }),
-        })
+        }),
+
+        fetchGroupMessage : builder.query({
+            query: (id) => `/v1/group/${id}/message`,
+            providesTags: ['Group'],
+        }),
 
     })
 });
@@ -269,7 +274,8 @@ export const {
     useFetchAllGroupDetailsQuery,
     useUpdateGroupMutation,
     useDeleteGroupMutation,
-    useAddGroupMembersMutation
+    useAddGroupMembersMutation,
+    useFetchGroupMessageQuery
 } = api;
 
 
