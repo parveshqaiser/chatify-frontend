@@ -286,7 +286,7 @@ const ChatWindow = ({selectedUser,currentUser})=>{
 
             return groups;
         }, {})).map(([date, messages]) => ({date,messages})
-        );
+    );
 
     if (!selectedUser){
         return(
