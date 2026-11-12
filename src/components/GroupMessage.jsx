@@ -79,7 +79,7 @@ const GroupMessage = () => {
                 {!searchOpen && <div className="relative shrink-0" ref={menuRef}>
 
                     <button className='rounded-full p-2'>
-                        <Link to={"/home"}>
+                        <Link to={"/group"}>
                             <HomeIcon size={20}  className={"text-gray-300"}/>
                         </Link>
                     </button>
@@ -106,6 +106,9 @@ const GroupMessage = () => {
                         </li>                       
                         <li>
                         <button onClick={() => setActiveModal('exitGroup')} className="text-[12px]">Exit Group</button>
+                        </li>
+                        <li>
+                        <button onClick={() => setActiveModal('permission')} className="text-[12px]">Permission</button>
                         </li>
                     </ul>
                     )}
@@ -272,7 +275,7 @@ const GroupMessage = () => {
     </main>
 
     <GroupViewModal isOpen={activeModal === 'groupInfo'}  onClose={closeModal}/>
-    <AddMembersModal isOpen={activeModal === 'addMember'}  onClose={closeModal} />
+    <AddMembersModal id={id} isOpen={activeModal === 'addMember'}  onClose={closeModal} />
     <ExitGroupModal  isOpen={activeModal === 'exitGroup'}  onClose={closeModal}/>
 
     </>

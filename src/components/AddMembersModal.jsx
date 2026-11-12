@@ -1,26 +1,19 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Search, X, Check, UserPlus, Users } from "lucide-react";
+import { useAddGroupMembersMutation, useGetAllUsersQuery } from "../redux/api";
 
 const DEFAULT_MEMBERS = [
-    { id: "1", name: "Ajay", username: "@ajay", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop" },
-    { id: "2", name: "Sharma", username: "@sharma", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&h=100&fit=crop" },
-    { id: "3", name: "Neil", username: "@neil", avatar: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop" },
-    { id: "4", name: "Mukesh", username: "@mukesh", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop" },
-    { id: "5", name: "Suresh", username: "@suresh", avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100&h=100&fit=crop" },
-    { id: "6", name: "Priya", username: "@priya", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" },
-    { id: "7", name: "Ajay Kumar", username: "@ajay_k", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" },
+    { id: "6a95c2d1836b6ae17581fa64", name: "Ajay", username: "@ajay", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop" },
+    { id: "6a9986ab66566f380babde81", name: "Sharma", username: "@sharma", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&h=100&fit=crop" },
+    { id: "6a9986ab66566f380babde82", name: "Neil", username: "@neil", avatar: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop" },
+    { id: "6a9986ab66566f380babde83", name: "Mukesh", username: "@mukesh", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop" },
+    { id: "6a9986ab66566f380babde84", name: "Suresh", username: "@suresh", avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100&h=100&fit=crop" },
+    { id: "6a9986ab66566f380babde85", name: "Priya", username: "@priya", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" },
+    { id: "6a9986ab66566f380babde80", name: "Ajay Kumar", username: "@ajay_k", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" },
 ];
 
-/**
- * Props:
- * @param {boolean} isOpen - Whether modal is visible
- * @param {function} onClose - Callback when modal is closed
- * @param {function} onSave - Callback receiving array of selected members on save: onSave(selectedMembers)
- * @param {Array} members - Optional list of members to select from (defaults to demo list)
- * @param {Array} alreadyMemberIds - Optional list of member IDs already in group (shown as disabled)
- * @param {string} title - Modal heading (default: "Add Members")
- */
 const AddMembersModal = ({
+    id,
     isOpen = false,
     onClose,
     onSave,
@@ -28,22 +21,13 @@ const AddMembersModal = ({
     alreadyMemberIds = [],
     title = "Add Members",
 }) => {
+
+    let {data: { data: allUsers } = [], isLoading: isAllUsersLoading } = useGetAllUsersQuery();
+    let [addGroupMembers] = useAddGroupMembersMutation();
+
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedIds, setSelectedIds] = useState(new Set());
 
-    // Normalize member items to guarantee id and name
-    const normalizedMembers = useMemo(() => {
-        return members.map((m, index) => {
-            if (typeof m === "string") {
-                return { id: `m-${index}`, name: m, username: `@${m.toLowerCase().replace(/\s+/g, "")}` };
-            }
-            return {
-                ...m,
-                id: m.id || m._id || `m-${index}`,
-                name: m.name || m.username || "Unknown Member",
-            };
-        });
-    }, [members]);
 
     // Reset state on open/close
     useEffect(() => {
@@ -65,18 +49,19 @@ const AddMembersModal = ({
     }, [isOpen, onClose]);
 
     // Filtered member list based on search query
-    const filteredMembers = useMemo(() => {
-        const query = searchQuery.trim().toLowerCase();
-        if (!query) return normalizedMembers;
-        return normalizedMembers.filter(
+    let filteredMembers = useMemo(() => {
+        let query = searchQuery.trim().toLowerCase();
+        if (!query) return allUsers;
+        return allUsers.filter(
             (m) =>
                 m.name?.toLowerCase().includes(query) ||
                 m.username?.toLowerCase().includes(query)
         );
-    }, [normalizedMembers, searchQuery]);
+    }, [allUsers, searchQuery]);
 
     // Toggle individual member selection
-    const toggleMember = (id) => {
+    let toggleMember = (id) => {
+
         if (alreadyMemberIds.includes(id)) return;
         setSelectedIds((prev) => {
             const next = new Set(prev);
@@ -115,26 +100,35 @@ const AddMembersModal = ({
     };
 
     // Save action
-    const handleSave = () => {
-        const selectedList = normalizedMembers.filter((m) => selectedIds.has(m.id));
-        if (onSave) {
-            onSave(selectedList);
+    const handleSave = async() => {
+        try {
+
+            let selectedList = Array.from(selectedIds);
+            console.log("selectedIds ", selectedList);
+
+            // let res = await addGroupMembers({id,data : selectedList}).unwrap();
+            // console.log("res ", res);
+        } catch (error) {
+            console.log("error ", error);
         }
-        if (onClose) {
-            onClose();
-        }
+        // if (onSave) {
+        //     onSave(selectedList);
+        // }
+        // if (onClose) {
+        //     onClose();
+        // }
     };
 
     // Helper for selected chips list
-    const selectedMembersList = useMemo(() => {
-        return normalizedMembers.filter((m) => selectedIds.has(m.id));
-    }, [normalizedMembers, selectedIds]);
+    // const selectedMembersList = useMemo(() => {
+    //     return normalizedMembers.filter((m) => selectedIds.has(m.id));
+    // }, [normalizedMembers, selectedIds]);
 
     if (!isOpen) return null;
 
     return (
     <dialog id="add_mem" open={isOpen} className="modal modal-bottom sm:modal-middle bg-black/60 backdrop-blur-xs transition-opacity duration-200">
-        <div className="modal-box w-full max-w-lg p-0 overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl flex flex-col max-h-[90vh]">
+        <main className="modal-box w-full max-w-lg p-0 overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl flex flex-col max-h-[90vh]">
             
             <header className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40">
                 <div className="flex items-center gap-2.5">
@@ -189,7 +183,7 @@ const AddMembersModal = ({
                 </div>
 
                 {/* selected names */}
-                {selectedMembersList.length > 0 && (
+                {/* {selectedMembersList.length > 0 && (
                     <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none">
                         {selectedMembersList.map((m) => (
                             <span
@@ -207,34 +201,26 @@ const AddMembersModal = ({
                             </span>
                         ))}
                     </div>
-                )}
+                )} */}
 
                 {/* Quick selection toolbar */}
                 <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-1">
                     <span>
                         Showing {filteredMembers.length} {filteredMembers.length === 1 ? "contact" : "contacts"}
                     </span>
-                    {availableMembers.length > 0 && (
-                        <button                          
-                            onClick={handleToggleSelectAll}
-                            className="font-medium text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
-                        >
-                            {isAllSelected ? "Deselect All" : "Select All"}
-                        </button>
-                    )}
                 </div>
             </aside>
 
             {/* Member Checkbox List (Scrollable) */}
-            <div className="flex-1 overflow-y-auto min-h-55 max-h-85 p-2 space-y-1 divide-y divide-slate-100 dark:divide-slate-800/40">
+            <section className="flex-1 overflow-y-auto min-h-55 max-h-85 p-2 space-y-1 divide-y divide-slate-100 dark:divide-slate-800/40">
             {filteredMembers.length > 0 ? (
                 filteredMembers.map((member) => {
-                    const isSelected = selectedIds.has(member.id);
-                    const isAlreadyMember = alreadyMemberIds.includes(member.id);
+                    let isSelected = selectedIds.has(member._id);
+                    let isAlreadyMember = alreadyMemberIds.includes(member._id);
 
                     return (
                         <label
-                            key={member.id}
+                            key={member?._id}
                             className={`flex items-center justify-between p-2.5 rounded-xl cursor-pointer select-none transition-all group ${
                                 isAlreadyMember
                                     ? "opacity-50 cursor-not-allowed bg-slate-50/50 dark:bg-slate-800/30"
@@ -244,12 +230,12 @@ const AddMembersModal = ({
                             }`}
                         >
                            
-                            <div className="flex items-center gap-3 min-w-0">
-                                {/* Avatar or Initial fallback */}
+                            <article className="flex items-center gap-3 min-w-0">
+                                
                                 <div className="relative shrink-0">
                                     {member.avatar ? (
                                         <img
-                                            src={member.avatar}
+                                            src={member?.avatar?.url}
                                             alt={member.name}
                                             className="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700"
                                         />
@@ -276,14 +262,15 @@ const AddMembersModal = ({
                                             : member.username || "Chatify user"}
                                     </p>
                                 </div>
-                            </div>
+                            </article>
 
                             <div className="pl-3 shrink-0">
                                 <input
                                     type="checkbox"
+                                    // checked={isSelected}
                                     checked={isSelected || isAlreadyMember}
                                     disabled={isAlreadyMember}
-                                    onChange={() => toggleMember(member.id)}
+                                    onChange={() => toggleMember(member._id)}
                                     className="checkbox checkbox-primary checkbox-sm rounded-md transition-transform active:scale-90"
                                 />
                             </div>
@@ -291,7 +278,7 @@ const AddMembersModal = ({
                     );
                 })
             ) : (
-                <div className="py-5 text-center border">
+                <div className="py-5 text-center">
                     <Users className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
                     <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
                         No members found
@@ -301,7 +288,7 @@ const AddMembersModal = ({
                     </p>
                 </div>
             )}
-            </div>
+            </section>
 
             {/* Footer Actions */}
             <footer className="flex items-center justify-end gap-2.5 px-5 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 shrink-0">
@@ -321,7 +308,7 @@ const AddMembersModal = ({
                     <span>Save {selectedIds.size > 0 ? `(${selectedIds.size})` : ""}</span>
                 </button>
             </footer>
-        </div>
+        </main>
     </dialog>
     );
 };

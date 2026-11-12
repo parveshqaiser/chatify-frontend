@@ -236,6 +236,14 @@ export const api = createApi({
                 method: "DELETE",
                 url: `/v1/group/${id}`,
             }),
+        }),
+
+        addGroupMembers : builder.mutation({
+            query: ({id,data}) => ({
+                method: "POST",
+                url: `/v1/group/${id}/add-members`,
+                body: data
+            }),
         })
 
     })
@@ -260,7 +268,8 @@ export const {
     useCreateGroupMutation,
     useFetchGroupDetailsQuery,
     useUpdateGroupMutation,
-    useDeleteGroupMutation
+    useDeleteGroupMutation,
+    useAddGroupMembersMutation
 } = api;
 
 
