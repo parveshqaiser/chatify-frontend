@@ -2,7 +2,7 @@ import { CircleX, Crown, HomeIcon, MessageCirclePlus, UserRoundPen } from 'lucid
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SearchIconSVG } from '../utils/svg-icons.jsx';
-import { useDeleteGroupMutation, useFetchGroupDetailsQuery, useGetAllUsersQuery, useGetUserDetailsQuery } from '../redux/api.js';
+import { useDeleteGroupMutation, useFetchAllGroupDetailsQuery, useGetAllUsersQuery, useGetUserDetailsQuery } from '../redux/api.js';
 import { LoadingMessage } from '../components/Spinner.jsx';
 import CreateEditGroupModal from '../components/CreateEditGroupModal.jsx';
 import DeleteGroupModal from '../components/DeleteGroupModal.jsx';
@@ -57,7 +57,7 @@ const MemberStack = ({ members }) => {
 const GroupPage = () => {
     const { data: { data: allUsers } = [], isLoading: isAllUsersLoading } = useGetAllUsersQuery();
     const { data: { data: currentUser } = {} } = useGetUserDetailsQuery();
-    const { data: { data: groupDetails } = [], isLoading: isGroupLoading, refetch } = useFetchGroupDetailsQuery();
+    const { data: { data: groupDetails } = [], isLoading: isGroupLoading, refetch } = useFetchAllGroupDetailsQuery();
 
     const [deleteGroup] = useDeleteGroupMutation();
 

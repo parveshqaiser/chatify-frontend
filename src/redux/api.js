@@ -218,7 +218,7 @@ export const api = createApi({
                 body : data
             })
         }),
-        fetchGroupDetails : builder.query({
+        fetchAllGroupDetails : builder.query({
             query: () => "/v1/group",
             providesTags: ['Group'],
         }),
@@ -266,7 +266,7 @@ export const {
     useAddSocialLinksMutation,
     useRemoveSocialLinksMutation,
     useCreateGroupMutation,
-    useFetchGroupDetailsQuery,
+    useFetchAllGroupDetailsQuery,
     useUpdateGroupMutation,
     useDeleteGroupMutation,
     useAddGroupMembersMutation
