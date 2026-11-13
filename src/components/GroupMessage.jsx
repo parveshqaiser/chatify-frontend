@@ -12,15 +12,16 @@ import { useFetchGroupMessageQuery, useGetUserDetailsQuery } from '../redux/api.
 import { LoadingMessage } from './Spinner.jsx';
 import dayjs from 'dayjs';
 
+
 const GroupMessage = () => {
 
     let {id} = useParams();
     let menuRef = useRef();
 
-    let { data: { data: grpMessage } = [], isLoading: isGroupLoading, refetch } = useFetchGroupMessageQuery(id);
+    let { data: { data: grpMessage } = [], isLoading: isGroupLoading, refetch : refetchGrpMsg } = useFetchGroupMessageQuery(id);
     let { data : {data : currentUser} = {}, isLoading : isCurUserLoading} = useGetUserDetailsQuery();
 
-    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false); // no use as of now
     const [moreInfo, setMoreInfo] = useState(false);  // more info button in header
     const [fileIcons, setFileIcons] = useState(false);  // icons in send message
     const fileInputRef = useRef(null);  // for selecting images/videos
@@ -39,12 +40,12 @@ const GroupMessage = () => {
     // values --> 'addMember' | 'removeMember' | 'groupInfo' | 'clearChat' | 'block' | 'exitGroup'
 
 
-     // close menu/search on Escape
+    // close menu/search on Escape
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === "Escape") {
                 setMoreInfo(false);
-                setSearchOpen(false);
+                // setSearchOpen(false);
                 setFileIcons(false);
             }
         };
@@ -79,26 +80,33 @@ const GroupMessage = () => {
             alt="background"
             className="absolute inset-0 w-full h-full object-cover -z-10"
         />
-        <header className="shrink-0 flex items-center justify-between gap-2 bg-indigo-500 px-2 sm:px-3 py-3">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+        <header className="shrink-0  flex items-center justify-between gap-2 bg-indigo-500 px-2 sm:px-3 py-3">
+            <nav className="flex items-center gap-3 min-w-0 flex-1">
                 <img
                     src={grpMessage?.group?.groupAvatar?.url}
                     alt={"Group Avatar"}
                     className="h-10 w-10 rounded-full object-cover shrink-0"
                 />
                 <div className="min-w-0">
-                    <h2 className="text-sm font-semibold text-white truncate">{grpMessage?.group?.groupName}</h2>
-                    <p className={`text-xs text-yellow-300`}>
-                        {/* group members empty  */}
-                        Created By : {grpMessage?.group?.createdBy?.name} on {dayjs(grpMessage?.group?.createdAt).format("DD MMM YYYY")} 
-                    </p>
+                    <h2 className="text-[15px] font-semibold  truncate inline">
+                        {grpMessage?.group?.groupName}
+                    </h2>
+                    <h4 className={`text-xs text-yellow-300 inline`}>
+                        &nbsp; {grpMessage?.group?.description}
+                    </h4>
+                    <h4 className="text-xs">
+                        {grpMessage?.group?.members?.length} members :: {
+                            grpMessage?.group?.members
+                                ?.map(mem => mem?.userId?.name)
+                                .filter(Boolean)
+                                .join(", ")
+                        }
+                    </h4>
                 </div>
-            </div>
+            </nav>
 
-            <div className="flex items-center gap-1 shrink-0">
-
-                {!searchOpen && <div className="relative shrink-0" ref={menuRef}>
-
+            <nav className="flex items-center gap-1 shrink-0">
+                <div className="relative shrink-0" ref={menuRef}>
                     <button className='rounded-full p-2'>
                         <Link to={"/group"}>
                             <HomeIcon size={20}  className={"text-gray-300"}/>
@@ -133,8 +141,8 @@ const GroupMessage = () => {
                         </li>
                     </ul>
                     )}
-                </div>}
-            </div>
+                </div>
+            </nav>
         </header>
 
         <section className='flex-1 min-h-0 overflow-y-auto p-2 space-y-1'>
@@ -293,7 +301,15 @@ const GroupMessage = () => {
     </main>
 
     <GroupViewModal isOpen={activeModal === 'groupInfo'}  onClose={closeModal}/>
-    <AddMembersModal id={id} isOpen={activeModal === 'addMember'}  onClose={closeModal} />
+
+    <AddMembersModal
+        groupMembers={grpMessage?.group?.members}
+        id={id} 
+        isOpen={activeModal === 'addMember'}  
+        onClose={closeModal}
+        refetchGrpMsg={refetchGrpMsg} 
+    />
+
     <ExitGroupModal  isOpen={activeModal === 'exitGroup'}  onClose={closeModal}/>
 
     </>
