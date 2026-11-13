@@ -57,7 +57,7 @@ const GroupMessage = () => {
 
     let handleFileChange = ()=>{}
 
-    if(isGroupLoading){
+    if(isGroupLoading || isCurUserLoading){
         return <LoadingMessage />
     }
 
@@ -80,21 +80,21 @@ const GroupMessage = () => {
             alt="background"
             className="absolute inset-0 w-full h-full object-cover -z-10"
         />
-        <header className="shrink-0  flex items-center justify-between gap-2 bg-indigo-500 px-2 sm:px-3 py-3">
+       <header className="shrink-0 flex items-center justify-between gap-2 bg-emerald-700 text-white px-3 sm:px-4 py-3 shadow-sm border-b border-emerald-800">
             <nav className="flex items-center gap-3 min-w-0 flex-1">
                 <img
                     src={grpMessage?.group?.groupAvatar?.url}
                     alt={"Group Avatar"}
-                    className="h-10 w-10 rounded-full object-cover shrink-0"
+                    className="h-10 w-10 rounded-full object-cover shrink-0 ring-2 ring-emerald-300/40 hover:scale-105 transition-transform duration-200"
                 />
                 <div className="min-w-0">
-                    <h2 className="text-[15px] font-semibold  truncate inline">
+                    <h2 className="text-[15px] font-semibold text-white truncate inline">
                         {grpMessage?.group?.groupName}
                     </h2>
-                    <h4 className={`text-xs text-yellow-300 inline`}>
+                    <h4 className="text-xs font-medium text-emerald-200 inline">
                         &nbsp; {grpMessage?.group?.description}
                     </h4>
-                    <h4 className="text-xs">
+                    <h4 className="text-xs text-emerald-100/75 truncate">
                         {grpMessage?.group?.members?.length} members :: {
                             grpMessage?.group?.members
                                 ?.map(mem => mem?.userId?.name)
@@ -300,17 +300,17 @@ const GroupMessage = () => {
         </footer>
     </main>
 
-    <GroupViewModal isOpen={activeModal === 'groupInfo'}  onClose={closeModal}/>
+        <GroupViewModal grpMessage={grpMessage} currentUser={currentUser}  isOpen={activeModal === 'groupInfo'}  onClose={closeModal}/>
 
-    <AddMembersModal
-        groupMembers={grpMessage?.group?.members}
-        id={id} 
-        isOpen={activeModal === 'addMember'}  
-        onClose={closeModal}
-        refetchGrpMsg={refetchGrpMsg} 
-    />
+        <AddMembersModal
+            groupMembers={grpMessage?.group?.members}
+            id={id} 
+            isOpen={activeModal === 'addMember'}  
+            onClose={closeModal}
+            refetchGrpMsg={refetchGrpMsg} 
+        />
 
-    <ExitGroupModal  isOpen={activeModal === 'exitGroup'}  onClose={closeModal}/>
+        <ExitGroupModal  isOpen={activeModal === 'exitGroup'}  onClose={closeModal}/>
 
     </>
     )

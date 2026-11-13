@@ -31,9 +31,16 @@ pending :
 
     
     group msg
+        create group page                                          
+      
+        chat group page  or  group message page (using params)    (chat header ui modify pending)
+        show group info model UI
+        add members mmodal UI
+        clear chat modal                                        pending
+        exit group modal                                        done ,(int pending)
+        permissions modal                                       pending
 
-    create group page                                           going on
-    chat group page     
+        remove member                                           pending
 
 check notes :
     online users,
