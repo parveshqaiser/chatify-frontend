@@ -1,33 +1,24 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Search, X, Check, UserPlus, Users } from "lucide-react";
 import { useAddGroupMembersMutation, useGetAllUsersQuery } from "../redux/api";
-
-const DEFAULT_MEMBERS = [
-    { id: "6a95c2d1836b6ae17581fa64", name: "Ajay", username: "@ajay", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop" },
-    { id: "6a9986ab66566f380babde81", name: "Sharma", username: "@sharma", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&h=100&fit=crop" },
-    { id: "6a9986ab66566f380babde82", name: "Neil", username: "@neil", avatar: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop" },
-    { id: "6a9986ab66566f380babde83", name: "Mukesh", username: "@mukesh", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop" },
-    { id: "6a9986ab66566f380babde84", name: "Suresh", username: "@suresh", avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100&h=100&fit=crop" },
-    { id: "6a9986ab66566f380babde85", name: "Priya", username: "@priya", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" },
-    { id: "6a9986ab66566f380babde80", name: "Ajay Kumar", username: "@ajay_k", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" },
-];
+import { LoadingMessage } from "./Spinner";
+import toast from "react-hot-toast";
 
 const AddMembersModal = ({
+    groupMembers,
     id,
     isOpen = false,
     onClose,
-    onSave,
-    members = DEFAULT_MEMBERS,
     alreadyMemberIds = [],
     title = "Add Members",
+    refetchGrpMsg
 }) => {
 
-    let {data: { data: allUsers } = [], isLoading: isAllUsersLoading } = useGetAllUsersQuery();
+    let {data: { data: allUsers } = [], isLoading: loading } = useGetAllUsersQuery();
     let [addGroupMembers] = useAddGroupMembersMutation();
 
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedIds, setSelectedIds] = useState(new Set());
-
 
     // Reset state on open/close
     useEffect(() => {
@@ -48,16 +39,22 @@ const AddMembersModal = ({
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [isOpen, onClose]);
 
-    // Filtered member list based on search query
+    let memberIds = new Set(groupMembers.map(mem => mem.userId?._id));
+
     let filteredMembers = useMemo(() => {
         let query = searchQuery.trim().toLowerCase();
-        if (!query) return allUsers;
+        if (!query) return allUsers.filter(user => !memberIds.has(user._id));
         return allUsers.filter(
             (m) =>
                 m.name?.toLowerCase().includes(query) ||
                 m.username?.toLowerCase().includes(query)
         );
     }, [allUsers, searchQuery]);
+
+    if (loading) {
+        return <LoadingMessage />;
+    }
+    
 
     // Toggle individual member selection
     let toggleMember = (id) => {
@@ -74,55 +71,23 @@ const AddMembersModal = ({
         });
     };
 
-    // Toggle select all / deselect all
-    const availableMembers = useMemo(() => filteredMembers.filter((m) => !alreadyMemberIds.includes(m.id)),
-        [filteredMembers, alreadyMemberIds]
-    );
 
-    const isAllSelected =
-        availableMembers.length > 0 &&
-        availableMembers.every((m) => selectedIds.has(m.id));
-
-    const handleToggleSelectAll = () => {
-        if (isAllSelected) {
-            setSelectedIds((prev) => {
-                const next = new Set(prev);
-                availableMembers.forEach((m) => next.delete(m.id));
-                return next;
-            });
-        } else {
-            setSelectedIds((prev) => {
-                const next = new Set(prev);
-                availableMembers.forEach((m) => next.add(m.id));
-                return next;
-            });
-        }
-    };
-
-    // Save action
-    const handleSave = async() => {
+    const handleAddMembers = async() => {
         try {
 
             let selectedList = Array.from(selectedIds);
-            console.log("selectedIds ", selectedList);
 
-            // let res = await addGroupMembers({id,data : selectedList}).unwrap();
-            // console.log("res ", res);
+            let res = await addGroupMembers({id,data : selectedList}).unwrap();
+            if(res?.success){
+                toast.success(res.message);
+                onClose();
+                refetchGrpMsg();
+            }
         } catch (error) {
             console.log("error ", error);
+            toast.error(error?.data?.message || 'Failed to Add Member in Group');
         }
-        // if (onSave) {
-        //     onSave(selectedList);
-        // }
-        // if (onClose) {
-        //     onClose();
-        // }
     };
-
-    // Helper for selected chips list
-    // const selectedMembersList = useMemo(() => {
-    //     return normalizedMembers.filter((m) => selectedIds.has(m.id));
-    // }, [normalizedMembers, selectedIds]);
 
     if (!isOpen) return null;
 
@@ -182,27 +147,6 @@ const AddMembersModal = ({
                     )}
                 </div>
 
-                {/* selected names */}
-                {/* {selectedMembersList.length > 0 && (
-                    <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none">
-                        {selectedMembersList.map((m) => (
-                            <span
-                                key={m.id}
-                                className="inline-flex items-center gap-1.5 pl-2 pr-1.5 py-1 text-xs font-medium rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0 animate-fadeIn"
-                            >
-                                <span className="truncate max-w-25">{m.name}</span>
-                                <button                                  
-                                    onClick={() => toggleMember(m.id)}
-                                    className="rounded-full hover:bg-indigo-200 dark:hover:bg-indigo-800 p-0.5 text-indigo-600 dark:text-indigo-400 cursor-pointer"
-                                    title={`Remove ${m.name}`}
-                                >
-                                    <X size={12} />
-                                </button>
-                            </span>
-                        ))}
-                    </div>
-                )} */}
-
                 {/* Quick selection toolbar */}
                 <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-1">
                     <span>
@@ -217,7 +161,6 @@ const AddMembersModal = ({
                 filteredMembers.map((member) => {
                     let isSelected = selectedIds.has(member._id);
                     let isAlreadyMember = alreadyMemberIds.includes(member._id);
-
                     return (
                         <label
                             key={member?._id}
@@ -233,17 +176,11 @@ const AddMembersModal = ({
                             <article className="flex items-center gap-3 min-w-0">
                                 
                                 <div className="relative shrink-0">
-                                    {member.avatar ? (
-                                        <img
-                                            src={member?.avatar?.url}
-                                            alt={member.name}
-                                            className="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700"
-                                        />
-                                    ) : (
-                                        <div className="w-10 h-10 rounded-full bg-linear-to-tr from-indigo-500 to-purple-600 text-white font-semibold flex items-center justify-center text-sm shadow-xs">
-                                            {member.name.charAt(0).toUpperCase()}
-                                        </div>
-                                    )}
+                                    <img
+                                        src={member?.avatar?.url}
+                                        alt={member.name}
+                                        className="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700"
+                                    />
                                 </div>
 
                                 <div className="min-w-0">
@@ -257,9 +194,7 @@ const AddMembersModal = ({
                                         {member.name}
                                     </p>
                                     <p className="text-xs text-slate-400 dark:text-slate-500 truncate">
-                                        {isAlreadyMember
-                                            ? "Already in group"
-                                            : member.username || "Chatify user"}
+                                       @{member.username}
                                     </p>
                                 </div>
                             </article>
@@ -267,9 +202,7 @@ const AddMembersModal = ({
                             <div className="pl-3 shrink-0">
                                 <input
                                     type="checkbox"
-                                    // checked={isSelected}
-                                    checked={isSelected || isAlreadyMember}
-                                    disabled={isAlreadyMember}
+                                    checked={isSelected}                        
                                     onChange={() => toggleMember(member._id)}
                                     className="checkbox checkbox-primary checkbox-sm rounded-md transition-transform active:scale-90"
                                 />
@@ -300,7 +233,7 @@ const AddMembersModal = ({
                 </button>
 
                 <button
-                    onClick={handleSave}
+                    onClick={handleAddMembers}
                     disabled={selectedIds.size === 0}
                     className="btn btn-primary btn-sm px-5 rounded-xl text-white shadow-sm disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
                 >

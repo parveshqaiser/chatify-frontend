@@ -117,3 +117,14 @@ export const GROUPS = [
         creator : false,
 }];
 
+// members in add memebrs modal
+
+const DEFAULT_MEMBERS = [
+    { id: "6a95c2d1836b6ae17581fa64", name: "Ajay", username: "@ajay", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop" },
+    { id: "6a9986ab66566f380babde81", name: "Sharma", username: "@sharma", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&h=100&fit=crop" },
+    { id: "6a9986ab66566f380babde82", name: "Neil", username: "@neil", avatar: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop" },
+    { id: "6a9986ab66566f380babde83", name: "Mukesh", username: "@mukesh", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop" },
+    { id: "6a9986ab66566f380babde84", name: "Suresh", username: "@suresh", avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100&h=100&fit=crop" },
+    { id: "6a9986ab66566f380babde85", name: "Priya", username: "@priya", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" },
+    { id: "6a9986ab66566f380babde80", name: "Ajay Kumar", username: "@ajay_k", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" },
+];
