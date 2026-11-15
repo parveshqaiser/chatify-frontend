@@ -41,6 +41,7 @@ pending :
         permissions modal                                       pending
 
         remove member                                           pending
+        add past members section in group info                  pending
 
 check notes :
     online users,
