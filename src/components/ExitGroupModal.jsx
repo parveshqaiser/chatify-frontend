@@ -1,8 +1,8 @@
 
 import React, { useRef } from 'react'
 
-const ExitGroupModal = ({ isOpen, onClose, onConfirm }) => {
-   
+const ExitGroupModal = ({groupInfo, isOpen, onClose, onSuccess }) => {
+
     return (
     <dialog
         open={isOpen}
@@ -11,7 +11,7 @@ const ExitGroupModal = ({ isOpen, onClose, onConfirm }) => {
     >
         <main className="modal-box max-w-md">
             <header className="text-lg font-semibold mb-2">
-                Leave "Meme Factory" ?
+                Leave "{groupInfo?.groupName}" ?
             </header>
 
             <p className="text-sm text-white mb-6">
@@ -26,7 +26,7 @@ const ExitGroupModal = ({ isOpen, onClose, onConfirm }) => {
                     Cancel
                 </button>
                 <button
-                    onClick={onConfirm}
+                    onClick={()=>onSuccess(groupInfo?._id)}
                     className="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700 cursor-pointer"
                 >
                     Leave

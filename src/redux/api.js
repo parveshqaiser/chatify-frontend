@@ -251,6 +251,13 @@ export const api = createApi({
             providesTags: ['Group'],
         }),
 
+        exitGroup : builder.mutation({
+            query: (id) => ({
+                method: "DELETE",
+                url: `/v1/group/${id}/exit`,
+            }),
+        })
+
     })
 });
 
@@ -275,7 +282,8 @@ export const {
     useUpdateGroupMutation,
     useDeleteGroupMutation,
     useAddGroupMembersMutation,
-    useFetchGroupMessageQuery
+    useFetchGroupMessageQuery,
+    useExitGroupMutation
 } = api;
 
 
