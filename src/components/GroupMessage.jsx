@@ -1,16 +1,17 @@
 
 import { FileText, HomeIcon, Images, Info, Paperclip, Send, Smile } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import EmojiPicker from 'emoji-picker-react';
 import bgImage from "../assets/grp-chat-bg.jpg";
 import AddMembersModal from './AddMembersModal.jsx';
 import GroupViewModal from './GroupViewModal.jsx';
 import ExitGroupModal from './ExitGroupModal.jsx';
 import { Link } from 'react-router-dom';
-import { useFetchGroupMessageQuery, useGetUserDetailsQuery } from '../redux/api.js';
+import { useExitGroupMutation, useFetchAllGroupDetailsQuery, useFetchGroupMessageQuery, useGetUserDetailsQuery } from '../redux/api.js';
 import { LoadingMessage } from './Spinner.jsx';
 import dayjs from 'dayjs';
+import toast from 'react-hot-toast';
 
 
 const GroupMessage = () => {
@@ -18,8 +19,12 @@ const GroupMessage = () => {
     let {id} = useParams();
     let menuRef = useRef();
 
+    let navigate = useNavigate();
+
     let { data: { data: grpMessage } = [], isLoading: isGroupLoading, refetch : refetchGrpMsg } = useFetchGroupMessageQuery(id);
     let { data : {data : currentUser} = {}, isLoading : isCurUserLoading} = useGetUserDetailsQuery();
+    const [exitGroup, { isLoading: isExitSubmitting }] = useExitGroupMutation();
+     const { data: { data: groupDetails } = [], refetch : refetchGroupDeatils } = useFetchAllGroupDetailsQuery();
 
     const [searchOpen, setSearchOpen] = useState(false); // no use as of now
     const [moreInfo, setMoreInfo] = useState(false);  // more info button in header
@@ -71,6 +76,24 @@ const GroupMessage = () => {
         groups[date].push(message);
         return groups;
     }, {});
+
+    const handleLeaveGroup = async(id)=>{
+      try {
+            let res = await exitGroup(id).unwrap();
+            console.log("id", id);
+            if (res?.success) {
+                toast.success(res.message);
+                closeModal();
+                refetchGroupDeatils();
+                setTimeout(()=>{
+                    navigate("/group");
+                },1200);               
+            }
+        } catch (error) {
+            console.error("error ", error);
+            toast.error(error?.message || "Some Error in Exiting Group");
+        }
+    }
     
     return (
     <>
@@ -300,7 +323,12 @@ const GroupMessage = () => {
         </footer>
     </main>
 
-        <GroupViewModal grpMessage={grpMessage} currentUser={currentUser}  isOpen={activeModal === 'groupInfo'}  onClose={closeModal}/>
+        <GroupViewModal 
+            grpMessage={grpMessage} 
+            currentUser={currentUser}  
+            isOpen={activeModal === 'groupInfo'}  
+            onClose={closeModal}
+        />
 
         <AddMembersModal
             groupMembers={grpMessage?.group?.members}
@@ -310,7 +338,12 @@ const GroupMessage = () => {
             refetchGrpMsg={refetchGrpMsg} 
         />
 
-        <ExitGroupModal  isOpen={activeModal === 'exitGroup'}  onClose={closeModal}/>
+        <ExitGroupModal  
+            groupInfo={grpMessage?.group} 
+            isOpen={activeModal === 'exitGroup'}  
+            onClose={closeModal}
+            onSuccess = {handleLeaveGroup}
+        />
 
     </>
     )
