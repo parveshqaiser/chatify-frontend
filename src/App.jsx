@@ -15,6 +15,7 @@ import appStore from './redux/store.js';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import GroupPage from './pages/GroupPage.jsx';
 import GroupMessage from './components/GroupMessage.jsx';
+import Selectropdown from './test/Selectropdown.jsx';
 
 function App() {
 	
@@ -28,7 +29,7 @@ function App() {
 				<Route index path='/login' element={<LoginPage />}></Route>
 				<Route path='/signup' element={<RegistrationPage />}></Route>
 				<Route path='/register/success' element={<EmailVerificatipnPage />}></Route>
-				{/* <Route path="/test" element={ <GroupListPage />} /> */}
+				<Route path="/test" element={ <Selectropdown />} />
 
 				<Route element={<ProtectedRoute />}>
                     <Route path="/home" element={<HomePage />} />

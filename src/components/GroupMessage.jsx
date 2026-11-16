@@ -12,6 +12,7 @@ import { useExitGroupMutation, useFetchAllGroupDetailsQuery, useFetchGroupMessag
 import { LoadingMessage } from './Spinner.jsx';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
+import GroupPermission from './GroupPermission.jsx';
 
 
 const GroupMessage = () => {
@@ -80,7 +81,6 @@ const GroupMessage = () => {
     const handleLeaveGroup = async(id)=>{
       try {
             let res = await exitGroup(id).unwrap();
-            console.log("id", id);
             if (res?.success) {
                 toast.success(res.message);
                 closeModal();
@@ -343,6 +343,13 @@ const GroupMessage = () => {
             isOpen={activeModal === 'exitGroup'}  
             onClose={closeModal}
             onSuccess = {handleLeaveGroup}
+        />
+
+        <GroupPermission   
+            groupInfo={grpMessage?.group} 
+            currentUser={currentUser}  
+            isOpen={activeModal === 'permission'} 
+            onClose={closeModal}
         />
 
     </>
