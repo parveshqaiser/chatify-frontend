@@ -24,8 +24,8 @@ const GroupMessage = () => {
 
     let { data: { data: grpMessage } = [], isLoading: isGroupLoading, refetch : refetchGrpMsg } = useFetchGroupMessageQuery(id);
     let { data : {data : currentUser} = {}, isLoading : isCurUserLoading} = useGetUserDetailsQuery();
-    const [exitGroup, { isLoading: isExitSubmitting }] = useExitGroupMutation();
-     const { data: { data: groupDetails } = [], refetch : refetchGroupDeatils } = useFetchAllGroupDetailsQuery();
+    let [exitGroup, { isLoading: isExitSubmitting }] = useExitGroupMutation();
+    let { data: { data: groupDetails } = [], refetch : refetchGroupDeatils } = useFetchAllGroupDetailsQuery();
 
     const [searchOpen, setSearchOpen] = useState(false); // no use as of now
     const [moreInfo, setMoreInfo] = useState(false);  // more info button in header
@@ -350,6 +350,7 @@ const GroupMessage = () => {
             currentUser={currentUser}  
             isOpen={activeModal === 'permission'} 
             onClose={closeModal}
+            refetchGrpMsg ={refetchGrpMsg}
         />
 
     </>
