@@ -1,12 +1,18 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { X, ShieldCheck,Search, Users, AlertCircle, CircleX } from "lucide-react";
+import { X, ShieldCheck,Search, Users, CircleX } from "lucide-react";
+import toast from "react-hot-toast";
+import { useRolePermissionMutation } from "../redux/api";
 
 const GroupPermission = ({
     groupInfo,
     currentUser,
     isOpen = false,
     onClose,
+    refetchGrpMsg
 }) => {
+
+    let [rolePermission] = useRolePermissionMutation();
+
     const [searchQuery, setSearchQuery] = useState(""); // not using this now
     const [members,setMembers] = useState(groupInfo?.members || []);
 
@@ -16,7 +22,6 @@ const GroupPermission = ({
     useEffect(() => {
         if (isOpen) setSearchQuery("");
     }, [isOpen]);
-
 
     let originalRolesMap = useMemo(() => {
         const map = {};
@@ -54,9 +59,20 @@ const GroupPermission = ({
 
     let handleRoleChanges = async()=>{
         try {
-            console.log("submit ", changedRoles);
+            if(Object.keys(changedRoles).length ==0){
+                return toast.error("Please Select Members");
+            }
+
+            let id = groupInfo?._id;
+            let res = await rolePermission({id, data :changedRoles}).unwrap();
+
+            if(res.success){
+                toast.success(res.message);
+                onClose();
+                refetchGrpMsg();
+            }
         } catch (error) {
-            console.log(error);
+            toast.error(error?.data?.message || "Some issue is giving permission");
         }
     }
 

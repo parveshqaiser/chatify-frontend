@@ -256,6 +256,14 @@ export const api = createApi({
                 method: "DELETE",
                 url: `/v1/group/${id}/exit`,
             }),
+        }),
+
+        rolePermission : builder.mutation({
+            query: ({id, data}) => ({
+                method: "PATCH",
+                url: `/v1/group/${id}/permission`,
+                body : data
+            }),
         })
 
     })
@@ -283,7 +291,8 @@ export const {
     useDeleteGroupMutation,
     useAddGroupMembersMutation,
     useFetchGroupMessageQuery,
-    useExitGroupMutation
+    useExitGroupMutation,
+    useRolePermissionMutation
 } = api;
 
 
