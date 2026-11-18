@@ -151,9 +151,6 @@ const GroupMessage = () => {
                         <button onClick={() => setActiveModal('addMember')} className="text-[12px]">Add</button>
                         </li>
                         <li>
-                        <button onClick={() => setActiveModal('removeMember')} className="text-[12px]">Remove</button>
-                        </li>
-                        <li>
                         <button onClick={() => setActiveModal('clearChat')} className="text-[12px]">Clear Chat</button>
                         </li>                       
                         <li>
