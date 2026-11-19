@@ -1,17 +1,18 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { X, ShieldCheck,Search, Users, CircleX } from "lucide-react";
 import toast from "react-hot-toast";
-import { useRolePermissionMutation } from "../redux/api";
+import { useRemoveMemberMutation, useRolePermissionMutation } from "../redux/api";
 
 const GroupPermission = ({
     groupInfo,
     currentUser,
     isOpen = false,
     onClose,
-    refetchGrpMsg
+    refetchGroupDeatils
 }) => {
 
     let [rolePermission] = useRolePermissionMutation();
+    let [removeMember]  = useRemoveMemberMutation();
 
     const [searchQuery, setSearchQuery] = useState(""); // not using this now
     const [members,setMembers] = useState(groupInfo?.members || []);
@@ -69,15 +70,25 @@ const GroupPermission = ({
             if(res.success){
                 toast.success(res.message);
                 onClose();
-                refetchGrpMsg();
+                refetchGroupDeatils();
             }
         } catch (error) {
             toast.error(error?.data?.message || "Some issue is giving permission");
         }
     }
 
-    let handleMemberRemove = (id) => {
-        console.log("*** del id ", id);
+    let handleMemberRemove = async(id) => {
+        try {
+            let groupId = groupInfo?._id;
+            let res = await removeMember({groupId,id}).unwrap();
+            if(res.success){
+                toast.success(res.message);
+                onClose();
+                refetchGroupDeatils();
+            }
+        } catch (error) {
+            toast.error(error?.data?.message || "Some issue is giving permission");
+        }
     };
 
     if (!isOpen) return null;

@@ -11,7 +11,7 @@ const AddMembersModal = ({
     isOpen = false,
     onClose,
     title = "Add Members",
-    refetchGrpMsg
+    refetchGroupDeatils
 }) => {
    
     const { data: usersResponse, isLoading: loading } = useGetAllUsersQuery();
@@ -82,7 +82,7 @@ const AddMembersModal = ({
             if (res?.success) {
                 toast.success(res.message);
                 onClose?.();
-                refetchGrpMsg?.();
+                refetchGroupDeatils?.();
             }
         } catch (error) {
             console.error("error ", error);

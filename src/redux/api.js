@@ -182,7 +182,7 @@ export const api = createApi({
             query: (targetUserId) => `/v1/chat/${targetUserId}`,
         }),
 
-        // v2 chat messages
+        // chat v2
         uploadPresignedUrl : builder.mutation({
             query : (data)=>({
                 method : "POST",
@@ -244,6 +244,7 @@ export const api = createApi({
                 url: `/v1/group/${id}/add-members`,
                 body: data
             }),
+            providesTags : ['Group']
         }),
 
         fetchGroupMessage : builder.query({
@@ -263,6 +264,14 @@ export const api = createApi({
                 method: "PATCH",
                 url: `/v1/group/${id}/permission`,
                 body : data
+            }),
+        }),
+
+        removeMember : builder.mutation({
+            query: ({groupId,id}) => ({
+                method: "DELETE",
+                url: `/v1/group/${groupId}/remove-members`,
+                body : {userId:id}
             }),
         })
 
@@ -292,7 +301,8 @@ export const {
     useAddGroupMembersMutation,
     useFetchGroupMessageQuery,
     useExitGroupMutation,
-    useRolePermissionMutation
+    useRolePermissionMutation,
+    useRemoveMemberMutation
 } = api;
 
 
