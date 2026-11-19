@@ -22,7 +22,7 @@ const GroupMessage = () => {
 
     let navigate = useNavigate();
 
-    let { data: { data: grpMessage } = [], isLoading: isGroupLoading, refetch : refetchGrpMsg } = useFetchGroupMessageQuery(id);
+    let { data: { data: grpMessage } = [], isLoading: isGroupLoading, error: groupMessageError, refetch : refetchGrpMsg } = useFetchGroupMessageQuery(id);
     let { data : {data : currentUser} = {}, isLoading : isCurUserLoading} = useGetUserDetailsQuery();
     let [exitGroup, { isLoading: isExitSubmitting }] = useExitGroupMutation();
     let { data: { data: groupDetails } = [], refetch : refetchGroupDeatils } = useFetchAllGroupDetailsQuery();
@@ -34,6 +34,8 @@ const GroupMessage = () => {
     const documentRef = useRef(null); // for selecting pdf/word
     const [fileLoading, setFileLoading] = useState(false);
     const [message, setMessage] = useState("");
+
+    console.log("groupMessageError ",groupMessageError)
     
     // for file upload
     const [selectedFile, setSelectedFile] = useState(null);
@@ -65,6 +67,10 @@ const GroupMessage = () => {
 
     if(isGroupLoading || isCurUserLoading){
         return <LoadingMessage />
+    }
+
+    if(groupMessageError){
+        return (<blockquote className='text-center my-10 text-red-500 text-lg'>{groupMessageError?.data?.message}</blockquote>)
     }
 
     let groupedMessages = grpMessage?.allMessages.reduce((groups, message) => {
@@ -332,7 +338,7 @@ const GroupMessage = () => {
             id={id} 
             isOpen={activeModal === 'addMember'}  
             onClose={closeModal}
-            refetchGrpMsg={refetchGrpMsg} 
+            refetchGroupDeatils={refetchGrpMsg} 
         />
 
         <ExitGroupModal  
@@ -347,7 +353,7 @@ const GroupMessage = () => {
             currentUser={currentUser}  
             isOpen={activeModal === 'permission'} 
             onClose={closeModal}
-            refetchGrpMsg ={refetchGrpMsg}
+            refetchGroupDeatils ={refetchGrpMsg}
         />
 
     </>

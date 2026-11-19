@@ -115,6 +115,10 @@ const CreateEditGroupModal = ({
                 return toast.error('Group Name Required');
             }
 
+            if (description && description.length >71) {
+                return toast.error('Max char of description (70)');
+            }
+
             let { _id } = currentUser || {};
 
             // let selectedMembers  =  [{_id}, ...selectedUsers.map(val => val._id)];
@@ -151,6 +155,10 @@ const CreateEditGroupModal = ({
         try {
             if (!groupName || groupName.trim() === '') {
                 return toast.error('Group Name Required');
+            }
+
+            if (description && description.length >71) {
+                return toast.error('Max char of description (70)');
             }
 
             const updateFormData = new FormData();
