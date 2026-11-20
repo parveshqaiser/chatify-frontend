@@ -38,9 +38,9 @@ pending :
         add members mmodal UI
         clear chat modal                                        pending
         exit group modal                                        done ,(int pending)
-        permissions modal                                       pending
+        permissions modal                                       done
 
-        remove member                                           pending
+        remove member                                           done
         add past members section in group info                  pending
 
 check notes :
