@@ -35,8 +35,6 @@ const GroupMessage = () => {
     const [fileLoading, setFileLoading] = useState(false);
     const [message, setMessage] = useState("");
 
-    console.log("groupMessageError ",groupMessageError)
-    
     // for file upload
     const [selectedFile, setSelectedFile] = useState(null);
     const [filePreview, setFilePreview] = useState(null);
