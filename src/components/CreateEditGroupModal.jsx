@@ -116,7 +116,7 @@ const CreateEditGroupModal = ({
             }
 
             if (description && description.length >71) {
-                return toast.error('Max char of description (70)');
+                return toast.error('Max 70 chars allowed description');
             }
 
             let { _id } = currentUser || {};
@@ -158,7 +158,7 @@ const CreateEditGroupModal = ({
             }
 
             if (description && description.length >71) {
-                return toast.error('Max char of description (70)');
+                return toast.error('Max 70 chars allowed description');
             }
 
             const updateFormData = new FormData();
