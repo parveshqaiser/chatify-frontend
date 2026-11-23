@@ -273,7 +273,14 @@ export const api = createApi({
                 url: `/v1/group/${groupId}/remove-members`,
                 body : {userId:id}
             }),
-        })
+        }),
+
+        clearUserConversation : builder.mutation({
+            query : (id)=>({
+                method: "DELETE",
+                url: `/v1/group/${id}/delete-msg`,
+            })
+        }) 
 
     })
 });
@@ -302,7 +309,8 @@ export const {
     useFetchGroupMessageQuery,
     useExitGroupMutation,
     useRolePermissionMutation,
-    useRemoveMemberMutation
+    useRemoveMemberMutation,
+    useClearUserConversationMutation
 } = api;
 
 

@@ -8,11 +8,12 @@ import AddMembersModal from './AddMembersModal.jsx';
 import GroupViewModal from './GroupViewModal.jsx';
 import ExitGroupModal from './ExitGroupModal.jsx';
 import { Link } from 'react-router-dom';
-import { useExitGroupMutation, useFetchAllGroupDetailsQuery, useFetchGroupMessageQuery, useGetUserDetailsQuery } from '../redux/api.js';
+import { useClearUserConversationMutation, useExitGroupMutation, useFetchAllGroupDetailsQuery, useFetchGroupMessageQuery, useGetUserDetailsQuery } from '../redux/api.js';
 import { LoadingMessage } from './Spinner.jsx';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import GroupPermission from './GroupPermission.jsx';
+import ClearUserChatModal from './ClearUserChatModal.jsx';
 
 
 const GroupMessage = () => {
@@ -26,6 +27,7 @@ const GroupMessage = () => {
     let { data : {data : currentUser} = {}, isLoading : isCurUserLoading} = useGetUserDetailsQuery();
     let [exitGroup, { isLoading: isExitSubmitting }] = useExitGroupMutation();
     let { data: { data: groupDetails } = [], refetch : refetchGroupDeatils } = useFetchAllGroupDetailsQuery();
+    let [clearMessages] = useClearUserConversationMutation();
 
     const [searchOpen, setSearchOpen] = useState(false); // no use as of now
     const [moreInfo, setMoreInfo] = useState(false);  // more info button in header
@@ -98,7 +100,21 @@ const GroupMessage = () => {
             toast.error(error?.message || "Some Error in Exiting Group");
         }
     }
-    
+
+    const handleCLearUserMessages = async()=>{
+        try {
+            let res = await clearMessages(id).unwrap();
+            if(res.success){
+                toast.success(res.message);
+                closeModal();
+                refetchGroupDeatils();
+            }
+        } catch (error) {
+            console.error("error ", error);
+            toast.error(error?.message || "Some Error in Clearing Messages");
+        }
+    }
+
     return (
     <>
     <main className="max-w-4xl w-full mx-auto h-[calc(100dvh-1rem)] flex flex-col backdrop-blur-sm my-2">
@@ -352,6 +368,12 @@ const GroupMessage = () => {
             isOpen={activeModal === 'permission'} 
             onClose={closeModal}
             refetchGroupDeatils ={refetchGrpMsg}
+        />
+
+        <ClearUserChatModal 
+            isOpen={activeModal === 'clearChat'}
+            onClose={closeModal} 
+            onSuccess={handleCLearUserMessages}
         />
 
     </>
